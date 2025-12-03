@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1089136652537",
+    "project_id": "second-story-33031",
+    "storage_bucket": "second-story-33031.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089136652537:android:259d84210c9518f49bb228",
+        "android_client_info": {
+          "package_name": "com.example.secondstoryproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnkWq80O8SLrkAL8l4AQSLM1_mGp-POKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
