@@ -42,6 +42,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return insets;
         });
 
+        TextView textToRegister = findViewById(R.id.tv_login_to_register);
+        textToRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        TextView textToForgotPw = findViewById(R.id.tv_login_to_resetpw);
+        textToForgotPw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, forgotPwActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
         // get the views
         etUName = findViewById(R.id.usernameInput);
         etPassword = findViewById(R.id.passwordInput);

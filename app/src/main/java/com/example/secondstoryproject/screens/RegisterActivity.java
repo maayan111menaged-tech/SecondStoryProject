@@ -60,6 +60,15 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             return insets;
         });
 
+        TextView textToLogin = findViewById(R.id.tv_register_to_login);
+        textToLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
 
         /// get the views
@@ -68,25 +77,25 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         etLName = findViewById(R.id.lastnameInput);
         etEmail = findViewById(R.id.emailInput);
         etPhoneNumber = findViewById(R.id.phonenumberInput);
-        etDate = findViewById(R.id.dateInput);
         etPassword = findViewById(R.id.passwordInput);
         btnRegister = findViewById(R.id.btn_register_toHome);
+        etDate = findViewById(R.id.dateInput);
 
         etDate.setFocusable(false);
         etDate.setClickable(true);
         etDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // צור את ה-DatePicker
+                /// צור את ה-DatePicker
                 MaterialDatePicker.Builder<Long> datePickerBuilder = MaterialDatePicker.Builder.datePicker();
                 datePickerBuilder.setTitleText("בחר תאריך");
 
-                // הגבלת תאריכים לעבר
+                /// הגבלת תאריכים לעבר
                 CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
                 constraintsBuilder.setEnd(MaterialDatePicker.todayInUtcMilliseconds()); // עד היום
                 datePickerBuilder.setCalendarConstraints(constraintsBuilder.build());
 
-                // אם יש כבר תאריך בשדה, הגדר אותו בתור תאריך התחלתי
+                /// אם יש כבר תאריך בשדה, הגדר אותו בתור תאריך התחלתי
                 String existingDate = etDate.getText().toString();
                 if (!existingDate.isEmpty()) {
                     try {
@@ -182,14 +191,18 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     /// @return true if the input is valid, false otherwise
     /// @see Validator
     private boolean checkInput(String uName, String fName, String lName, String email, String phone,String date, String password) {
+        Log.d(TAG, "entered checkInput function");
 
-        if (!Validator.isUNameValid(uName)) {
+            if (!Validator.isUNameValid(uName)) {
             Log.e(TAG, "checkInput: User name can include letters, numbers, dot and underscore");
             /// show error message to user
             etUName.setError("User name can include letters, numbers, dot and underscore");
             /// set focus to user name field
             etEmail.requestFocus();
             return false;
+        }
+        else{
+            Log.d(TAG, "isUNameValid true");
         }
 
         if (!Validator.isNameValid(fName)) {
@@ -200,6 +213,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             etFName.requestFocus();
             return false;
         }
+        else{
+            Log.d(TAG, "isfNameValid true");
+        }
 
         if (!Validator.isNameValid(lName)) {
             Log.e(TAG, "checkInput: Last name must be at least 3 characters long");
@@ -209,6 +225,10 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             etLName.requestFocus();
             return false;
         }
+        else{
+            Log.d(TAG, "islNameValid true");
+        }
+
 
         if (!Validator.isEmailValid(email)) {
             Log.e(TAG, "checkInput: Invalid email address");
@@ -218,11 +238,18 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             etEmail.requestFocus();
             return false;
         }
+        else{
+            Log.d(TAG, "isEmailValid true");
+        }
+
         if (date == null || date.trim().isEmpty()) {
             Log.e(TAG, "checkInput: Date cannot be empty");
             etDate.setError("Please select a date");
             etDate.requestFocus();
             return false;
+        }
+        else{
+            Log.d(TAG, "dateCheck true");
         }
 
         if (!Validator.isPhoneValid(phone)) {
@@ -233,6 +260,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             etPhoneNumber.requestFocus();
             return false;
         }
+        else{
+            Log.d(TAG, "isPhoneValid true");
+        }
 
         if (!Validator.isPasswordValid(password)) {
             Log.e(TAG, "checkInput: Password must be at least 6 characters long");
@@ -241,6 +271,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             /// set focus to password field
             etPassword.requestFocus();
             return false;
+        }
+        else{
+            Log.d(TAG, "idPasswordValid true");
         }
 
         Log.d(TAG, "checkInput: Input is valid");
@@ -252,14 +285,19 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         Log.d(TAG, "registerUser: Registering user...");
 
         String uid = databaseService.generateUserId();
+        Log.d("TEST", "Generated UID = " + uid);
 
         /// create a new user object
+        Log.d(TAG, "creating user");
         User user = new User( uid, username, password, fName, lName, email,
                 phoneNumber,dateOfBirth,0, "default",
-                false);
+                isAdmin);
+        Log.d(TAG, "user created but no in the database yet");
 
+        Log.d(TAG, "Checking if username exists: " + username);
         databaseService.checkIfUserNameExists(username, new DatabaseService.DatabaseCallback<Boolean>() {
             @Override
+
             public void onCompleted(Boolean exists) {
                 Log.d(TAG, "checkIfUserNameExists completed: " + exists);
                 if (exists) {

@@ -27,7 +27,9 @@ public class User {
     public notificationType notifications;
 
 
-    public User(String id, String userName, String password, String fName, String lName, String email, String phoneNumber,String dateOfBirth, int donationCounter, String profilePhoneUrl, boolean isAdmin) {
+    public User(String id, String userName, String password, String fName, String lName,
+                String email, String phoneNumber,String dateOfBirth,
+                int donationCounter, String profilePhoneUrl, boolean isAdmin) {
         this.id = id;
         this.userName = userName;
         this.password = password;

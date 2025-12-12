@@ -313,7 +313,56 @@ public class DatabaseService {
                         return;
                     }
                     boolean exists = task.getResult().getChildrenCount() > 0;
+                    Log.d(TAG, "Username exists? " + exists);
                     callback.onCompleted(exists);
+                });
+    }
+    public void findUserByUserName(@NotNull final String username, @NotNull final DatabaseCallback<User> callback) {
+        Log.d(TAG, "🔍 findUserByUserName called with username: " + username);
+
+        Log.d(TAG, "Full ref: " + databaseReference.child("users").toString());
+
+        readData(USERS_PATH).orderByChild("userName").equalTo(username).get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d(TAG, "❌ Firebase task failed", task.getException());
+                        callback.onFailed(task.getException());
+                        return;
+                    }
+
+                    if (task.getResult() == null) {
+                        Log.d(TAG, "⚠️ Task result is null");
+                        callback.onCompleted(null);
+                        return;
+                    }
+
+                    long childrenCount = task.getResult().getChildrenCount();
+                    Log.d(TAG, "ℹ️ Task completed successfully, children count: " + childrenCount);
+
+                    if (childrenCount == 0) {
+                        Log.d(TAG, "❌ No user found with username: " + username);
+                        callback.onCompleted(null);
+                        return;
+                    }
+
+                    for (DataSnapshot dataSnapshot : task.getResult().getChildren()) {
+                        Log.d(TAG, "✅ Found child key: " + dataSnapshot.getKey());
+
+                        User user = dataSnapshot.getValue(User.class);
+                        if (user == null) {
+                            Log.e(TAG, "⚠️ Failed to map DataSnapshot to User object");
+                            continue; // מנסה את השאר אם יש יותר children
+                        } else {
+                            Log.d(TAG, "✅ User mapped successfully: " + user.getUserName() + ", email: " + user.getEmail());
+                        }
+
+                        callback.onCompleted(user);
+                        return;
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Firebase query failed with exception", e);
+                    callback.onFailed(e);
                 });
     }
 

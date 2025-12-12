@@ -13,6 +13,12 @@
         android:theme="@style/Theme.SecondStoryProject"
         tools:targetApi="31">
         <activity
+            android:name=".screens.forgotPwActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.updateDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.SignoutActivity"
             android:exported="false" />
         <activity

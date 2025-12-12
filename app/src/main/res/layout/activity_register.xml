@@ -25,7 +25,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            >
 
             <TextView
                 android:id="@+id/bigTitle"
@@ -84,6 +84,7 @@
 
 
         <!-- שדה שם משתמש -->
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/usernameInput_layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -104,6 +105,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- שדה שם פרטי -->
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/firstnameInput_layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -181,6 +183,7 @@
                 android:inputType="phone"
                 android:textColor="@android:color/black"
                 />
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- שדה תאריך -->
@@ -217,6 +220,7 @@
             android:hint="סיסמה"
             android:maxWidth="488dp"
             android:layout_gravity="center"
+            app:endIconMode="password_toggle"
             android:textColor="@android:color/black"
             android:textColorHint="@color/black"            >
             <com.google.android.material.textfield.TextInputEditText
@@ -227,6 +231,16 @@
                 android:textColor="@android:color/black"
                 />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tv_register_to_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="יש לך משתמש קיים?"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:textSize="7pt"
+            />
 
         <Button
             android:id="@+id/btn_register_toHome"

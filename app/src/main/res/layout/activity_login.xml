@@ -85,47 +85,64 @@
     </FrameLayout>
 
         <!-- שדה שם משתמש -->
-        <EditText
-            android:id="@+id/usernameInput"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/usernameInput_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="380dp"
             android:layout_height="wrap_content"
             android:hint="שם משתמש"
-            android:textColor="@android:color/black"
-            android:textColorHint="@color/black"
-            android:textSize="16sp"
-            android:fontFamily="@font/noot"
-            android:background="@android:color/transparent"
-            android:paddingBottom="8dp"/>
-
-        <!-- הקו התחתון -->
-        <View
-            android:layout_width="380dp"
-            android:layout_height="2dp"
+            android:maxWidth="488dp"
             android:layout_gravity="center"
-            android:background="@android:color/black"
-            android:layout_marginBottom="16dp"/>
+            android:textColor="@android:color/black"
+            android:textColorHint="@color/black"            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/usernameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:textColor="@android:color/black"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- שדה סיסמה -->
-        <EditText
-            android:id="@+id/passwordInput"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordInput_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="380dp"
             android:layout_height="wrap_content"
             android:hint="סיסמה"
-            android:textColor="@android:color/black"
-            android:textColorHint="@color/black"
-            android:textSize="16sp"
-            android:gravity="right|center_vertical"
-            android:fontFamily="@font/noot"
-            android:inputType="textPassword"
-            android:background="@android:color/transparent"
-            android:paddingBottom="8dp"/>
-
-        <!-- הקו התחתון -->
-        <View
-            android:layout_width="380dp"
-            android:layout_height="2dp"
+            android:maxWidth="488dp"
             android:layout_gravity="center"
-            android:background="@android:color/black"
+            app:endIconMode="password_toggle"
+            android:textColor="@android:color/black"
+            android:textColorHint="@color/black"            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="@android:color/black"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/tv_login_to_resetpw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="שכחת את הסיסמא?"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:textSize="7pt"
+            />
+        <TextView
+            android:layout_marginTop="8dp"
+            android:id="@+id/tv_login_to_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="אין לך משתמש קיים?"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:textSize="7pt"
             />
 
         <Button
@@ -133,7 +150,7 @@
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:backgroundTint="#36b3b8"
             android:fontFamily="@font/akitrg__"
             android:text="כניסה"
