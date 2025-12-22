@@ -181,7 +181,7 @@ public class updateDetailsActivity extends AppCompatActivity implements View.OnC
         currentUser.setPassword(password);
 
         // עדכון במסד הנתונים
-        DatabaseService.getInstance().updateUser(currentUser, new DatabaseService.DatabaseCallback<Void>() {
+        DatabaseService.getInstance().writeUser(currentUser, new DatabaseService.DatabaseCallback<Void>() {
             @Override
             public void onCompleted(Void result) {
                 Toast.makeText(updateDetailsActivity.this, "פרטייך עודכנו בהצלחה!", Toast.LENGTH_LONG).show();

@@ -12,19 +12,18 @@ public class User {
     public String email;
     public String phoneNumber;
     public String dateOfBirth;
-    public String city; // ??
     public int donationCounter;
     /// public rate  // דרגה נוכחית
     public String profilePhoneUrl;
     public boolean isAdmin;
     public ArrayList<Donation> donationList;
     public ArrayList<Rate> rateList;
-    public enum notificationType{
+    public enum NotificationType {
         PHONE_NUMBER,
         EMAIL
     }
 
-    public notificationType notifications;
+    public NotificationType notifications;
 
 
     public User(String id, String userName, String password, String fName, String lName,
@@ -44,13 +43,13 @@ public class User {
         this.isAdmin = isAdmin;
         this.donationList = new ArrayList<>();
         this.rateList = new ArrayList<>();
-        this.notifications = notificationType.EMAIL;
+        this.notifications = NotificationType.EMAIL;
     }
 
     public User() {
         this.donationList = new ArrayList<>();
         this.rateList = new ArrayList<>();
-        this.notifications = notificationType.EMAIL;
+        this.notifications = NotificationType.EMAIL;
     }
 
     public String getId() {
@@ -159,11 +158,11 @@ public class User {
     public void setRateList(ArrayList<Rate> rateList) {
         this.rateList = rateList;
     }
-    public notificationType getNotifications() {
+    public NotificationType getNotifications() {
         return notifications;
     }
 
-    public void setNotifications(notificationType notifications) {
+    public void setNotifications(NotificationType notifications) {
         this.notifications = notifications;
     }
 

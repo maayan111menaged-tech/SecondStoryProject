@@ -82,7 +82,7 @@ public class forgotPwActivity extends AppCompatActivity {
                             /// שלב 3: עידכון סיסמא
                             user.setPassword(cpw);
 
-                            db.updateUser(user, new DatabaseService.DatabaseCallback<Void>() {
+                            db.writeUser(user, new DatabaseService.DatabaseCallback<Void>() {
                                 @Override
                                 public void onCompleted(Void object) {
                                     Log.d(TAG, "Password updated successfully for: " + username);

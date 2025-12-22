@@ -5,11 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.User;
 
@@ -23,7 +18,6 @@ import com.google.firebase.database.Transaction;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 /// a service to interact with the Firebase Realtime Database.
@@ -234,7 +228,7 @@ public class DatabaseService {
     ///            if the operation fails, the callback will receive an exception
     /// @see DatabaseCallback
     /// @see User
-    public void createNewUser(@NotNull final User user, @Nullable final DatabaseCallback<Void> callback) {
+    public void writeUser(@NotNull final User user, @Nullable final DatabaseCallback<Void> callback) {
         writeData(USERS_PATH + "/" + user.getId(), user, callback);
     }
 
@@ -276,37 +270,34 @@ public class DatabaseService {
     /// @see DatabaseCallback
     /// @see User
     public void getUserByUserNameAndPassword(@NotNull final String username, @NotNull final String password, @NotNull final DatabaseCallback<User> callback) {
-        readData(USERS_PATH).orderByChild("userName").equalTo(username).get()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.e(TAG, "Error getting data", task.getException());
-                        callback.onFailed(task.getException());
-                        return;
-                    }
-                    if (task.getResult().getChildrenCount() == 0) {
-                        callback.onFailed(new Exception("User not found"));
-                        return;
-                    }
-                    for (DataSnapshot dataSnapshot : task.getResult().getChildren()) {
-                        User user = dataSnapshot.getValue(User.class);
-                        if (user == null || !Objects.equals(user.getPassword(), password)) {
-                            callback.onFailed(new Exception("Invalid email or password"));
-                            return;
-                        }
-
+        Log.d(TAG, "in getUserByUserNameAndPassword function");
+        getUserList(new DatabaseCallback<List<User>>() {
+            @Override
+            public void onCompleted(List<User> users) {
+                for (User user : users) {
+                    if (user.getUserName().equals(username) && user.getPassword().equals(password)) {
                         callback.onCompleted(user);
                         return;
-
                     }
-                });
+                }
+                callback.onCompleted(null);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
     }
 
     /// check if an email already exists in the database
     /// @param username the email to check
     /// @param callback the callback to call when the operation is completed
     public void checkIfUserNameExists(@NotNull final String username, @NotNull final DatabaseCallback<Boolean> callback) {
+        Log.d(TAG, "in function checkIfUserNameExists");
         readData(USERS_PATH).orderByChild("userName").equalTo(username).get()
                 .addOnCompleteListener(task -> {
+                    Log.d(TAG,"after");
                     if (!task.isSuccessful()) {
                         Log.e(TAG, "Error getting data", task.getException());
                         callback.onFailed(task.getException());
@@ -320,10 +311,10 @@ public class DatabaseService {
     public void findUserByUserName(@NotNull final String username, @NotNull final DatabaseCallback<User> callback) {
         Log.d(TAG, "🔍 findUserByUserName called with username: " + username);
 
-        Log.d(TAG, "Full ref: " + databaseReference.child("users").toString());
-
         readData(USERS_PATH).orderByChild("userName").equalTo(username).get()
-                .addOnCompleteListener(task -> {
+                .addOnCompleteListener(task ->
+                {
+
                     if (!task.isSuccessful()) {
                         Log.d(TAG, "❌ Firebase task failed", task.getException());
                         callback.onFailed(task.getException());
@@ -364,24 +355,6 @@ public class DatabaseService {
                     Log.e(TAG, "❌ Firebase query failed with exception", e);
                     callback.onFailed(e);
                 });
-    }
-
-    public void updateUser(@NotNull final User user, @Nullable final DatabaseCallback<Void> callback) {
-        runTransaction(USERS_PATH + "/" + user.getId(), User.class, currentUser -> user, new DatabaseCallback<User>() {
-            @Override
-            public void onCompleted(User object) {
-                if (callback != null) {
-                    callback.onCompleted(null);
-                }
-            }
-
-            @Override
-            public void onFailed(Exception e) {
-                if (callback != null) {
-                    callback.onFailed(e);
-                }
-            }
-        });
     }
 
 

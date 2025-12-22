@@ -61,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
 
 
+
         // get the views
         etUName = findViewById(R.id.usernameInput);
         etPassword = findViewById(R.id.passwordInput);
@@ -113,12 +114,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void loginUser(String uname, String password) {
+        Log.d(TAG,"in function loginUser");
         databaseService.getUserByUserNameAndPassword(uname, password, new DatabaseService.DatabaseCallback<User>() {
             @Override
+
             public void onCompleted(User user) {
                 Log.d(TAG, "onCompleted: User logged in: " + user.toString());
                 SharedPreferencesUtil.saveUser(LoginActivity.this, user);
-                Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent mainIntent = new Intent(LoginActivity.this, updateDetailsActivity.class);
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mainIntent);
             }

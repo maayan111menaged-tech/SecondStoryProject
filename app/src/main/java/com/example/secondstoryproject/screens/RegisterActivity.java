@@ -1,7 +1,6 @@
 package com.example.secondstoryproject.screens;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -177,6 +176,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             if (!checkInput(uName, fName, lName, email, phone, date, password)) {
                 return;
             }
+            Log.d(TAG,"input is valid!");
 
             Log.d(TAG, "onClick: Registering user...");
 
@@ -318,7 +318,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void createUserInDatabase(User user) {
-        databaseService.createNewUser(user, new DatabaseService.DatabaseCallback<Void>() {
+        databaseService.writeUser(user, new DatabaseService.DatabaseCallback<Void>() {
             @Override
             public void onCompleted(Void object) {
                 Log.d(TAG, "createUserInDatabase: User created successfully");
