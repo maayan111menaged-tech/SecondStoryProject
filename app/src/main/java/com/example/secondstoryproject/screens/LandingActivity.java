@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 public class LandingActivity extends AppCompatActivity {
 
@@ -25,6 +26,16 @@ public class LandingActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        if(SharedPreferencesUtil.isUserLoggedIn(this)){
+            Intent intent = new Intent(LandingActivity.this, SignoutActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+
+
         Button buttonLogin = findViewById(R.id.btn_Landing_toLogin);
         Button buttonSignin = findViewById(R.id.btn_Landing_toSignUp);
 

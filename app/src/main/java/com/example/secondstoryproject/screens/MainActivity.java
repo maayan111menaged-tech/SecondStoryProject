@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -15,13 +17,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
+import com.example.secondstoryproject.models.UserLevel;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private TextView tvWelcome;
-
+    ProgressBar rateProgressBar;
+    ImageView currentRateIcon,nextRateIcon;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,21 +37,48 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        rateProgressBar = findViewById(R.id.rateProgressBar);
+        currentRateIcon = findViewById(R.id.currentRateIcon);
+        nextRateIcon = findViewById(R.id.nextRateIcon);
 
-        // קישור ל-TextView במסך
-        tvWelcome = findViewById(R.id.tvWelcome);
+        User currentUser = SharedPreferencesUtil.getUser(this);
 
-        // קבלת המשתמש מה-SharedPreferences
-        User user = SharedPreferencesUtil.getUser(this);
+        updateUserLevelUI(currentUser);
+    }
 
-        if (user != null) {
-            String username = user.getUserName();
-            Log.d(TAG, "Logged in user: " + username);
-            tvWelcome.setText("Welcome, " + username + "!");
+
+    private void updateUserLevelUI(User user) {
+
+        int donations = user.getDonationCounter();
+        UserLevel currentLevel = UserLevel.fromDonationCount(donations);
+
+        int min = currentLevel.getMinDonations();
+        int max = currentLevel.getMaxDonations()+1;
+
+        int progress;
+        if (max == Integer.MAX_VALUE) {
+            progress = 100;
         } else {
-            Log.d(TAG, "No user is logged in");
-            tvWelcome.setText("Welcome, Guest!");
+            progress = (donations - min) * 100 / (max - min);
         }
 
+        rateProgressBar.setProgress(progress);
 
-}}
+        // אייקון דרגה נוכחית
+        currentRateIcon.setImageResource(currentLevel.getIconRes());
+
+        // אייקון דרגה הבאה
+        UserLevel[] levels = UserLevel.values();
+        int nextIndex = currentLevel.ordinal() + 1;
+
+        if (nextIndex < levels.length) {
+            nextRateIcon.setVisibility(View.VISIBLE);
+            nextRateIcon.setImageResource(levels[nextIndex].getIconRes());
+        } else {
+            nextRateIcon.setVisibility(View.INVISIBLE); // אגדה
+        }
+    }
+
+
+
+}

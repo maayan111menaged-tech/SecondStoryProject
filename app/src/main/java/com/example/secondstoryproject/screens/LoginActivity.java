@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -117,11 +118,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Log.d(TAG,"in function loginUser");
         databaseService.getUserByUserNameAndPassword(uname, password, new DatabaseService.DatabaseCallback<User>() {
             @Override
-
             public void onCompleted(User user) {
+                if (user == null) {
+                    Log.d(TAG,"got null as a user, USER DOES NOT EXIST");
+                    Toast.makeText(LoginActivity.this, "לא קיים", Toast.LENGTH_LONG).show();                    return;
+                }
                 Log.d(TAG, "onCompleted: User logged in: " + user.toString());
                 SharedPreferencesUtil.saveUser(LoginActivity.this, user);
-                Intent mainIntent = new Intent(LoginActivity.this, updateDetailsActivity.class);
+                Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mainIntent);
             }

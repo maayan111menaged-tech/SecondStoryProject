@@ -144,12 +144,14 @@ public class DatabaseService {
     /// @param clazz the class of the objects to return
     /// @param callback the callback to call when the operation is completed
     private <T> void getDataList(@NotNull final String path, @NotNull final Class<T> clazz, @NotNull final DatabaseCallback<List<T>> callback) {
+        Log.d(TAG,"in getDataList function.");
         readData(path).get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e(TAG, "Error getting data", task.getException());
                 callback.onFailed(task.getException());
                 return;
             }
+            Log.d(TAG,"got data! ");
             List<T> tList = new ArrayList<>();
             task.getResult().getChildren().forEach(dataSnapshot -> {
                 T t = dataSnapshot.getValue(clazz);
@@ -251,6 +253,7 @@ public class DatabaseService {
     /// @see List
     /// @see User
     public void getUserList(@NotNull final DatabaseCallback<List<User>> callback) {
+        Log.d(TAG,"in getUserList function");
         getDataList(USERS_PATH, User.class, callback);
     }
 
@@ -274,17 +277,20 @@ public class DatabaseService {
         getUserList(new DatabaseCallback<List<User>>() {
             @Override
             public void onCompleted(List<User> users) {
+                Log.d(TAG,"in OnComplete");
                 for (User user : users) {
                     if (user.getUserName().equals(username) && user.getPassword().equals(password)) {
                         callback.onCompleted(user);
                         return;
                     }
                 }
+                Log.d(TAG,"couldnt find a match. returning null");
                 callback.onCompleted(null);
             }
 
             @Override
             public void onFailed(Exception e) {
+                Log.d(TAG,"in OnFalied");
                 callback.onFailed(e);
             }
         });

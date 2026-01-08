@@ -17,7 +17,7 @@
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:layout_gravity="bottom"
-            app:srcCompat="@drawable/book_background_pic2" />
+            app:srcCompat="@drawable/book_background_pic2"/>
 
         <LinearLayout
             android:layout_width="match_parent"

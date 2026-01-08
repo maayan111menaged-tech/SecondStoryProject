@@ -29,6 +29,8 @@ public class SignoutActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
         Button buttonSignOut = findViewById(R.id.btn_signout);
         buttonSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
