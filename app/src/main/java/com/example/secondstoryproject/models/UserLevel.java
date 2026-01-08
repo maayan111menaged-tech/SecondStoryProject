@@ -4,12 +4,12 @@ import com.example.secondstoryproject.R;
 
 public enum UserLevel {
 
-    BRONZE("ארד", 0, 4, R.drawable.ic_bronze),
-    SILVER("כסף", 5, 14, R.drawable.ic_silver),
-    GOLD("זהב", 15, 29, R.drawable.ic_gold),
-    TROPHY("גביע", 30, 49, R.drawable.ic_trophy),
-    CROWN("כתר", 50, 99, R.drawable.ic_crown),
-    EARTH("אגדה", 100, Integer.MAX_VALUE, R.drawable.ic_earth);
+    BRONZE("תורם ארד", 0, 4, R.drawable.ic_bronze),
+    SILVER("תורם כסף", 5, 14, R.drawable.ic_silver),
+    GOLD("תורם זהב", 15, 29, R.drawable.ic_gold),
+    TROPHY("תורם מצטיין", 30, 49, R.drawable.ic_trophy),
+    CROWN("גיבור הקהילה", 50, 99, R.drawable.ic_crown),
+    EARTH("שגריר הנתינה", 100, Integer.MAX_VALUE, R.drawable.ic_earth);
 
     private final String label;
     private final int minDonations;

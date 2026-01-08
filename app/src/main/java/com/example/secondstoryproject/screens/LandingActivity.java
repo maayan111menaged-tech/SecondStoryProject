@@ -28,7 +28,7 @@ public class LandingActivity extends AppCompatActivity {
         });
 
         if(SharedPreferencesUtil.isUserLoggedIn(this)){
-            Intent intent = new Intent(LandingActivity.this, SignoutActivity.class);
+            Intent intent = new Intent(LandingActivity.this, LeaderBoardActivity.class);
             startActivity(intent);
             finish();
             return;
