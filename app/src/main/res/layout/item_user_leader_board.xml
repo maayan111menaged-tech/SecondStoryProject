@@ -10,6 +10,7 @@
     app:cardElevation="2dp"
     android:clickable="true"
     android:focusable="true"
+    android:background="@android:color/white"
     android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout

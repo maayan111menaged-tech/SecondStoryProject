@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SecondStoryProject</string>
+    <string name="open_drawer">פתח תפריט צד</string>
+    <string name="close_drawer">סגור תפריט צד</string>
 </resources>

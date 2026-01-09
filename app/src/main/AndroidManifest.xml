@@ -13,13 +13,13 @@
         android:theme="@style/Theme.SecondStoryProject"
         tools:targetApi="31">
         <activity
+            android:name=".screens.navpageActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.LeaderBoardActivity"
             android:exported="false" />
         <activity
             android:name=".screens.UsersListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".screens.temporeryActivity"
             android:exported="false" />
         <activity
             android:name=".screens.forgotPwActivity"
