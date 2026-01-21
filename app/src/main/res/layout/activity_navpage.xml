@@ -9,25 +9,25 @@
     tools:openDrawer="start"
     android:fitsSystemWindows="true"
     android:background="@android:color/white"
-    tools:context=".screens.navpageActivity">
+    tools:context=".screens.navpageActivity"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        
+
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/toolBar"
             android:elevation="4dp"
-            android:background="#4C7EFF"
+            android:background="@android:color/transparent"
             android:paddingTop="?attr/actionBarSize"
             android:fitsSystemWindows="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            />
-        
+            android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
