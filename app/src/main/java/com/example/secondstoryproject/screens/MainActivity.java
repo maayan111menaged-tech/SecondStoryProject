@@ -32,55 +32,17 @@ import com.example.secondstoryproject.models.UserLevel;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final String TAG = "MainActivity";
-    DrawerLayout drawerLayout;
     ProgressBar rateProgressBar;
     ImageView currentRateIcon,nextRateIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.nav_layout), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        Toolbar toolbar = findViewById(R.id.toolBar);
-        setSupportActionBar(toolbar);
-
-        if(getSupportActionBar()!=null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.baseline_menu_24);
-        }
-
-        drawerLayout = findViewById(R.id.nav_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this,
-                drawerLayout,
-                toolbar,
-                R.string.open_drawer,
-                R.string.close_drawer
-        );
-
-        DrawerArrowDrawable arrowDrawable = toggle.getDrawerArrowDrawable();
-        arrowDrawable.setBarLength(80f);
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.black));
-
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
+        setContentLayout(R.layout.activity_main);
 
         rateProgressBar = findViewById(R.id.rateProgressBar);
         currentRateIcon = findViewById(R.id.currentRateIcon);

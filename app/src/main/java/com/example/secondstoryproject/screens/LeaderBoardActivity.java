@@ -21,7 +21,7 @@ import com.example.secondstoryproject.services.DatabaseService;
 
 import java.util.List;
 
-public class LeaderBoardActivity extends AppCompatActivity {
+public class LeaderBoardActivity extends BaseActivity {
 
     private static final String TAG = "LeaderBoardActivity";
     private UserAdapterLeaderBoard userAdapterLeaderBoard;
@@ -30,13 +30,8 @@ public class LeaderBoardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_leader_board);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        setContentLayout(R.layout.activity_leader_board);
+
 
 
         RecyclerView usersList = findViewById(R.id.rv_users_list_leader_board);

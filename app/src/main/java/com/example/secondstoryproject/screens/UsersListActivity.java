@@ -20,7 +20,7 @@ import com.example.secondstoryproject.services.DatabaseService;
 
 import java.util.List;
 
-public class UsersListActivity extends AppCompatActivity {
+public class UsersListActivity extends BaseActivity {
 
     private static final String TAG = "UsersListActivity";
     private UserAdapter userAdapter;
@@ -30,13 +30,7 @@ public class UsersListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_users_list);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        setContentLayout(R.layout.activity_users_list);
 
         RecyclerView usersList = findViewById(R.id.rv_users_list);
         tvUserCount = findViewById(R.id.tv_user_count);

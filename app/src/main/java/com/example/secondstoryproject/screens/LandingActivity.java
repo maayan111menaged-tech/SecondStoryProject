@@ -34,11 +34,8 @@ public class LandingActivity extends AppCompatActivity {
             return;
         }
 
-
-
         Button buttonLogin = findViewById(R.id.btn_Landing_toLogin);
         Button buttonSignin = findViewById(R.id.btn_Landing_toSignUp);
-
 
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override

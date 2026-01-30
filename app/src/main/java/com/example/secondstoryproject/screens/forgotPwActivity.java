@@ -21,26 +21,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class forgotPwActivity extends AppCompatActivity {
+public class forgotPwActivity extends BaseActivity {
 
     private static final String TAG = "forgotPwActivity";
     private EditText etUName, etEmail, etPw, etConfirmPw;
     private Button btnConfirm;
-    private DatabaseService db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_forgot_pw);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        db = DatabaseService.getInstance();
+        setContentLayout(R.layout.activity_forgot_pw);
 
         etUName = findViewById(R.id.usernameInput);
         etEmail = findViewById(R.id.emailInput);
@@ -63,7 +53,7 @@ public class forgotPwActivity extends AppCompatActivity {
                     Log.d(TAG , "searching user by the user name");
 
                     /// שלב 1: חיפוש יוזר לפי שם המשתמש
-                    db.findUserByUserName(username, new DatabaseService.DatabaseCallback<User>() {
+                    databaseService.findUserByUserName(username, new DatabaseService.DatabaseCallback<User>() {
                         @Override
                         public void onCompleted(User user) {
                             if (user == null) {
@@ -82,7 +72,7 @@ public class forgotPwActivity extends AppCompatActivity {
                             /// שלב 3: עידכון סיסמא
                             user.setPassword(cpw);
 
-                            db.writeUser(user, new DatabaseService.DatabaseCallback<Void>() {
+                            databaseService.writeUser(user, new DatabaseService.DatabaseCallback<Void>() {
                                 @Override
                                 public void onCompleted(Void object) {
                                     Log.d(TAG, "Password updated successfully for: " + username);
