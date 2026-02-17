@@ -22,7 +22,7 @@ import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.example.secondstoryproject.utils.Validator;
 
 /// Activity for logging in the user
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "LoginActivity";
 
@@ -32,10 +32,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private DatabaseService databaseService;
 
     @Override
+    protected boolean hasSideMenu() {
+        return false; // לא צריך Drawer
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_login);
+        setContentLayout(R.layout.activity_login);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

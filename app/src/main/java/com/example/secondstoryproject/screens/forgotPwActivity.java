@@ -28,6 +28,11 @@ public class forgotPwActivity extends BaseActivity {
     private Button btnConfirm;
 
     @Override
+    protected boolean hasSideMenu() {
+        return false; // לא צריך Drawer
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentLayout(R.layout.activity_forgot_pw);

@@ -29,7 +29,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 
-public class updateDetailsActivity extends AppCompatActivity implements View.OnClickListener {
+public class updateDetailsActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "UpdateDetailsActivity";
     private EditText etUserName, etFirstName, etLastName, etEmail, etPhoneNumber, etDate, etPassword;
@@ -38,10 +38,14 @@ public class updateDetailsActivity extends AppCompatActivity implements View.OnC
     private User currentUser;
 
     @Override
+    protected boolean hasSideMenu() {
+        return false; // לא צריך Drawer
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_update_details);
+        setContentLayout(R.layout.activity_update_details);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

@@ -14,15 +14,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- לוגו -->
-        <ImageView
-            android:id="@+id/logoPhoto"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="left"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="30dp"
-            app:srcCompat="@mipmap/ic_launcher" />
 
         <!-- כותרת גדולה -->
         <FrameLayout

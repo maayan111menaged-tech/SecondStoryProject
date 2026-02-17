@@ -14,13 +14,16 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
-public class LandingActivity extends AppCompatActivity {
-
+public class LandingActivity extends BaseActivity {
+    @Override
+    protected boolean hasSideMenu() {
+        return false; // לא צריך Drawer
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_landing);
+        setContentLayout(R.layout.activity_landing);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

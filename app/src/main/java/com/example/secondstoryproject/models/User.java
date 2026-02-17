@@ -18,7 +18,7 @@ public class User {
     private String phoneNumber;
     private String dateOfBirth;
     private int donationCounter; //כמות התרומות שנתן
-    private String profilePhoneUrl;
+    private String profilePhoneUrl; // the name is wrong - CHANGE IT!!!
     private boolean isAdmin;
     private ArrayList<Donation> donationList; //יכלול גם תרומות שקיבל ושנתן
     private ArrayList<Rate> rateList; // פידבקים שקיבל

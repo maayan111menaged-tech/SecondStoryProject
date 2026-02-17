@@ -37,12 +37,15 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     private EditText etUName, etFName, etLName, etEmail, etPhoneNumber, etPassword;
     private TextInputEditText etDate;
     private Button btnRegister;
-
+    @Override
+    protected boolean hasSideMenu() {
+        return false; // לא צריך Drawer
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_register);
+        setContentLayout(R.layout.activity_register);
 
         databaseService = DatabaseService.getInstance();
 

@@ -32,8 +32,7 @@ import com.example.secondstoryproject.models.UserLevel;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
     ProgressBar rateProgressBar;
@@ -86,14 +85,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // סגירת ה-Drawer אחרי בחירה
-        drawerLayout.closeDrawer(GravityCompat.START);
 
-        // TODO: חיבור לעמודים שונים בהתאם ל-item.getItemId()
-        return true;
-    }
 
     @Override
     public void onBackPressed() {
