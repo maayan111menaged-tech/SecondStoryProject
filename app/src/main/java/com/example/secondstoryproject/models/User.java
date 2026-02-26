@@ -7,7 +7,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import java.util.ArrayList;
 
 @IgnoreExtraProperties
-public class User {
+public class User implements Idable{
 
     private String id;
     private String userName;

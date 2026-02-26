@@ -30,7 +30,7 @@ public class LeaderBoardActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentLayout(R.layout.activity_leader_board);
+        setContentView(R.layout.activity_leader_board);
 
 
 
@@ -60,7 +60,7 @@ public class LeaderBoardActivity extends BaseActivity {
     @Override
     protected void onResume(                                                                                                                                                                                                ) {
         super.onResume();
-        DatabaseService.getInstance().getUserList(new DatabaseService.DatabaseCallback<List<User>>() {
+        DatabaseService.getInstance().getUserService().getAll(new DatabaseService.DatabaseCallback<List<User>>() {
             @Override
             public void onCompleted(List<User> users) {
                 userAdapterLeaderBoard.setUserList(users);

@@ -30,7 +30,7 @@ public class UsersListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentLayout(R.layout.activity_users_list);
+        setContentView(R.layout.activity_users_list);
 
         RecyclerView usersList = findViewById(R.id.rv_users_list);
         tvUserCount = findViewById(R.id.tv_user_count);
@@ -58,7 +58,7 @@ public class UsersListActivity extends BaseActivity {
     @Override
     protected void onResume(                                                                                                                                                                                                ) {
         super.onResume();
-        DatabaseService.getInstance().getUserList(new DatabaseService.DatabaseCallback<List<User>>() {
+        DatabaseService.getInstance().getUserService().getAll(new DatabaseService.DatabaseCallback<List<User>>() {
             @Override
             public void onCompleted(List<User> users) {
                 userAdapter.setUserList(users);

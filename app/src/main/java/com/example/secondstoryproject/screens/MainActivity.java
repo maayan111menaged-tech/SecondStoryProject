@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentLayout(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
         rateProgressBar = findViewById(R.id.rateProgressBar);
         currentRateIcon = findViewById(R.id.currentRateIcon);
@@ -50,7 +50,30 @@ public class MainActivity extends BaseActivity {
         User currentUser = SharedPreferencesUtil.getUser(this);
 
         updateUserLevelUI(currentUser);
+
+
+
+
+
+        Button buttoToAddDonation = findViewById(R.id.btn_addDonation);
+        Button buttonToSearchDonation = findViewById(R.id.btn_searchDonation);
+
+        buttoToAddDonation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PickCatergoryActivity.class);
+                startActivity(intent);
+            }
+        });
+        buttonToSearchDonation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
+
 
 
     private void updateUserLevelUI(User user) {

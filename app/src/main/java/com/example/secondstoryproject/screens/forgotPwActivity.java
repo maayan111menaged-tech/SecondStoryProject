@@ -35,7 +35,7 @@ public class forgotPwActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentLayout(R.layout.activity_forgot_pw);
+        setContentView(R.layout.activity_forgot_pw);
 
         etUName = findViewById(R.id.usernameInput);
         etEmail = findViewById(R.id.emailInput);
@@ -58,7 +58,7 @@ public class forgotPwActivity extends BaseActivity {
                     Log.d(TAG , "searching user by the user name");
 
                     /// שלב 1: חיפוש יוזר לפי שם המשתמש
-                    databaseService.findUserByUserName(username, new DatabaseService.DatabaseCallback<User>() {
+                    databaseService.getUserService().findUserByUserName(username, new DatabaseService.DatabaseCallback<User>() {
                         @Override
                         public void onCompleted(User user) {
                             if (user == null) {
@@ -77,10 +77,12 @@ public class forgotPwActivity extends BaseActivity {
                             /// שלב 3: עידכון סיסמא
                             user.setPassword(cpw);
 
-                            databaseService.writeUser(user, new DatabaseService.DatabaseCallback<Void>() {
+                            databaseService.getUserService().update(user.getId(), u -> {
+                                u.setPassword(user.getPassword());
+                                return u;
+                            }, new DatabaseService.DatabaseCallback<User>() {
                                 @Override
-                                public void onCompleted(Void object) {
-                                    Log.d(TAG, "Password updated successfully for: " + username);
+                                public void onCompleted(User updatedUser) {
                                     Toast.makeText(forgotPwActivity.this, "הסיסמה עודכנה בהצלחה", Toast.LENGTH_SHORT).show();
                                     finish();
                                 }

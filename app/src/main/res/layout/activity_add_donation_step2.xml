@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- קטגוריה שנבחרה -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/imgCategory"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvCategoryName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- שם תרומה -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="שם התרומה"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="נא לתאר את התרומה בקצרה"
+            android:textSize="13sp"
+            android:textColor="#777777"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etDonationName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="כתבו כאן את שם התרומה..."
+            android:inputType="textCapWords"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- תיאור -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="תיאור התרומה"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="נא לפרט: צבע, מצב, מתי נקנה, שימוש קודם, תאריך תפוגה (אם רלוונטי) וכל פרט חשוב נוסף."
+            android:textSize="13sp"
+            android:textColor="#777777"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etDescription"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="@drawable/bg_rounded_input"
+            android:hint="כתבו כאן את תיאור התרומה..."
+            android:gravity="top|start"
+            android:inputType="textMultiLine"
+            android:maxLines="6"
+            android:padding="12dp"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- עיר -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="עיר"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp"/>
+
+        <AutoCompleteTextView
+            android:id="@+id/actCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_input"
+            android:hint="בחרו עיר"
+            android:padding="12dp"
+            android:completionThreshold="1"
+            android:layout_marginBottom="30dp"/>
+
+        <!-- כפתור המשך -->
+        <Button
+            android:id="@+id/btnNextToUploadPic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="המשך לפרסום תמונה"/>
+
+    </LinearLayout>
+
+</ScrollView>

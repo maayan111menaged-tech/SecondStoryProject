@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="israel_cities">
+        <item>תל אביב</item>
+        <item>ירושלים</item>
+        <item>חיפה</item>
+        <item>באר שבע</item>
+        <item>אשדוד</item>
+        <item>ראשון לציון</item>
+        <item>פתח תקווה</item>
+        <item>נתניה</item>
+        <item>רמת גן</item>
+        <item>חולון</item>
+        <item>הרצליה</item>
+        <item>כפר סבא</item>
+        <item>מודיעין</item>
+        <item>אילת</item>
+    </string-array>
+</resources>

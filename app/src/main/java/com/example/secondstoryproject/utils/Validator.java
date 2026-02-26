@@ -1,8 +1,12 @@
 package com.example.secondstoryproject.utils;
+import android.content.Context;
 import android.util.Patterns;
 
 import androidx.annotation.Nullable;
 
+import com.example.secondstoryproject.R;
+
+import java.util.Date;
 /// Validator class to validate user input.
 /// This class contains static methods to validate user input,
 /// like email, password, phone, name etc.
@@ -50,5 +54,41 @@ public class Validator {
     }
 
 
+
+
+    // =====================  שם תרומה =====================
+    public static boolean isDonationNameValid(@Nullable String donationName) {
+        return donationName != null && !donationName.trim().isEmpty();
+    }
+
+    // ===================== תיאור תרומה =====================
+    public static boolean isDescriptionValid(@Nullable String description) {
+        return description != null && description.trim().length() >= 20;
+    }
+
+    // ===================== עיר =====================
+    // האם המשתמש הכניס משהו בכלל
+    public static boolean isCityValid(@Nullable String city) {
+        return city != null && !city.trim().isEmpty();
+    }
+
+    // האם העיר קיימת ברשימה (Context נדרש כדי לגשת ל-resources)
+    public static boolean isCityInList(Context context, @Nullable String city) {
+        if (city == null) return false;
+
+        String[] cities = context.getResources().getStringArray(R.array.israel_cities);
+        for (String c : cities) {
+            if (c.equals(city)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================== תאריך =====================
+    // בדיקה שתאריך תפוגה בעתיד
+    public static boolean isFutureDate(@Nullable Date date) {
+        return date != null && date.after(new Date());
+    }
 
 }

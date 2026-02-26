@@ -1,104 +1,76 @@
 package com.example.secondstoryproject.models;
 
-public class Donation {
+public class Donation implements Idable {
 
-    public String id;
-    public String name;
-    public String description;
-    public enum donationCategory{
-        CLOTHES,
-        TOYS,
-        FOOD
+    private String id;
+    private String name;
+    private String description;
+    private DonationCategory category;
+    private DonationStatus status;
+    private String photoUrl;
+    private String city; // חדש – עיר
+
+    private String giverID;
+    private String receiverID;
+
+    // Enum של סטטוס
+    public enum DonationStatus {
+        AVAILABLE,
+        MATCHED,
+        DELIVERED
     }
 
-
-
-    public donationCategory category;
-    public enum donationStatus{
-        AVAILABLE,   // פנוי
-        MATCHED,     // נמצא מישהו שצריך
-        DELIVERED    // נמסר
+    public Donation() {
+        // חובה ל-Firebase
     }
-    public donationStatus status;
-    public String photoUrl;
-    public User giver;
-    public User receiver;
-    //public -- location;
 
+    public Donation(String id,
+                    String name,
+                    String description,
+                    DonationCategory category,
+                    DonationStatus status,
+                    String photoUrl,
+                    String city,
+                    String giverID,
+                    String receiverID) {
 
-    public Donation(String id, String name, String description, donationCategory category, donationStatus status, String photoUrl, User giver, User receiver) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.category = category;
         this.status = status;
         this.photoUrl = photoUrl;
-        this.giver = giver;
-        this.receiver = receiver;
-    }
-    public Donation() {}
-
-    public String getId() {
-        return id;
+        this.city = city;
+        this.giverID = giverID;
+        this.receiverID = receiverID;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    // -------- Getters & Setters --------
 
-    public String getName() {
-        return name;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public DonationCategory getCategory() { return category; }
+    public void setCategory(DonationCategory category) { this.category = category; }
 
-    public donationCategory getCategory() {
-        return category;
-    }
+    public DonationStatus getStatus() { return status; }
+    public void setStatus(DonationStatus status) { this.status = status; }
 
-    public void setCategory(donationCategory category) {
-        this.category = category;
-    }
+    public String getPhotoUrl() { return photoUrl; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 
-    public donationStatus getStatus() {
-        return status;
-    }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
 
-    public void setStatus(donationStatus status) {
-        this.status = status;
-    }
+    public String getGiverID() { return giverID; }
+    public void setGiverID(String giver) { this.giverID = giver; }
 
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
-    public User getGiver() {
-        return giver;
-    }
-
-    public void setGiver(User giver) {
-        this.giver = giver;
-    }
-
-    public User getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(User receiver) {
-        this.receiver = receiver;
-    }
+    public String getReceiverID() { return receiverID; }
+    public void setReceiverID(String receiver) { this.receiverID = receiver; }
 }

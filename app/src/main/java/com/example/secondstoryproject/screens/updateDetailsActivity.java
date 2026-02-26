@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
+import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.Validator;
@@ -45,7 +46,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentLayout(R.layout.activity_update_details);
+        setContentView(R.layout.activity_update_details);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -185,19 +186,27 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         currentUser.setPassword(password);
 
         // עדכון במסד הנתונים
-        DatabaseService.getInstance().writeUser(currentUser, new DatabaseService.DatabaseCallback<Void>() {
-            @Override
-            public void onCompleted(Void result) {
-                Toast.makeText(updateDetailsActivity.this, "פרטייך עודכנו בהצלחה!", Toast.LENGTH_LONG).show();
-                showUserProfile(); // ריענון השדות
-            }
+        DatabaseService.getInstance().getUserService().update(
+                currentUser.getId(),
+                oldUser -> currentUser,
+                new IDatabaseService.DatabaseCallback<User>() {
+                    @Override
+                    public void onCompleted(User result) {
+                        Toast.makeText(updateDetailsActivity.this,
+                                "פרטייך עודכנו בהצלחה!",
+                                Toast.LENGTH_LONG).show();
+                        showUserProfile();
+                    }
 
-            @Override
-            public void onFailed(Exception e) {
-                Toast.makeText(updateDetailsActivity.this, "שגיאה בעדכון הפרטים", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Error updating user", e);
-            }
-        });
+                    @Override
+                    public void onFailed(Exception e) {
+                        Toast.makeText(updateDetailsActivity.this,
+                                "שגיאה בעדכון הפרטים",
+                                Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error updating user", e);
+                    }
+                }
+        );
     } // סוגר הסופי של updateUserProfile
 
     private boolean isValid(String firstName, String lastName, String phone, String email,

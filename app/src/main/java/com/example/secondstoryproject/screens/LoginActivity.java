@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
+import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.example.secondstoryproject.utils.Validator;
 
@@ -29,7 +30,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private EditText etUName, etPassword;
     private Button btnLogin;
 
-    private DatabaseService databaseService;
+    private IDatabaseService databaseService;
 
     @Override
     protected boolean hasSideMenu() {
@@ -40,7 +41,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentLayout(R.layout.activity_login);
+        setContentView(R.layout.activity_login);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -121,12 +122,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     private void loginUser(String uname, String password) {
         Log.d(TAG,"in function loginUser");
-        databaseService.getUserByUserNameAndPassword(uname, password, new DatabaseService.DatabaseCallback<User>() {
+        databaseService.getUserService().getUserByUserNameAndPassword(uname, password, new DatabaseService.DatabaseCallback<User>() {
             @Override
             public void onCompleted(User user) {
                 if (user == null) {
                     Log.d(TAG,"got null as a user, USER DOES NOT EXIST");
-                    Toast.makeText(LoginActivity.this, "לא קיים", Toast.LENGTH_LONG).show();                    return;
+                    Toast.makeText(LoginActivity.this, "לא קיים", Toast.LENGTH_LONG).show();
+                    return;
                 }
                 Log.d(TAG, "onCompleted: User logged in: " + user.toString());
                 SharedPreferencesUtil.saveUser(LoginActivity.this, user);

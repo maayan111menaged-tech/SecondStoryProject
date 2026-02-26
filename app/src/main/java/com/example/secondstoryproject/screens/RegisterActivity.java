@@ -45,7 +45,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentLayout(R.layout.activity_register);
+        setContentView(R.layout.activity_register);
 
         databaseService = DatabaseService.getInstance();
 
@@ -183,8 +183,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     private void registerUser(String username, String password, String fName, String lName,
                               String email, String phoneNumber, String dateOfBirth) {
 
-        String uid = databaseService.generateUserId();
-
+        String uid = databaseService.getUserService().generateId();
         User user = new User(
                 uid,
                 username,
@@ -196,7 +195,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 dateOfBirth
         );
 
-        databaseService.checkIfUserNameExists(username, new DatabaseService.DatabaseCallback<Boolean>() {
+        databaseService.getUserService().checkIfUserNameExists(username, new DatabaseService.DatabaseCallback<Boolean>() {
             @Override
             public void onCompleted(Boolean exists) {
                 if (exists) {
@@ -215,7 +214,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void createUserInDatabase(User user) {
-        databaseService.writeUser(user, new DatabaseService.DatabaseCallback<Void>() {
+        databaseService.getUserService().create(user, new DatabaseService.DatabaseCallback<Void>() {
             @Override
             public void onCompleted(Void object) {
                 SharedPreferencesUtil.saveUser(RegisterActivity.this, user);

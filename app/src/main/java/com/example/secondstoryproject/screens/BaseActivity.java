@@ -15,13 +15,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.services.DatabaseService;
+import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
 
 public abstract class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    protected DatabaseService databaseService;
+    protected IDatabaseService databaseService;
     protected DrawerLayout drawerLayout;
 
     protected boolean hasSideMenu() {
@@ -34,7 +35,7 @@ public abstract class BaseActivity extends AppCompatActivity
         databaseService = DatabaseService.getInstance();
 
         // טוען את ה-Base XML
-        setContentView(R.layout.activity_base);
+        super.setContentView(R.layout.activity_base);
 
         // Toolbar
         Toolbar toolbar = findViewById(R.id.toolBar);
@@ -73,6 +74,12 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void setContentView(int layoutResID) {
+//        super.setContentView(layoutResID);
+        setContentLayout(layoutResID);
+    }
+
     // 👇 מזריק את ה-layout של המסך לתוך Base
     protected void setContentLayout(int layoutResId) {
         FrameLayout contentFrame = findViewById(R.id.content_frame);
@@ -90,6 +97,8 @@ public abstract class BaseActivity extends AppCompatActivity
         drawerLayout.closeDrawer(GravityCompat.START);
     }
 
+
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
@@ -105,7 +114,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_add_donation) {
 
-            ///navigateTo(AddDonationActivity.class);
+            navigateTo(PickCatergoryActivity.class);
 
         } else if (id == R.id.nav_search_donation) {
 
