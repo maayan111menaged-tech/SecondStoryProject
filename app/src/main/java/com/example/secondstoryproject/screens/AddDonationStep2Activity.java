@@ -75,12 +75,20 @@ public class AddDonationStep2Activity extends BaseActivity {
         String donationName = etDonationName.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
         String city = actCity.getText().toString().trim();
+        String category = tvCategoryName.toString().trim();
 
         if (!checkInput(donationName, description, city)) {
             return;
         }
 
-        createDonation(donationName, description, city);
+        Intent intent = new Intent(AddDonationStep2Activity.this, AddDonationStep3Activity.class);
+
+        intent.putExtra("donation_name", donationName);
+        intent.putExtra("description", description);
+        intent.putExtra("city", city);
+        intent.putExtra("selected_category", category);
+
+        startActivity(intent);
     }
 
     private boolean checkInput(String donationName, String description, String city) {
@@ -111,44 +119,44 @@ public class AddDonationStep2Activity extends BaseActivity {
         return true;
     }
 
-    private void createDonation(String name, String description, String city) {
-
-        String donationId = databaseService.getDonationService().generateId();
-
-        // שליפת המשתמש המחובר
-        String currentUserID = SharedPreferencesUtil.getUserId(this);
-
-        Donation donation = new Donation(
-                donationId,
-                name,
-                description,
-                selectedCategory, // enum אמיתי
-                Donation.DonationStatus.AVAILABLE, // סטטוס התחלתי
-                "", // photoUrl ריק בשלב הזה
-                city,
-                currentUserID, // giver
-                null // receiver בהתחלה אין
-        );
-
-        databaseService.getDonationService().create(donation,
-                new DatabaseService.DatabaseCallback<Void>() {
-
-                    @Override
-                    public void onCompleted(Void object) {
-
-                        Toast.makeText(AddDonationStep2Activity.this,
-                                "התרומה פורסמה בהצלחה!",
-                                Toast.LENGTH_SHORT).show();
-
-                        finish(); // חזרה למסך קודם
-                    }
-
-                    @Override
-                    public void onFailed(Exception e) {
-                        Toast.makeText(AddDonationStep2Activity.this,
-                                "שגיאה בפרסום התרומה",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
+//    private void createDonation(String name, String description, String city) {
+//
+//        String donationId = databaseService.getDonationService().generateId();
+//
+//        // שליפת המשתמש המחובר
+//        String currentUserID = SharedPreferencesUtil.getUserId(this);
+//
+//        Donation donation = new Donation(
+//                donationId,
+//                name,
+//                description,
+//                selectedCategory, // enum אמיתי
+//                Donation.DonationStatus.AVAILABLE, // סטטוס התחלתי
+//                "", // photoUrl ריק בשלב הזה
+//                city,
+//                currentUserID, // giver
+//                null // receiver בהתחלה אין
+//        );
+//
+//        databaseService.getDonationService().create(donation,
+//                new DatabaseService.DatabaseCallback<Void>() {
+//
+//                    @Override
+//                    public void onCompleted(Void object) {
+//
+//                        Toast.makeText(AddDonationStep2Activity.this,
+//                                "התרומה פורסמה בהצלחה!",
+//                                Toast.LENGTH_SHORT).show();
+//
+//                        finish(); // חזרה למסך קודם
+//                    }
+//
+//                    @Override
+//                    public void onFailed(Exception e) {
+//                        Toast.makeText(AddDonationStep2Activity.this,
+//                                "שגיאה בפרסום התרומה",
+//                                Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//    }
 }

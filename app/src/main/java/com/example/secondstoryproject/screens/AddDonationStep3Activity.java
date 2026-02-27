@@ -1,5 +1,7 @@
 package com.example.secondstoryproject.screens;
 
+import static android.opengl.ETC1.isValid;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,21 +25,29 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.adapters.ImageSourceAdapter;
 import com.example.secondstoryproject.models.Donation;
+import com.example.secondstoryproject.models.DonationCategory;
 import com.example.secondstoryproject.models.ImageSourceOption;
+import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
+import com.example.secondstoryproject.utils.SharedPreferencesUtil;
+import com.example.secondstoryproject.utils.Validator;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 
-public class AddFoodActivity extends BaseActivity implements View.OnClickListener {
+public class AddDonationStep3Activity extends BaseActivity implements View.OnClickListener {
 
     /// tag for logging
-    private static final String TAG = "AddFoodActivity";
+    private static final String TAG = "AddDonationStep3Activity";
 
-    private EditText foodNameEditText, foodPriceEditText;
-    private Button addFoodButton;
-    private ImageView foodImageView;
+    private Button addDonationButton;
+    private ImageView DonationImageView;
+
+    private String selectedDonationName;
+    private String selectedDescription;
+    private String selectedCity;
+    private String selectedCategoryName;
 
     /// Activity result launcher for selecting image from gallery
     private ActivityResultLauncher<Intent> selectImageLauncher;
@@ -56,22 +66,29 @@ public class AddFoodActivity extends BaseActivity implements View.OnClickListene
             return insets;
         });
 
+        /// getting extra from AddDonationStep2Activity
+        selectedDonationName = getIntent().getStringExtra("donationName");
+        selectedDescription = getIntent().getStringExtra("description");
+        selectedCity = getIntent().getStringExtra("city");
+        selectedCategoryName = getIntent().getStringExtra("selected_category");
+
+
+
+
         /// request permission for the camera and storage
         ImageUtil.requestPermission(this);
 
         /// get the views
-        foodNameEditText = findViewById(R.id.food_name);
-        foodPriceEditText = findViewById(R.id.food_price);
-        addFoodButton = findViewById(R.id.add_food_button);
-        foodImageView = findViewById(R.id.food_image);
+        addDonationButton = findViewById(R.id.add_donation_button);
+        DonationImageView = findViewById(R.id.donation_image);
 
         /// set the tag for the image view
         /// to check if the image was changed from app:srcCompat="@drawable/image"
-        foodImageView.setTag(R.drawable.image);
+        DonationImageView.setTag(R.drawable.image);
 
         /// set the on click listeners
-        foodImageView.setOnClickListener(this);
-        addFoodButton.setOnClickListener(this);
+        DonationImageView.setOnClickListener(this);
+        addDonationButton.setOnClickListener(this);
 
         /// register the activity result launcher for selecting image from gallery
         selectImageLauncher = registerForActivityResult(
@@ -79,9 +96,9 @@ public class AddFoodActivity extends BaseActivity implements View.OnClickListene
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri selectedImage = result.getData().getData();
-                        foodImageView.setImageURI(selectedImage);
+                        DonationImageView.setImageURI(selectedImage);
                         /// set the tag for the image view to null
-                        foodImageView.setTag(null);
+                        DonationImageView.setTag(null);
                     }
                 });
 
@@ -91,9 +108,9 @@ public class AddFoodActivity extends BaseActivity implements View.OnClickListene
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Bitmap bitmap = (Bitmap) result.getData().getExtras().get("data");
-                        foodImageView.setImageBitmap(bitmap);
+                        DonationImageView.setImageBitmap(bitmap);
                         /// set the tag for the image view to null
-                        foodImageView.setTag(null);
+                        DonationImageView.setTag(null);
                     }
                 });
 
@@ -101,12 +118,12 @@ public class AddFoodActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == addFoodButton.getId()) {
-            Log.d(TAG, "Add food button clicked");
-            addFoodToDatabase();
+        if (v.getId() == addDonationButton.getId()) {
+            Log.d(TAG, "Add donation button clicked");
+            addDonationToDatabase();
             return;
         }
-        if (v.getId() == foodImageView.getId()) {
+        if (v.getId() == DonationImageView.getId()) {
             Log.d(TAG, "Select image button clicked");
             showImageSourceDialog();
             return;
@@ -142,54 +159,52 @@ public class AddFoodActivity extends BaseActivity implements View.OnClickListene
     }
 
     /// add the food to the database
-    /// @see Food
-    private void addFoodToDatabase() {
-        /// get the values from the input fields
-        String name = foodNameEditText.getText().toString();
-        String priceText = foodPriceEditText.getText().toString();
+    /// @see Donation
+    private void addDonationToDatabase() {
+        String donationId = databaseService.getDonationService().generateId();
 
+        // שליפת המשתמש המחובר
+        String currentUserID = SharedPreferencesUtil.getUserId(this);
 
-        /// validate the input
-        /// stop if the input is not valid
-        if (!isValid(name, priceText, foodImageView)) return;
+        DonationCategory selectedCategory = DonationCategory.fromString(selectedCategoryName);
 
-        String imageBase64 = ImageUtil.toBase64(foodImageView);
-        /// convert the price to double
-        double price = Double.parseDouble(priceText);
+        if (!checkInput(DonationImageView)) return;
 
-        /// generate a new id for the food
-        String id = databaseService.getFoodService().generateId();
+        String imageBase64 = ImageUtil.toBase64(DonationImageView);
 
-        Log.d(TAG, "Adding food to database");
-        Log.d(TAG, "ID: " + id);
-        Log.d(TAG, "Name: " + name);
-        Log.d(TAG, "Price: " + price);
-//        Log.d(TAG, "Image: " + imageBase64);
+        Donation donation = new Donation(
+                donationId,
+                selectedCategoryName,
+                selectedDescription,
+                selectedCategory,
+                Donation.DonationStatus.AVAILABLE, // סטטוס התחלתי
+                imageBase64,
+                selectedCity,
+                currentUserID, // giver
+                null // receiver בהתחלה אין
+        );
 
-        /// create a new food object
-        Food food = new Food(id, name, price, imageBase64);
+        databaseService.getDonationService().create(donation,
+                new DatabaseService.DatabaseCallback<Void>() {
 
-        /// save the food to the database and get the result in the callback
-        databaseService.getFoodService().create(food, new IDatabaseService.DatabaseCallback<>() {
-            @Override
-            public void onCompleted(Void object) {
-                Log.d(TAG, "Food added successfully");
-                Toast.makeText(AddFoodActivity.this, "Food added successfully", Toast.LENGTH_SHORT).show();
-                /// clear the input fields after adding the food for the next food
-                Log.d(TAG, "Clearing input fields");
-                foodNameEditText.setText("");
-                foodPriceEditText.setText("");
-                foodImageView.setImageBitmap(null);
-            }
+                    @Override
+                    public void onCompleted(Void object) {
 
-            @Override
-            public void onFailed(Exception e) {
-                Log.e(TAG, "Failed to add food", e);
-                Toast.makeText(AddFoodActivity.this, "Failed to add food", Toast.LENGTH_SHORT).show();
-            }
-        });
+                        Toast.makeText(AddDonationStep3Activity.this,
+                                "התרומה פורסמה בהצלחה!",
+                                Toast.LENGTH_SHORT).show();
+
+                        finish(); // חזרה למסך קודם
+                    }
+
+                    @Override
+                    public void onFailed(Exception e) {
+                        Toast.makeText(AddDonationStep3Activity.this,
+                                "שגיאה בפרסום התרומה",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
-
 
     /// select image from gallery
     private void selectImageFromGallery() {
@@ -205,27 +220,13 @@ public class AddFoodActivity extends BaseActivity implements View.OnClickListene
 
 
     /// validate the input
-    private boolean isValid(String name, String priceText, ImageView foodImageView) {
-        if (name.isEmpty()) {
-            Log.e(TAG, "Name is empty");
-            foodNameEditText.setError("Name is required");
-            foodNameEditText.requestFocus();
-            return false;
+    private boolean checkInput(ImageView donationImageView) {
+        if (donationImageView.getTag() != null) {
+             Log.e(TAG, "Image is required");
+             Toast.makeText(this, "Image is required", Toast.LENGTH_SHORT).show();
+             return false;
         }
 
-        if (priceText.isEmpty()) {
-            Log.e(TAG, "Price is empty");
-            foodPriceEditText.setError("Price is required");
-            foodPriceEditText.requestFocus();
-            return false;
-        }
-
-        // check if foodImageView was changed from app:srcCompat="@drawable/image"
-        if (foodImageView.getTag() != null) {
-            Log.e(TAG, "Image is required");
-            Toast.makeText(this, "Image is required", Toast.LENGTH_SHORT).show();
-            return false;
-        }
         return true;
     }
 

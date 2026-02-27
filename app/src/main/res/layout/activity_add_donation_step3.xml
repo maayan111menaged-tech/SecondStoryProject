@@ -9,10 +9,13 @@
     tools:context=".screens.AddDonationStep3Activity">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -31,11 +34,11 @@
                     android:layout_height="200dp">
 
                     <ImageView
-                        android:id="@+id/food_image"
+                        android:id="@+id/donation_image"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="?attr/colorSurfaceVariant"
-                        android:contentDescription="Food Image"
+                        android:contentDescription="Donation Image"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/image" />
 
@@ -71,12 +74,21 @@
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
-
                 </FrameLayout>
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_donation_button"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Add Donation"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:cornerRadius="30dp"
+            app:icon="@android:drawable/ic_input_add"
+            app:iconGravity="textStart"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
 
     </LinearLayout>
 
