@@ -110,7 +110,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_user_profile) {
 
-            ///navigateTo(UserProfileActivity.class);
+            navigateTo(UserProfileActivity.class);
 
         } else if (id == R.id.nav_add_donation) {
 

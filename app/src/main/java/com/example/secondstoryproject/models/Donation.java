@@ -13,13 +13,6 @@ public class Donation implements Idable {
     private String giverID;
     private String receiverID;
 
-    // Enum של סטטוס
-    public enum DonationStatus {
-        AVAILABLE,
-        MATCHED,
-        DELIVERED
-    }
-
     public Donation() {
         // חובה ל-Firebase
     }

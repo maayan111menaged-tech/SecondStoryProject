@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationCategory;
+import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
@@ -64,29 +65,28 @@ public class AddDonationStep4Activity extends BaseActivity {
     /// add the food to the database
     /// @see Donation
     private void publishDonation() {
-        Log.d("AD", "הגעתי לפונקציה publishDonation");
+
         String donationId = databaseService.getDonationService().generateId();
-        Log.d("AD","genereted id");
+
         // שליפת המשתמש המחובר
         String currentUserId = SharedPreferencesUtil.getUserId(this);
-        Log.d("AD","got current user");
+
         Donation donation = new Donation(
                 donationId,
                 donationName,
                 description,
                 DonationCategory.fromString(categoryName),
-                Donation.DonationStatus.AVAILABLE,
+                DonationStatus.PENDING_APPROVAL,
                 imageBase64,
                 city,
                 currentUserId,
                 null
         );
-        Log.d("AD","created user");
+
 
         databaseService.getDonationService().create(donation, new DatabaseService.DatabaseCallback<Void>() {
             @Override
             public void onCompleted(Void object) {
-                Log.d("AD","in onCompleted");
                 Toast.makeText(AddDonationStep4Activity.this,
                         "התרומה פורסמה בהצלחה!", Toast.LENGTH_SHORT).show();
 
@@ -98,7 +98,6 @@ public class AddDonationStep4Activity extends BaseActivity {
 
             @Override
             public void onFailed(Exception e) {
-                Log.d("AD","in onFailed");
                 Toast.makeText(AddDonationStep4Activity.this,
                         "שגיאה בפרסום התרומה", Toast.LENGTH_SHORT).show();
             }
