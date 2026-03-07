@@ -39,4 +39,5 @@ public enum DonationCategory {
     public static DonationCategory fromString(String value) {
         return DonationCategory.valueOf(value);
     }
+
 }

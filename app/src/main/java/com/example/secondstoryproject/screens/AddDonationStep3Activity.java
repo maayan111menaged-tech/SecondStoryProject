@@ -1,7 +1,5 @@
 package com.example.secondstoryproject.screens;
 
-import static android.opengl.ETC1.isValid;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -158,52 +156,25 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
         bottomSheetDialog.show();
     }
 
-    /// add the food to the database
-    /// @see Donation
+    /// go to step 4
     private void addDonationToDatabase() {
-        String donationId = databaseService.getDonationService().generateId();
-
-        // שליפת המשתמש המחובר
-        String currentUserID = SharedPreferencesUtil.getUserId(this);
-
         DonationCategory selectedCategory = DonationCategory.fromString(selectedCategoryName);
 
         if (!checkInput(DonationImageView)) return;
 
         String imageBase64 = ImageUtil.toBase64(DonationImageView);
 
-        Donation donation = new Donation(
-                donationId,
-                selectedCategoryName,
-                selectedDescription,
-                selectedCategory,
-                Donation.DonationStatus.AVAILABLE, // סטטוס התחלתי
-                imageBase64,
-                selectedCity,
-                currentUserID, // giver
-                null // receiver בהתחלה אין
-        );
+        Log.d(TAG, "Donation name: " + selectedDonationName);
+        Log.d(TAG, "Category: " + selectedCategoryName);
+        Log.d(TAG, "Image tag: " + DonationImageView.getTag());
 
-        databaseService.getDonationService().create(donation,
-                new DatabaseService.DatabaseCallback<Void>() {
-
-                    @Override
-                    public void onCompleted(Void object) {
-
-                        Toast.makeText(AddDonationStep3Activity.this,
-                                "התרומה פורסמה בהצלחה!",
-                                Toast.LENGTH_SHORT).show();
-
-                        finish(); // חזרה למסך קודם
-                    }
-
-                    @Override
-                    public void onFailed(Exception e) {
-                        Toast.makeText(AddDonationStep3Activity.this,
-                                "שגיאה בפרסום התרומה",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+        Intent intent = new Intent(AddDonationStep3Activity.this, AddDonationStep4Activity.class);
+        intent.putExtra("donationName", selectedDonationName);
+        intent.putExtra("description", selectedDescription);
+        intent.putExtra("selected_category", selectedCategoryName);
+        intent.putExtra("imageBase64", imageBase64);
+        intent.putExtra("city", selectedCity);
+        startActivity(intent);
     }
 
     /// select image from gallery

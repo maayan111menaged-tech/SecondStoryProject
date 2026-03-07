@@ -2,7 +2,6 @@ package com.example.secondstoryproject.screens;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -12,11 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.secondstoryproject.R;
-import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationCategory;
-import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
-import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.example.secondstoryproject.utils.Validator;
 
 public class AddDonationStep2Activity extends BaseActivity {
@@ -31,7 +27,7 @@ public class AddDonationStep2Activity extends BaseActivity {
     private ImageView imgCategory;
     private TextView tvCategoryName;
 
-    private DonationCategory selectedCategory;
+    private DonationCategory selectedCategory; // enum אמיתי
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,35 +43,33 @@ public class AddDonationStep2Activity extends BaseActivity {
         actCity = findViewById(R.id.actCity);
         btnNextToUploadPic = findViewById(R.id.btnNextToUploadPic);
 
-        String selectedCategoryName = getIntent().getStringExtra("selected_category");
-        if (selectedCategoryName != null) {
-            selectedCategory = DonationCategory.fromString(selectedCategoryName);
+        // --- כאן אנחנו מקבלים את הקטגוריה מה-Intent ---
+        String selectedCategoryNameFromIntent = getIntent().getStringExtra("selected_category");
+        if (selectedCategoryNameFromIntent != null) {
+            // ממירים מ-String ל-Enum
+            selectedCategory = DonationCategory.fromString(selectedCategoryNameFromIntent);
             imgCategory.setImageResource(selectedCategory.getIconResId());
             tvCategoryName.setText(selectedCategory.getHebrewName());
         }
 
         setupCityDropdown();
+
         btnNextToUploadPic.setOnClickListener(v -> submitDonation());
     }
 
     private void setupCityDropdown() {
-
         String[] cities = getResources().getStringArray(R.array.israel_cities);
-
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(this,
                         android.R.layout.simple_dropdown_item_1line,
                         cities);
-
         actCity.setAdapter(adapter);
     }
 
     private void submitDonation() {
-
         String donationName = etDonationName.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
         String city = actCity.getText().toString().trim();
-        String category = tvCategoryName.toString().trim();
 
         if (!checkInput(donationName, description, city)) {
             return;
@@ -83,16 +77,18 @@ public class AddDonationStep2Activity extends BaseActivity {
 
         Intent intent = new Intent(AddDonationStep2Activity.this, AddDonationStep3Activity.class);
 
-        intent.putExtra("donation_name", donationName);
+        // שולחים את כל הנתונים בצורה נקייה
+        intent.putExtra("donationName", donationName);
         intent.putExtra("description", description);
         intent.putExtra("city", city);
-        intent.putExtra("selected_category", category);
+
+        // שולחים את שם ה-Enum (CLOTHES, TOYS וכו') כדי שה-Step3 ידע לקרוא
+        intent.putExtra("selected_category", selectedCategory.name());
 
         startActivity(intent);
     }
 
     private boolean checkInput(String donationName, String description, String city) {
-
         if (!Validator.isDonationNameValid(donationName)) {
             etDonationName.setError("נא להזין שם לתרומה");
             etDonationName.requestFocus();
@@ -118,45 +114,4 @@ public class AddDonationStep2Activity extends BaseActivity {
 
         return true;
     }
-
-//    private void createDonation(String name, String description, String city) {
-//
-//        String donationId = databaseService.getDonationService().generateId();
-//
-//        // שליפת המשתמש המחובר
-//        String currentUserID = SharedPreferencesUtil.getUserId(this);
-//
-//        Donation donation = new Donation(
-//                donationId,
-//                name,
-//                description,
-//                selectedCategory, // enum אמיתי
-//                Donation.DonationStatus.AVAILABLE, // סטטוס התחלתי
-//                "", // photoUrl ריק בשלב הזה
-//                city,
-//                currentUserID, // giver
-//                null // receiver בהתחלה אין
-//        );
-//
-//        databaseService.getDonationService().create(donation,
-//                new DatabaseService.DatabaseCallback<Void>() {
-//
-//                    @Override
-//                    public void onCompleted(Void object) {
-//
-//                        Toast.makeText(AddDonationStep2Activity.this,
-//                                "התרומה פורסמה בהצלחה!",
-//                                Toast.LENGTH_SHORT).show();
-//
-//                        finish(); // חזרה למסך קודם
-//                    }
-//
-//                    @Override
-//                    public void onFailed(Exception e) {
-//                        Toast.makeText(AddDonationStep2Activity.this,
-//                                "שגיאה בפרסום התרומה",
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
 }
