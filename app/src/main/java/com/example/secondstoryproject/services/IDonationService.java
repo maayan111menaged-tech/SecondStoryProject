@@ -60,4 +60,13 @@ public interface IDonationService {
      *                 Can be {@code null} if the caller does not need to handle the result.
      */
     void delete(@NonNull String donationId, @Nullable DatabaseCallback<Void> callback);
+
+    /**
+     * Retrieve all donations created by a specific user.
+     *
+     * @param giverId the ID of the user who created the donations
+     * @param callback called with a list of donations belonging to that user
+     */
+    void getByGiverId(@NonNull String giverId,
+                      @NonNull DatabaseCallback<List<Donation>> callback);
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ProfileActivity">
+    tools:context=".screens.UserProfileActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -36,7 +36,7 @@
                 android:text="username"
                 android:textColor="#36b3b8"
                 android:textSize="22sp"
-                android:textStyle="bold"                />
+                android:textStyle="bold"/>
         </LinearLayout>
 
         <!-- Profile Picture -->
@@ -107,13 +107,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp">
 
+            <!-- Phone -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="12dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom = "5dp"
+                android:layout_marginBottom="5dp"
                 android:background="@drawable/rounded_background">
 
                 <ImageView
@@ -130,13 +131,15 @@
                     android:layout_marginStart="8dp"/>
             </LinearLayout>
 
+            <!-- Email -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="12dp"
-                android:layout_marginBottom = "5dp"
-                android:background="@drawable/rounded_background">                android:gravity="center_vertical">
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/rounded_background"
+                android:gravity="center_vertical">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -152,12 +155,13 @@
                     android:layout_marginStart="8dp"/>
             </LinearLayout>
 
+            <!-- Birthday -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="12dp"
-                android:layout_marginBottom = "5dp"
+                android:layout_marginBottom="5dp"
                 android:background="@drawable/rounded_background"
                 android:gravity="center_vertical">
 
@@ -193,9 +197,56 @@
                 android:text="עריכת פרטים"
                 android:backgroundTint="#36b3b8"
                 android:textColor="@android:color/white"
-                android:layout_marginEnd="8dp" />
-
+                android:layout_marginEnd="8dp"/>
         </LinearLayout>
+
+        <!-- User Donations -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="התרומות שלי"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Horizontal RecyclerView עם חצים -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvUserDonations"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"/>
+
+            <ImageButton
+                android:id="@+id/btnLeft"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/rounded_background"
+                android:src="@drawable/ic_arrow_left"
+                android:tint="@android:color/white"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <ImageButton
+                android:id="@+id/btnRight"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/rounded_background"
+                android:src="@drawable/ic_arrow_right"
+                android:tint="@android:color/white"
+                android:clickable="true"
+                android:focusable="true"/>
+        </RelativeLayout>
 
     </LinearLayout>
 </ScrollView>

@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback;
 import com.example.secondstoryproject.services.IDonationService;
-
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -42,5 +42,33 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
     @Override
     public void delete(@NonNull String donationId, @Nullable DatabaseCallback<Void> callback) {
         super.delete(donationId, callback);
+    }
+
+    @Override
+    public void getByGiverId(@NonNull String giverId, @NonNull DatabaseCallback<List<Donation>> callback) {
+
+        super.getAll(new DatabaseCallback<List<Donation>>() {
+
+            @Override
+            public void onCompleted(List<Donation> donations) {
+
+                List<Donation> userDonations = new ArrayList<>();
+
+                for (Donation donation : donations) {
+                    if (donation.getGiverID() != null &&
+                            donation.getGiverID().equals(giverId)) {
+
+                        userDonations.add(donation);
+                    }
+                }
+
+                callback.onCompleted(userDonations);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
     }
 }
