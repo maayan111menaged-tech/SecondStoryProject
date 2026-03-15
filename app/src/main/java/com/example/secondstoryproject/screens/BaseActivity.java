@@ -25,6 +25,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected IDatabaseService databaseService;
     protected DrawerLayout drawerLayout;
 
+
     protected boolean hasSideMenu() {
         return true; // ברירת מחדל – יש Drawer
     }

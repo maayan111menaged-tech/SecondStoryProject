@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationStatus;
+import com.example.secondstoryproject.screens.DonationDetailActivity;
 import com.example.secondstoryproject.screens.MainActivity;
 import com.example.secondstoryproject.utils.ImageUtil;
 
@@ -56,7 +57,7 @@ public class ProfileDonationAdapter extends RecyclerView.Adapter<ProfileDonation
 
         holder.itemView.setOnClickListener(v -> {
 
-            Intent intent = new Intent(context, MainActivity.class);
+            Intent intent = new Intent(context, DonationDetailActivity.class);
             intent.putExtra("donationId", donation.getId());
             context.startActivity(intent);
 
