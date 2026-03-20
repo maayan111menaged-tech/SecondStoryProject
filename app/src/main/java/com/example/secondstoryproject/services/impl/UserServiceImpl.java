@@ -117,6 +117,19 @@ public class UserServiceImpl extends BaseFirebaseService<User> implements IUserS
         });
     }
 
+    @Override
+    public void getUsersCount(@NonNull DatabaseCallback<Integer> callback) {
+        getAll(new DatabaseCallback<List<User>>() {
+            @Override
+            public void onCompleted(List<User> users) {
+                callback.onCompleted(users.size());
+            }
 
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
 
 }

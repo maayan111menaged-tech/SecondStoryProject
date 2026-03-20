@@ -130,9 +130,19 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     Toast.makeText(LoginActivity.this, "לא קיים", Toast.LENGTH_LONG).show();
                     return;
                 }
+
                 Log.d(TAG, "onCompleted: User logged in: " + user.toString());
                 SharedPreferencesUtil.saveUser(LoginActivity.this, user);
-                Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+
+                // בודק אם המשתמש הוא ADMIN או רגיל
+                Class<?> targetActivity;
+                if (user.isAdmin()) {
+                    targetActivity = AdminMainActivity.class;
+                } else {
+                    targetActivity = MainActivity.class;
+                }
+
+                Intent mainIntent = new Intent(LoginActivity.this, targetActivity);
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mainIntent);
             }

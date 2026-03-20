@@ -80,4 +80,7 @@ public interface IUserService {
     ///                 or {@code null} if no user matches the given username.
     void findUserByUserName(@NonNull String username, @NonNull DatabaseCallback<User> callback);
 
+    ///get the amount of registered users
+    ///  used in the main admin page and userlist page
+    void getUsersCount(@NonNull DatabaseCallback<Integer> callback);
 }

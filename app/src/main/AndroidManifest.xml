@@ -22,7 +22,7 @@
         android:theme="@style/Theme.SecondStoryProject"
         tools:targetApi="31">
         <activity
-            android:name=".AdminMainActivity"
+            android:name=".screens.AdminMainActivity"
             android:exported="false" />
         <activity
             android:name=".screens.DonationDetailActivity"

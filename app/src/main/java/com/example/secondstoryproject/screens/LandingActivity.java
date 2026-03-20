@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 public class LandingActivity extends BaseActivity {
@@ -30,13 +31,22 @@ public class LandingActivity extends BaseActivity {
             return insets;
         });
 
-        if(SharedPreferencesUtil.isUserLoggedIn(this)){
-            Intent intent = new Intent(LandingActivity.this, MainActivity.class);
+        if (SharedPreferencesUtil.isUserLoggedIn(this)) {
+            User currentUser = SharedPreferencesUtil.getUser(this);
+
+            Class<?> targetActivity;
+
+            if (currentUser.isAdmin()) {
+                targetActivity = AdminMainActivity.class; // מחלקת Activity של ADMIN
+            } else {
+                targetActivity = MainActivity.class; // מחלקת Activity רגילה
+            }
+
+            Intent intent = new Intent(LandingActivity.this, targetActivity);
             startActivity(intent);
             finish();
             return;
         }
-
         Button buttonLogin = findViewById(R.id.btn_Landing_toLogin);
         Button buttonSignin = findViewById(R.id.btn_Landing_toSignUp);
 

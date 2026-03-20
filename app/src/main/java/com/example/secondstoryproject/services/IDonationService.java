@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.secondstoryproject.models.Donation;
+import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback;
 
 import java.util.List;
@@ -69,4 +70,8 @@ public interface IDonationService {
      */
     void getByGiverId(@NonNull String giverId,
                       @NonNull DatabaseCallback<List<Donation>> callback);
+
+    ///
+    void getDonationsCountByStatus(@NonNull DonationStatus status,
+                                   @NonNull DatabaseCallback<Integer> callback);
 }

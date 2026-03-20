@@ -14,6 +14,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
@@ -25,7 +26,11 @@ public abstract class BaseActivity extends AppCompatActivity
     protected IDatabaseService databaseService;
     protected DrawerLayout drawerLayout;
 
-
+    protected boolean isAdmin() {
+        User currentUser = SharedPreferencesUtil.getUser(this);
+        if (currentUser == null) { return false; }
+        return currentUser.isAdmin();
+    }
     protected boolean hasSideMenu() {
         return true; // ברירת מחדל – יש Drawer
     }
@@ -45,6 +50,14 @@ public abstract class BaseActivity extends AppCompatActivity
         drawerLayout = findViewById(R.id.nav_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // בודק סוג משתמש
+        if (isAdmin()) {
+            navigationView.inflateMenu(R.menu.nav_menu_admin); // XML נפרד ל-ADMIN
+        } else {
+            navigationView.inflateMenu(R.menu.nav_menu);
+        }
+
         if (hasSideMenu()) {
 
             if (getSupportActionBar() != null) {
@@ -106,31 +119,26 @@ public abstract class BaseActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
             navigateTo(MainActivity.class);
-
+        } else if(id == R.id.nav_home_admin){
+            navigateTo(AdminMainActivity.class);
         } else if (id == R.id.nav_user_profile) {
-
             navigateTo(UserProfileActivity.class);
-
+        } else if(id == R.id.nav_admin_profile){
+            ///navigateTo(AdminProfileActivity.class);
         } else if (id == R.id.nav_add_donation) {
-
             navigateTo(PickCatergoryActivity.class);
-
+        } else if(id == R.id.nav_accept_donation){
+            /// navigateTo(AcceptDonationsActivity.class);
         } else if (id == R.id.nav_search_donation) {
-
             ///navigateTo(SearchDonationActivity.class);
-
         } else if (id == R.id.nav_leaders_board) {
-
             navigateTo(LeaderBoardActivity.class);
-
+        } else if(id == R.id.nav_users_list){
+            navigateTo(UsersListActivity.class);
         } else if (id == R.id.nav_settings) {
-
             ///navigateTo(SettingsActivity.class);
-
         } else if (id == R.id.nav_signOut) {
-
             drawerLayout.closeDrawer(GravityCompat.START);
             showLogoutDialog();
         }

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.secondstoryproject.models.Donation;
+import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback;
 import com.example.secondstoryproject.services.IDonationService;
 import java.util.ArrayList;
@@ -63,6 +64,34 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
                 }
 
                 callback.onCompleted(userDonations);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
+
+    @Override
+    public void getDonationsCountByStatus(@NonNull DonationStatus status,
+                                          @NonNull DatabaseCallback<Integer> callback) {
+
+        super.getAll(new DatabaseCallback<List<Donation>>() {
+            @Override
+            public void onCompleted(List<Donation> donations) {
+
+                int count = 0;
+
+                for (Donation donation : donations) {
+                    if (donation.getStatus() != null &&
+                            donation.getStatus() == status) {
+
+                        count++;
+                    }
+                }
+
+                callback.onCompleted(count);
             }
 
             @Override
