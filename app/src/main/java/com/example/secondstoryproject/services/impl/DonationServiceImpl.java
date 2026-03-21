@@ -46,6 +46,14 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
     }
 
     @Override
+    public void update(@NonNull String donationId,
+                       @NonNull java.util.function.UnaryOperator<Donation> function,
+                       @Nullable DatabaseCallback<Donation> callback) {
+
+        super.update(donationId, function, callback);
+    }
+
+    @Override
     public void getByGiverId(@NonNull String giverId, @NonNull DatabaseCallback<List<Donation>> callback) {
 
         super.getAll(new DatabaseCallback<List<Donation>>() {
@@ -92,6 +100,34 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
                 }
 
                 callback.onCompleted(count);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
+
+    @Override
+    public void getDonationsByStatus(@NonNull DonationStatus status,
+                                     @NonNull DatabaseCallback<List<Donation>> callback) {
+
+        super.getAll(new DatabaseCallback<List<Donation>>() {
+            @Override
+            public void onCompleted(List<Donation> donations) {
+
+                List<Donation> filtered = new ArrayList<>();
+
+                for (Donation donation : donations) {
+                    if (donation.getStatus() != null &&
+                            donation.getStatus() == status) {
+
+                        filtered.add(donation);
+                    }
+                }
+
+                callback.onCompleted(filtered);
             }
 
             @Override

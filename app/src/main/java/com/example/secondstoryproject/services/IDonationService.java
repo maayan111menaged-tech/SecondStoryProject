@@ -74,4 +74,13 @@ public interface IDonationService {
     ///
     void getDonationsCountByStatus(@NonNull DonationStatus status,
                                    @NonNull DatabaseCallback<Integer> callback);
+
+    ///
+    void getDonationsByStatus(@NonNull DonationStatus status,
+                              @NonNull DatabaseCallback<List<Donation>> callback);
+
+    ///
+    void update(@NonNull String donationId,
+                @NonNull java.util.function.UnaryOperator<Donation> function,
+                @Nullable DatabaseCallback<Donation> callback);
 }

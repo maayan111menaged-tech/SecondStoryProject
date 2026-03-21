@@ -48,8 +48,8 @@ public class AdminMainActivity extends BaseActivity {
         loadStats();
 
         // 🔹 כפתורים
-        ///btnAcceptDonations.setOnClickListener(v ->
-           ///     startActivity(new Intent(this, AcceptDonationActivity.class)));
+        btnAcceptDonations.setOnClickListener(v ->
+                startActivity(new Intent(this, AcceptDonationActivity.class)));
 
         btnUsersList.setOnClickListener(v ->
                 startActivity(new Intent(this, UsersListActivity.class)));
