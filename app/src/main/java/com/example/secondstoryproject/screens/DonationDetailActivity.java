@@ -9,13 +9,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.Donation;
+import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
+import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 public class DonationDetailActivity extends BaseActivity {
 
@@ -25,11 +30,17 @@ public class DonationDetailActivity extends BaseActivity {
     private Button btnApprove, btnReject;
     private LinearLayout layoutAdminActions;
     private Donation currentDonation;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donation_detail);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         ivDonation = findViewById(R.id.ivDonation);
         ivStatus = findViewById(R.id.ivStatus);
@@ -42,7 +53,7 @@ public class DonationDetailActivity extends BaseActivity {
         btnReject = findViewById(R.id.btnReject);
         layoutAdminActions = findViewById(R.id.layout_admin_actions);
 
-        String donationId = getIntent().getStringExtra("donationId");
+        String donationId = getIntent().getStringExtra("DONATION_ID");
         if (donationId != null) {
             loadDonationDetails(donationId);
         }
@@ -93,7 +104,12 @@ public class DonationDetailActivity extends BaseActivity {
             ivDonation.setImageResource(R.drawable.ic_profile);
         }
 
-        if (status == DonationStatus.PENDING_APPROVAL) {
+        currentDonation = donation;
+        currentUser = SharedPreferencesUtil.getUser(this);
+
+        if (status == DonationStatus.PENDING_APPROVAL
+                && currentUser != null
+                && currentUser.isAdmin()) {
             layoutAdminActions.setVisibility(View.VISIBLE);
             setupButtons();
         } else {
@@ -102,7 +118,6 @@ public class DonationDetailActivity extends BaseActivity {
     }
 
     private void setupButtons() {
-
         btnApprove.setOnClickListener(v -> showConfirmDialog(true));
         btnReject.setOnClickListener(v -> showConfirmDialog(false));
     }

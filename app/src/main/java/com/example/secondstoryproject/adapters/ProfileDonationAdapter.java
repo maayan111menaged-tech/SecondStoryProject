@@ -58,7 +58,7 @@ public class ProfileDonationAdapter extends RecyclerView.Adapter<ProfileDonation
         holder.itemView.setOnClickListener(v -> {
 
             Intent intent = new Intent(context, DonationDetailActivity.class);
-            intent.putExtra("donationId", donation.getId());
+            intent.putExtra("DONATION_ID", donation.getId());
             context.startActivity(intent);
 
         });

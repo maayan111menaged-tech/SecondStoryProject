@@ -22,9 +22,6 @@
         android:theme="@style/Theme.SecondStoryProject"
         tools:targetApi="31">
         <activity
-            android:name=".screens.DonationDetailsActivity"
-            android:exported="false" />
-        <activity
             android:name=".screens.AcceptDonationActivity"
             android:exported="false" />
         <activity
