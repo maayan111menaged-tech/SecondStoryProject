@@ -1,5 +1,8 @@
 package com.example.secondstoryproject.models;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 public class Donation implements Idable {
 
     private String id;
@@ -12,6 +15,10 @@ public class Donation implements Idable {
 
     private String giverID;
     private String receiverID;
+
+    private ArrayList<StatusLog> statusHistory; // היסטוריית סטטוסים
+
+
 
     public Donation() {
         // חובה ל-Firebase
@@ -36,6 +43,12 @@ public class Donation implements Idable {
         this.city = city;
         this.giverID = giverID;
         this.receiverID = receiverID;
+
+        this.statusHistory = new ArrayList<>();
+        // מוסיפים את הסטטוס ההתחלתי להיסטוריה
+        addStatusLog(status, null);
+
+
     }
 
     // -------- Getters & Setters --------
@@ -66,4 +79,56 @@ public class Donation implements Idable {
 
     public String getReceiverID() { return receiverID; }
     public void setReceiverID(String receiver) { this.receiverID = receiver; }
+
+
+    public ArrayList<StatusLog> getStatusHistory() { return statusHistory; }
+    public void setStatusHistory(ArrayList<StatusLog> statusHistory) { this.statusHistory = statusHistory; }
+
+
+
+    // ----- פונקציה לעדכון סטטוס -----
+    /**
+     * מעדכן את סטטוס התרומה ושומר את ההיסטוריה.
+     *
+     * @param newStatus הסטטוס החדש
+     * @param reason    סיבה לשינוי, אם קיימת (יכול להיות null)
+     */
+    public void updateStatus(DonationStatus newStatus, String reason) {
+        this.status = newStatus;
+        addStatusLog(newStatus, reason);
+    }
+
+    // ----- פונקציה פנימית להוספת רשומה להיסטוריה -----
+    private void addStatusLog(DonationStatus status, String reason) {
+        if (statusHistory == null) {
+            statusHistory = new ArrayList<>();
+        }
+        statusHistory.add(new StatusLog(status, new Date(), reason));
+    }
+
+    // ----- StatusLog פנימי -----
+    public static class StatusLog {
+        private DonationStatus status;
+        private Date timestamp;
+        private String reason; // optional, לדוגמה דחייה עם סיבה
+
+        public StatusLog() {
+            // חובה ל-Firebase
+        }
+
+        public StatusLog(DonationStatus status, Date timestamp, String reason) {
+            this.status = status;
+            this.timestamp = timestamp;
+            this.reason = reason;
+        }
+
+        public DonationStatus getStatus() { return status; }
+        public void setStatus(DonationStatus status) { this.status = status; }
+
+        public Date getTimestamp() { return timestamp; }
+        public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
+
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
+    }
 }

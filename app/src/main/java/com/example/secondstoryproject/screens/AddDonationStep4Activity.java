@@ -18,11 +18,9 @@ import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 public class AddDonationStep4Activity extends BaseActivity {
-
     private ImageView imgPreview;
     private TextView tvName, tvDescription, tvCity, tvCategory;
     private Button btnConfirm;
-
     private String donationName, description, city, categoryName;
     private String imageBase64;
 

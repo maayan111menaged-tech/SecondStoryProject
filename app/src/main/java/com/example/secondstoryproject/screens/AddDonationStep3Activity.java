@@ -35,10 +35,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 
 public class AddDonationStep3Activity extends BaseActivity implements View.OnClickListener {
-
-    /// tag for logging
     private static final String TAG = "AddDonationStep3Activity";
-
     private Button addDonationButton;
     private ImageView DonationImageView;
 
@@ -56,7 +53,6 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        /// set the layout for the activity
         setContentView(R.layout.activity_add_donation_step3);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -69,9 +65,6 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
         selectedDescription = getIntent().getStringExtra("description");
         selectedCity = getIntent().getStringExtra("city");
         selectedCategoryName = getIntent().getStringExtra("selected_category");
-
-
-
 
         /// request permission for the camera and storage
         ImageUtil.requestPermission(this);
