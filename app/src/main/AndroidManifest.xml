@@ -61,9 +61,6 @@
             android:name=".screens.updateDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".screens.SignoutActivity"
-            android:exported="false" />
-        <activity
             android:name=".screens.BaseActivity"
             android:exported="false" />
         <activity

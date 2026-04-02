@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layoutDirection="rtl"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".screens.BaseActivity">
 
     <!-- ===== אזור מרכזי ===== -->
     <LinearLayout

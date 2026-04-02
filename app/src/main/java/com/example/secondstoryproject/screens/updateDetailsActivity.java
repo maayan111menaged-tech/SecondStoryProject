@@ -1,6 +1,7 @@
 package com.example.secondstoryproject.screens;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -196,6 +197,9 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
                                 "פרטייך עודכנו בהצלחה!",
                                 Toast.LENGTH_LONG).show();
                         showUserProfile();
+                        Intent intent = new Intent(updateDetailsActivity.this, UserProfileActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
 
                     @Override
