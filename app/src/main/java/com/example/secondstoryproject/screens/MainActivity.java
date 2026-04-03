@@ -43,6 +43,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        bottomNav.setSelectedItemId(R.id.menu_home);
+
         rateProgressBar = findViewById(R.id.rateProgressBar);
         currentRateIcon = findViewById(R.id.currentRateIcon);
         nextRateIcon = findViewById(R.id.nextRateIcon);

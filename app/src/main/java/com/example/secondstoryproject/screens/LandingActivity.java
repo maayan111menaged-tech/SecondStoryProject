@@ -21,6 +21,9 @@ public class LandingActivity extends BaseActivity {
         return false; // לא צריך Drawer
     }
     @Override
+    protected boolean hasBottomMenu(){ return false; }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);

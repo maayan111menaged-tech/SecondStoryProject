@@ -42,6 +42,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         return false; // לא צריך Drawer
     }
     @Override
+    protected boolean hasBottomMenu(){ return false; }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);

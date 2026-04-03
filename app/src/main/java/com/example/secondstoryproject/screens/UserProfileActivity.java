@@ -53,6 +53,8 @@ public class UserProfileActivity extends BaseActivity {
             return insets;
         });
 
+        bottomNav.setSelectedItemId(R.id.menu_profile);
+
         tvUserName = findViewById(R.id.tvUserName);
         tvFullName = findViewById(R.id.tvFullName);
         tvLevel = findViewById(R.id.tvLevel);

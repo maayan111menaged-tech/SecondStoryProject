@@ -36,6 +36,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected boolean hasSideMenu() {
         return false; // לא צריך Drawer
     }
+    @Override
+    protected boolean hasBottomMenu(){ return false; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

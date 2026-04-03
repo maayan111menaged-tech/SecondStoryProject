@@ -18,6 +18,7 @@ import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 public abstract class BaseActivity extends AppCompatActivity
@@ -25,6 +26,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected IDatabaseService databaseService;
     protected DrawerLayout drawerLayout;
+    BottomNavigationView bottomNav;
+
 
     protected boolean isAdmin() {
         User currentUser = SharedPreferencesUtil.getUser(this);
@@ -34,7 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected boolean hasSideMenu() {
         return true; // ברירת מחדל – יש Drawer
     }
-
+    protected boolean hasBottomMenu(){ return true; }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,8 @@ public abstract class BaseActivity extends AppCompatActivity
         drawerLayout = findViewById(R.id.nav_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        bottomNav = findViewById(R.id.bottom_nav);
 
         // בודק סוג משתמש
         if (isAdmin()) {
@@ -85,6 +90,9 @@ public abstract class BaseActivity extends AppCompatActivity
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 getSupportActionBar().setHomeAsUpIndicator(null);
             }
+        }
+        if(!hasBottomMenu()){
+            bottomNav.setVisibility(View.GONE);
         }
     }
 
