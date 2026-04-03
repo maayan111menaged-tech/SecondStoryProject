@@ -37,6 +37,8 @@ public class AdminMainActivity extends BaseActivity {
             return insets;
         });
 
+        bottomNav.setSelectedItemId(R.id.menu_home);
+
         // 🔹 חיבורים ל-XML
         btnAcceptDonations = findViewById(R.id.btn_accept_donations);
         btnUsersList = findViewById(R.id.btn_users_list);

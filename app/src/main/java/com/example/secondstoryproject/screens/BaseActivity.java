@@ -94,6 +94,28 @@ public abstract class BaseActivity extends AppCompatActivity
         if(!hasBottomMenu()){
             bottomNav.setVisibility(View.GONE);
         }
+        else {
+            bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    if (item.getItemId() == R.id.menu_chat) {
+                        navigateTo(ChatActivity.class);
+                    }
+                    if (item.getItemId() == R.id.menu_home) {
+                        if(isAdmin())   navigateTo(AdminMainActivity.class);
+                        else navigateTo(MainActivity.class);
+                    }
+                    if (item.getItemId() == R.id.menu_profile) {
+                        navigateTo(UserProfileActivity.class);
+                    }
+                    return true;
+                }
+            });
+            for (int i = 0; i < bottomNav.getMenu().size(); i++) {
+                bottomNav.getMenu().getItem(i).setChecked(false);
+            }
+        }
+
     }
 
     @Override

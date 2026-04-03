@@ -52,8 +52,8 @@ public class UserProfileActivity extends BaseActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
         bottomNav.setSelectedItemId(R.id.menu_profile);
+
 
         tvUserName = findViewById(R.id.tvUserName);
         tvFullName = findViewById(R.id.tvFullName);
