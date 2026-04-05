@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.adapters.UserAdapter;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
+import com.example.secondstoryproject.services.IDatabaseService;
 
 import java.util.List;
 
@@ -49,6 +51,50 @@ public class UsersListActivity extends BaseActivity {
             public void onLongUserClick(User user) {
                 // Handle long user click
                 Log.d(TAG, "User long clicked: " + user);
+            }
+            @Override
+            public void onMakeAdminClick(User user) {
+
+                String name = user.getUserName();
+
+                new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
+                        .setTitle("Make Admin")
+                        .setMessage("האם תרצה להפוך את " + name + " לאדמין?")
+                        .setPositiveButton("כן", (dialog, which) -> {
+
+                            // 👇 כאן "Loading" לוגי (לא UI ישיר)
+                            user.setAdmin(true);
+
+                            DatabaseService.getInstance().getUserService().update(
+                                    user.getId(),
+                                    oldUser -> user,
+                                    new IDatabaseService.DatabaseCallback<User>() {
+
+                                        @Override
+                                        public void onCompleted(User result) {
+
+                                            // ✔ זה מה שמתקן את הכפתור!
+                                            userAdapter.updateUserById(result);
+
+                                            Toast.makeText(UsersListActivity.this,
+                                                    "המשתמש הפך לאדמין",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onFailed(Exception e) {
+                                            Toast.makeText(UsersListActivity.this,
+                                                    "שגיאה בעדכון המשתמש",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                            );
+                        })
+                        .setNegativeButton("לא", (dialog, which) ->{
+                            userAdapter.resetMakeAdminButton(user);
+                            dialog.dismiss();
+                                })
+                        .show();
             }
         });
         usersList.setAdapter(userAdapter);

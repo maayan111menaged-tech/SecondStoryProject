@@ -27,15 +27,12 @@
             app:cardElevation="0dp"
             app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
-            <TextView
-                android:id="@+id/tv_user_initials"
+            <ImageView
+                android:id="@+id/iv_user_profile_pic"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="JD"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorPrimary" />
+                android:src="@drawable/ic_profile" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -51,10 +48,17 @@
                 android:id="@+id/tv_item_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="5dp"
+                tools:text="@tools:sample/first_names" />
+            <TextView
+                android:id="@+id/tv_item_user_fullname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="@tools:sample/full_names" />
 
             <LinearLayout
@@ -106,31 +110,14 @@
 
         </LinearLayout>
 
-        <LinearLayout
+
+        <Button
+            android:id="@+id/btn_make_admin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center|end"
-            android:orientation="vertical">
+            android:text="Make Admin"
+            android:textSize="11sp" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_user_role"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="Admin"
-                android:textSize="12sp"
-                android:visibility="gone"
-                app:chipBackgroundColor="?attr/colorSecondary"
-                app:chipStrokeWidth="0dp"
-                tools:visibility="visible" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="8dp"
-                android:src="@android:drawable/ic_menu_more"
-                app:tint="#999999" />
-
-        </LinearLayout>
 
     </LinearLayout>
 

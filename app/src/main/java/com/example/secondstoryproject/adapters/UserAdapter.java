@@ -1,7 +1,10 @@
 package com.example.secondstoryproject.adapters;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
+import com.example.secondstoryproject.utils.ImageUtil;
 import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
@@ -21,6 +25,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
     public interface OnUserClickListener {
         void onUserClick(User user);
         void onLongUserClick(User user);
+        void onMakeAdminClick(User user);
     }
 
     private final List<User> userList;
@@ -42,29 +47,27 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         User user = userList.get(position);
         if (user == null) return;
 
+        holder.tvUserName.setText(user.getUserName());
         holder.tvName.setText(user.getFullName());
         holder.tvEmail.setText(user.getEmail());
         holder.tvPhone.setText(user.getPhoneNumber());
 
+        String base64 = user.getProfilePhoneUrl();
 
-        //CHANGE TO PROFILE IMAGE!!!!!!!!!!!!!!!!!!!!!!!!!
-        // Set initials
-        String initials = "";
-        if (user.getfName() != null && !user.getfName().isEmpty()) {
-            initials += user.getfName().charAt(0);
+        if (base64 != null && !base64.isEmpty()) {
+            Bitmap bitmap = ImageUtil.fromBase64(base64);
+            holder.ivProfilePic.setImageBitmap(bitmap);
         }
-        if (user.getlName() != null && !user.getlName().isEmpty()) {
-            initials += user.getlName().charAt(0);
-        }
-        holder.tvInitials.setText(initials.toUpperCase());
 
-        // Show admin chip if user is admin
+        // if user admin change the MakeAdmin button
         if (user.isAdmin()) {
-            holder.chipRole.setVisibility(View.VISIBLE);
-            holder.chipRole.setText("Admin");
+            holder.btnMakeAdmin.setEnabled(false);
+            holder.btnMakeAdmin.setText("Already Admin");
         } else {
-            holder.chipRole.setVisibility(View.GONE);
+            holder.btnMakeAdmin.setEnabled(true);
+            holder.btnMakeAdmin.setText("Make Admin");
         }
+
 
         holder.itemView.setOnClickListener(v -> {
             if (onUserClickListener != null) {
@@ -79,6 +82,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             return true;
         });
 
+        holder.btnMakeAdmin.setOnClickListener(v -> {
+
+            holder.btnMakeAdmin.setEnabled(false);
+            holder.btnMakeAdmin.setText("Loading...");
+
+            if (onUserClickListener != null) {
+                onUserClickListener.onMakeAdminClick(user);
+            }
+        });
     }
 
     @Override
@@ -102,25 +114,54 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         userList.set(index, user);
         notifyItemChanged(index);
     }
+    public void updateUserById(User updatedUser) {
+        for (int i = 0; i < userList.size(); i++) {
+            if (userList.get(i).getId().equals(updatedUser.getId())) {
+                userList.set(i, updatedUser);
+                notifyItemChanged(i);
+                return;
+            }
+        }
+    }
+    public void resetMakeAdminButton(User user) {
+        for (int i = 0; i < userList.size(); i++) {
+            if (userList.get(i).getId().equals(user.getId())) {
 
+                userList.get(i).setAdmin(false);
+                notifyItemChanged(i);
+                return;
+            }
+        }
+    }
     public void removeUser(User user) {
         int index = userList.indexOf(user);
         if (index == -1) return;
         userList.remove(index);
         notifyItemRemoved(index);
     }
+    public void setLoadingState(Button button, boolean isLoading) {
+        if (isLoading) {
+            button.setEnabled(false);
+            button.setText("Loading...");
+        } else {
+            button.setEnabled(true);
+            button.setText("Make Admin");
+        }
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvEmail, tvPhone, tvInitials;
-        Chip chipRole;
+        TextView tvUserName,tvName, tvEmail, tvPhone;
+        ImageView ivProfilePic;
+        Button btnMakeAdmin;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvName = itemView.findViewById(R.id.tv_item_user_name);
+            tvUserName = itemView.findViewById(R.id.tv_item_user_name);
+            tvName = itemView.findViewById(R.id.tv_item_user_fullname);
             tvEmail = itemView.findViewById(R.id.tv_item_user_email);
             tvPhone = itemView.findViewById(R.id.tv_item_user_phone);
-            tvInitials = itemView.findViewById(R.id.tv_user_initials);
-            chipRole = itemView.findViewById(R.id.chip_user_role);
+            ivProfilePic = itemView.findViewById(R.id.iv_user_profile_pic);
+            btnMakeAdmin = itemView.findViewById(R.id.btn_make_admin);
         }
     }
 }
