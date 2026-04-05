@@ -1,4 +1,6 @@
 package com.example.secondstoryproject.adapters;
+import static com.example.secondstoryproject.utils.SharedPreferencesUtil.getUserId;
+
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.utils.ImageUtil;
+import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
@@ -46,6 +49,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User user = userList.get(position);
         if (user == null) return;
+
+        String currentUserId = SharedPreferencesUtil.getUserId(holder.itemView.getContext());
+        if (user.getId().equals(currentUserId)) {
+            holder.tvMeBadge.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvMeBadge.setVisibility(View.GONE);
+        }
 
         holder.tvUserName.setText(user.getUserName());
         holder.tvName.setText(user.getFullName());
@@ -150,7 +160,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUserName,tvName, tvEmail, tvPhone;
+        TextView tvUserName,tvName, tvEmail, tvPhone, tvMeBadge;
         ImageView ivProfilePic;
         Button btnMakeAdmin;
 
@@ -162,6 +172,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             tvPhone = itemView.findViewById(R.id.tv_item_user_phone);
             ivProfilePic = itemView.findViewById(R.id.iv_user_profile_pic);
             btnMakeAdmin = itemView.findViewById(R.id.btn_make_admin);
+
+            tvMeBadge = itemView.findViewById(R.id.tv_me_badge);
+
         }
     }
 }

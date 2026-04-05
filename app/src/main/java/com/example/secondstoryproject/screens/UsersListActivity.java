@@ -1,5 +1,7 @@
 package com.example.secondstoryproject.screens;
 
+import static com.example.secondstoryproject.utils.SharedPreferencesUtil.getUserId;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +35,7 @@ public class UsersListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users_list);
+
 
         RecyclerView usersList = findViewById(R.id.rv_users_list);
         tvUserCount = findViewById(R.id.tv_user_count);
