@@ -29,31 +29,50 @@
 
         </FrameLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="make sure to press submit\nafter choosing a profile picture"/>
+
         <TableLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="50dp">
+            android:layout_marginTop="30dp">
 
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
                 <ImageButton
-                    tools:src="@tools:sample/avatars"
+                    android:id="@+id/pic1"
+                    android:src="@drawable/profilepic1"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circle_border"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
                 <ImageButton
-                    tools:src="@tools:sample/avatars"
+                    android:id="@+id/pic2"
+                    android:src="@drawable/profilepic2"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circle_border"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
                 <ImageButton
-                    tools:src="@tools:sample/avatars"
+                    android:id="@+id/pic3"
+                    android:src="@drawable/profilepic3"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circle_border"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
+
 
             </TableRow>
 
@@ -62,20 +81,32 @@
                 android:layout_height="wrap_content">
 
                 <ImageButton
-                    tools:src="@tools:sample/avatars"
+                    android:id="@+id/pic4"
+                    android:src="@drawable/profilepic4"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circle_border"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
                 <ImageButton
-                    tools:src="@tools:sample/avatars"
+                    android:id="@+id/pic5"
+                    android:src="@drawable/profilepic5"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circle_border"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
                 <ImageButton
-                    tools:src="@tools:sample/avatars"
+                    android:id="@+id/pic6"
+                    android:src="@drawable/profilepic6"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circle_border"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
 
             </TableRow>
 
@@ -83,19 +114,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center">
-                <Space/>
-                <ImageButton
-                    android:src="@drawable/baseline_add_circle_24"
-                    android:background="none"
+                <View
                     android:layout_width="100dp"
-                    android:layout_height="100dp" />
-                <Space/>
+                    android:layout_height="100dp"
+                    android:layout_margin="10dp"/>
+                <ImageButton
+                    android:id="@+id/btnAddImage"
+                    android:src="@drawable/baseline_add_circle_24"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_margin="10dp"
+
+                    android:background="@drawable/circle_border"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
+                <View
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_margin="10dp"/>
 
             </TableRow>
 
         </TableLayout>
 
         <Button
+            android:id="@+id/btnSubmit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
