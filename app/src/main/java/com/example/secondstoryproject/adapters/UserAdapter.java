@@ -30,12 +30,24 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         void onLongUserClick(User user);
         void onMakeAdminClick(User user);
     }
+    public interface OnFilterListener {
+        void onFilterResult(int count);
+    }
+
+    private List<User> fullUserList = new ArrayList<>(); // הרשימה המלאה תמיד
+    private String currentUserId = "";
 
     private final List<User> userList;
     private final OnUserClickListener onUserClickListener;
     public UserAdapter(@Nullable final OnUserClickListener onUserClickListener) {
         userList = new ArrayList<>();
         this.onUserClickListener = onUserClickListener;
+    }
+
+    private OnFilterListener onFilterListener;
+
+    public void setOnFilterListener(OnFilterListener listener) {
+        this.onFilterListener = listener;
     }
 
     @NonNull
@@ -109,17 +121,38 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
     }
 
     public void setUserList(List<User> users, String currentUserId) {
-        userList.clear();
+        this.currentUserId = currentUserId;
 
+        fullUserList.clear();
         List<User> sorted = new ArrayList<>(users);
         sorted.sort((a, b) -> {
             boolean aIsMe = a.getId().equals(currentUserId);
             boolean bIsMe = b.getId().equals(currentUserId);
-            return Boolean.compare(!aIsMe, !bIsMe); // ME עולה למעלה
+            return Boolean.compare(!aIsMe, !bIsMe);
         });
+        fullUserList.addAll(sorted);
 
-        userList.addAll(sorted);
+        userList.clear();
+        userList.addAll(fullUserList);
         notifyDataSetChanged();
+    }
+
+    public void filter(String query, Boolean adminFilter) {
+        userList.clear();
+        for (User user : fullUserList) {
+            boolean matchesSearch = query == null || query.isEmpty()
+                    || user.getUserName().toLowerCase().contains(query.toLowerCase());
+            boolean matchesAdmin = adminFilter == null
+                    || user.isAdmin() == adminFilter;
+            if (matchesSearch && matchesAdmin) {
+                userList.add(user);
+            }
+        }
+        notifyDataSetChanged();
+
+        if (onFilterListener != null) {
+            onFilterListener.onFilterResult(userList.size());
+        }
     }
 
     public void addUser(User user) {
@@ -133,6 +166,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         notifyItemChanged(index);
     }
     public void updateUserById(User updatedUser) {
+        // עדכון ב-fullUserList
+        for (int i = 0; i < fullUserList.size(); i++) {
+            if (fullUserList.get(i).getId().equals(updatedUser.getId())) {
+                fullUserList.set(i, updatedUser);
+                break;
+            }
+        }
+        // עדכון ב-userList (המסוננת)
         for (int i = 0; i < userList.size(); i++) {
             if (userList.get(i).getId().equals(updatedUser.getId())) {
                 userList.set(i, updatedUser);

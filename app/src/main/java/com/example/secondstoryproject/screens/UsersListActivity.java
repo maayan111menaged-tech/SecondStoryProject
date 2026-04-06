@@ -5,6 +5,7 @@ import static com.example.secondstoryproject.utils.SharedPreferencesUtil.getUser
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
 
@@ -31,6 +33,8 @@ public class UsersListActivity extends BaseActivity {
     private UserAdapter userAdapter;
     private TextView tvUserCount;
 
+    private String searchQuery = "";
+    private Boolean adminFilter = null; // null = הכל
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +106,34 @@ public class UsersListActivity extends BaseActivity {
             }
         });
         usersList.setAdapter(userAdapter);
+        /// /////////
+        EditText etSearch = findViewById(R.id.et_search);
+        etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(android.text.Editable s) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchQuery = s.toString();
+                userAdapter.filter(searchQuery, adminFilter);
+            }
+        });
+
+        ChipGroup chipGroup = findViewById(R.id.chip_group_filter);
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.contains(R.id.chip_admin)) {
+                adminFilter = true;
+            } else if (checkedIds.contains(R.id.chip_not_admin)) {
+                adminFilter = false;
+            } else {
+                adminFilter = null;
+            }
+            userAdapter.filter(searchQuery, adminFilter);
+        });
+        /// /////////
+
+        userAdapter.setOnFilterListener(count ->
+                tvUserCount.setText("Total users: " + count)
+        );
     }
 
 

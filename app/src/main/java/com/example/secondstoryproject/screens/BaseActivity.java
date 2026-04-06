@@ -155,11 +155,11 @@ public abstract class BaseActivity extends AppCompatActivity
         } else if (id == R.id.nav_user_profile) {
             navigateTo(UserProfileActivity.class);
         } else if(id == R.id.nav_admin_profile){
-            ///navigateTo(AdminProfileActivity.class);
+            navigateTo(UserProfileActivity.class);
         } else if (id == R.id.nav_add_donation) {
             navigateTo(PickCatergoryActivity.class);
         } else if(id == R.id.nav_accept_donation){
-            /// navigateTo(AcceptDonationsActivity.class);
+            navigateTo(AcceptDonationActivity.class);
         } else if (id == R.id.nav_search_donation) {
             ///navigateTo(SearchDonationActivity.class);
         } else if (id == R.id.nav_leaders_board) {

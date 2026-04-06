@@ -130,7 +130,7 @@ public class User implements Idable{
 
     @Exclude
     public String getFullName(){
-        return this.fName + this.lName;
+        return this.fName + " " + this.lName;
     }
 
 
