@@ -40,7 +40,7 @@ public class UserProfileActivity extends BaseActivity {
     private ProfileDonationAdapter donationAdapter;
     private List<Donation> userDonations;
 
-    private ImageButton btnLeft, btnRight, btnEditProfilePic;
+    private ImageButton btnLeft, btnRight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,22 +87,6 @@ public class UserProfileActivity extends BaseActivity {
 
         btnLeft.setOnClickListener(v -> rvUserDonations.smoothScrollBy(300, 0));
         btnRight.setOnClickListener(v -> rvUserDonations.smoothScrollBy(-300, 0));
-
-        btnEditProfilePic = findViewById(R.id.btnEditProfilePic);
-        btnEditProfilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(UserProfileActivity.this, ProfilePicActivity.class);
-                startActivity(intent);
-            }
-        });
-        ivProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(UserProfileActivity.this, ProfilePicActivity.class);
-                startActivity(intent);
-            }
-        });
 
         // קבלת המשתמש מהSharedPreferences
         currentUser = SharedPreferencesUtil.getUser(this);

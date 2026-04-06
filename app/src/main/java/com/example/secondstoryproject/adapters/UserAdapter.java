@@ -108,9 +108,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         return userList.size();
     }
 
-    public void setUserList(List<User> users) {
+    public void setUserList(List<User> users, String currentUserId) {
         userList.clear();
-        userList.addAll(users);
+
+        List<User> sorted = new ArrayList<>(users);
+        sorted.sort((a, b) -> {
+            boolean aIsMe = a.getId().equals(currentUserId);
+            boolean bIsMe = b.getId().equals(currentUserId);
+            return Boolean.compare(!aIsMe, !bIsMe); // ME עולה למעלה
+        });
+
+        userList.addAll(sorted);
         notifyDataSetChanged();
     }
 

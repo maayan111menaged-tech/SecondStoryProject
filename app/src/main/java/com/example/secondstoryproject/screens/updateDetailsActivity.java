@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.IDatabaseService;
+import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.Validator;
@@ -38,6 +41,8 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
     /// private date
     private Button btnUpdateProfile;
     private User currentUser;
+    private ImageView ivProfile;
+    private ImageButton btnEditProfilePic;
 
     @Override
     protected boolean hasSideMenu() {
@@ -61,6 +66,26 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         etDate = findViewById(R.id.dateInput);
         etUserName = findViewById(R.id.usernameInput);
         etPassword = findViewById(R.id.passwordInput);
+
+        ivProfile = findViewById(R.id.imgProfile);
+        ivProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(updateDetailsActivity.this, ProfilePicActivity.class);
+                startActivity(intent);
+            }
+        });
+        btnEditProfilePic = findViewById(R.id.btnEditProfilePic);
+        btnEditProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(updateDetailsActivity.this, ProfilePicActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
 
         // אתחול הכפתור והגדרת OnClickListener
         btnUpdateProfile = findViewById(R.id.btn_updateDetails_toHome);
@@ -148,6 +173,13 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         etDate.setText(currentUser.getDateOfBirth());
         etUserName.setText(currentUser.getUserName());
         etPassword.setText(currentUser.getPassword());
+
+        String profileImageBase64 = currentUser.getProfilePhoneUrl();
+
+        if (profileImageBase64 != null && !profileImageBase64.isEmpty()) {
+            ivProfile.setImageBitmap(ImageUtil.fromBase64(profileImageBase64));
+        }
+
     }
 
     @Override

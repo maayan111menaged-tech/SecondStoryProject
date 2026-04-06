@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -75,6 +74,36 @@
                 android:textSize="23pt"
                 android:textStyle="bold" />
         </FrameLayout>
+
+
+        <!-- Profile Picture -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_profile"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circle_border"
+                android:padding="2dp"/>
+
+            <ImageButton
+                android:id="@+id/btnEditProfilePic"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/ic_edit"
+                android:backgroundTint="#36b3b8"
+                app:tint="@android:color/white"
+                android:layout_margin="4dp"/>
+        </FrameLayout>
+
+
 
         <!-- כרטיס מידע -->
         <com.google.android.material.card.MaterialCardView
@@ -281,4 +310,4 @@
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

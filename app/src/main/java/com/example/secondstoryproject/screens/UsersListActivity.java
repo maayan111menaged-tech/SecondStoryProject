@@ -21,6 +21,7 @@ import com.example.secondstoryproject.adapters.UserAdapter;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
+import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 import java.util.List;
 
@@ -110,7 +111,8 @@ public class UsersListActivity extends BaseActivity {
         DatabaseService.getInstance().getUserService().getAll(new DatabaseService.DatabaseCallback<List<User>>() {
             @Override
             public void onCompleted(List<User> users) {
-                userAdapter.setUserList(users);
+                String currentUserId = SharedPreferencesUtil.getUserId(UsersListActivity.this);
+                userAdapter.setUserList(users, currentUserId);
                 tvUserCount.setText("Total users: " + users.size());
             }
 
