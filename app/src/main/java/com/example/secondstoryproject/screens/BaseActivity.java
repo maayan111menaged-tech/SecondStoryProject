@@ -161,7 +161,7 @@ public abstract class BaseActivity extends AppCompatActivity
         } else if(id == R.id.nav_accept_donation){
             navigateTo(AcceptDonationActivity.class);
         } else if (id == R.id.nav_search_donation) {
-            ///navigateTo(SearchDonationActivity.class);
+            navigateTo(SearchDonationsActivity.class);
         } else if (id == R.id.nav_leaders_board) {
             navigateTo(LeaderBoardActivity.class);
         } else if(id == R.id.nav_users_list){
