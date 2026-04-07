@@ -17,6 +17,7 @@ import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.services.DatabaseService;
 
+import java.util.Date;
 import java.util.List;
 
 public class AcceptDonationActivity extends BaseActivity {
@@ -66,6 +67,16 @@ public class AcceptDonationActivity extends BaseActivity {
                             @Override
                             public void onCompleted(List<Donation> donations) {
                                 Log.d(TAG, "Loaded donations: " + donations.size());
+
+                                // מיון לפי תאריך הפרסום - הישן ביותר ראשון
+                                donations.sort((a, b) -> {
+                                    Date dateA = getFirstStatusDate(a);
+                                    Date dateB = getFirstStatusDate(b);
+                                    if (dateA == null) return 1;
+                                    if (dateB == null) return -1;
+                                    return dateA.compareTo(dateB);
+                                });
+
                                 adapter.setDonations(donations);
                             }
 
@@ -74,5 +85,11 @@ public class AcceptDonationActivity extends BaseActivity {
                                 Log.e(TAG, "Failed to load donations", e);
                             }
                         });
+    }
+    private Date getFirstStatusDate(Donation donation) {
+        if (donation.getStatusHistory() == null || donation.getStatusHistory().isEmpty()) {
+            return null;
+        }
+        return donation.getStatusHistory().get(0).getTimestamp();
     }
 }
