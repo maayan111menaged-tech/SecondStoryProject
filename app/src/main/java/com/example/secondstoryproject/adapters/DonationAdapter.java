@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.utils.ImageUtil;
+import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHolder> {
 
@@ -93,6 +94,13 @@ public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHo
             holder.imgDonation.setImageBitmap(ImageUtil.fromBase64(donation.getPhotoUrl()));
         }
 
+        String currentUserId = SharedPreferencesUtil.getUserId(holder.itemView.getContext());
+        if (donation.getGiverID().equals(currentUserId)) {
+            holder.tvMineBadge.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvMineBadge.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onDonationClick(donation);
         });
@@ -108,7 +116,7 @@ public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHo
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvCategory;
+        TextView tvName, tvCategory , tvMineBadge;
         ImageView imgDonation, imgCategory;
         Button btnMoreInfo;
 
@@ -119,6 +127,8 @@ public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHo
             imgDonation = itemView.findViewById(R.id.img_donation);
             imgCategory = itemView.findViewById(R.id.img_category);
             btnMoreInfo = itemView.findViewById(R.id.btn_more_info);
+
+            tvMineBadge = itemView.findViewById(R.id.tv_mine_badge);
         }
     }
 }

@@ -114,7 +114,7 @@ public class DonationDetailActivity extends BaseActivity {
             layoutInterested.setVisibility(LinearLayout.VISIBLE);
             setupButtonsInterested();
         } else {
-            layoutAdminActions.setVisibility(LinearLayout.GONE);
+            layoutInterested.setVisibility(LinearLayout.GONE);
         }
 
     }

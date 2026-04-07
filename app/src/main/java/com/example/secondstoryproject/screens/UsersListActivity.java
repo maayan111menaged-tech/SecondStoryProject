@@ -106,7 +106,7 @@ public class UsersListActivity extends BaseActivity {
             }
         });
         usersList.setAdapter(userAdapter);
-        /// /////////
+
         EditText etSearch = findViewById(R.id.et_search);
         etSearch.addTextChangedListener(new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -129,7 +129,6 @@ public class UsersListActivity extends BaseActivity {
             }
             userAdapter.filter(searchQuery, adminFilter);
         });
-        /// /////////
 
         userAdapter.setOnFilterListener(count ->
                 tvUserCount.setText("Total users: " + count)
