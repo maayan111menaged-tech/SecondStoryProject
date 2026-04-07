@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationStatus;
+import com.example.secondstoryproject.models.IsraelCity;
 import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback;
 
 import java.util.List;
@@ -79,8 +80,16 @@ public interface IDonationService {
     void getDonationsByStatus(@NonNull DonationStatus status,
                               @NonNull DatabaseCallback<List<Donation>> callback);
 
-    ///
+    void getDonationsCountByCity(@NonNull IsraelCity city,
+                           @NonNull DatabaseCallback<Integer> callback);
+
+     void getDonationsCountByCities(@NonNull DatabaseCallback<java.util.HashMap<String,
+             Integer>> callback);
+
+        ///
     void update(@NonNull String donationId,
                 @NonNull java.util.function.UnaryOperator<Donation> function,
                 @Nullable DatabaseCallback<Donation> callback);
+
+
 }

@@ -11,7 +11,7 @@ public class Donation implements Idable {
     private DonationCategory category;
     private DonationStatus status;
     private String photoUrl;
-    private String city; // חדש – עיר
+    private String city;
 
     private String giverID;
     private String receiverID;
@@ -50,6 +50,7 @@ public class Donation implements Idable {
 
 
     }
+
 
     // -------- Getters & Setters --------
 
@@ -130,5 +131,6 @@ public class Donation implements Idable {
 
         public String getReason() { return reason; }
         public void setReason(String reason) { this.reason = reason; }
+
     }
 }

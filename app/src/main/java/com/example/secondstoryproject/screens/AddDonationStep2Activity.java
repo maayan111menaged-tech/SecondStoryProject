@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.DonationCategory;
+import com.example.secondstoryproject.models.IsraelCity;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.Validator;
 
@@ -58,7 +59,7 @@ public class AddDonationStep2Activity extends BaseActivity {
     }
 
     private void setupCityDropdown() {
-        String[] cities = getResources().getStringArray(R.array.israel_cities);
+        String[] cities = IsraelCity.getHebrewNames();
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(this,
                         android.R.layout.simple_dropdown_item_1line,

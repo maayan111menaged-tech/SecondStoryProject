@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationStatus;
+import com.example.secondstoryproject.models.IsraelCity;
 import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback;
 import com.example.secondstoryproject.services.IDonationService;
 import java.util.ArrayList;
@@ -128,6 +129,63 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
                 }
 
                 callback.onCompleted(filtered);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
+
+    @Override
+    public void getDonationsCountByCity(@NonNull IsraelCity city,
+                                          @NonNull DatabaseCallback<Integer> callback) {
+
+        super.getAll(new DatabaseCallback<List<Donation>>() {
+            @Override
+            public void onCompleted(List<Donation> donations) {
+
+                int count = 0;
+
+                for (Donation donation : donations) {
+                    if (donation.getCity() != null &&
+                            donation.getCity().equals(city.getHebrewName())) {
+
+                        count++;
+                    }
+                }
+
+                callback.onCompleted(count);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
+
+    @Override
+    public void getDonationsCountByCities(@NonNull DatabaseCallback<java.util.HashMap<String, Integer>> callback) {
+
+        super.getAll(new DatabaseCallback<List<Donation>>() {
+            @Override
+            public void onCompleted(List<Donation> donations) {
+
+                java.util.HashMap<String, Integer> cityCountMap = new java.util.HashMap<>();
+
+                for (Donation donation : donations) {
+
+                    if (donation.getCity() == null) continue;
+
+                    String city = donation.getCity();
+
+                    int current = cityCountMap.containsKey(city) ? cityCountMap.get(city) : 0;
+                    cityCountMap.put(city, current + 1);
+                }
+
+                callback.onCompleted(cityCountMap);
             }
 
             @Override

@@ -5,6 +5,7 @@ import android.util.Patterns;
 import androidx.annotation.Nullable;
 
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.models.IsraelCity;
 
 import java.util.Date;
 /// Validator class to validate user input.
@@ -76,7 +77,7 @@ public class Validator {
     public static boolean isCityInList(Context context, @Nullable String city) {
         if (city == null) return false;
 
-        String[] cities = context.getResources().getStringArray(R.array.israel_cities);
+        String[] cities = IsraelCity.getHebrewNames();
         for (String c : cities) {
             if (c.equals(city)) {
                 return true;

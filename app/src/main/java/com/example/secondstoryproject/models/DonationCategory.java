@@ -35,7 +35,6 @@ public enum DonationCategory {
         return iconResId;
     }
 
-    // לשימוש כששומרים כ-String ב-Firebase
     public static DonationCategory fromString(String value) {
         return DonationCategory.valueOf(value);
     }

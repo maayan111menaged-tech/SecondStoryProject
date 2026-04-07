@@ -119,13 +119,29 @@
         </LinearLayout>
 
         <!-- מפה placeholder -->
-        <View
-            android:id="@+id/view_ForMap"
+        <FrameLayout
+            android:id="@+id/mapContainer"
             android:layout_width="350dp"
             android:layout_height="280dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:background="#36b3b8"/>
+            android:clickable="true"
+            android:focusable="true">
+
+            <org.osmdroid.views.MapView
+                android:id="@+id/miniMap"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- שכבה שקופה שתופסת את הלחיצה -->
+            <View
+                android:id="@+id/mapClickOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"/>
+        </FrameLayout>
 
         <!-- דרגות -->
         <LinearLayout

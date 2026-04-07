@@ -21,6 +21,7 @@ import com.example.secondstoryproject.adapters.DonationAdapter;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationCategory;
 import com.example.secondstoryproject.models.DonationStatus;
+import com.example.secondstoryproject.models.IsraelCity;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.google.android.material.button.MaterialButton;
 
@@ -121,7 +122,7 @@ public class SearchDonationsActivity extends BaseActivity {
     private void setupCityFilter() {
         AutoCompleteTextView spinnerCity = findViewById(R.id.spinner_city);
 
-        String[] cities = getResources().getStringArray(R.array.israel_cities);
+        String[] cities = IsraelCity.getHebrewNames();
         List<String> cityList = new ArrayList<>();
         cityList.add("All Cities");
         cityList.addAll(Arrays.asList(cities));
