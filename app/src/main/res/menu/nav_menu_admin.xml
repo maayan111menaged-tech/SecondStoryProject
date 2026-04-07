@@ -23,9 +23,9 @@
             android:title="accept Donation"
             />
         <item
-            android:id="@+id/nav_search_donation"
+            android:id="@+id/nav_donation_list"
             android:icon="@drawable/ic_search"
-            android:title="Search Donation"
+            android:title="Donation List"
             />
         <item
             android:id="@+id/nav_users_list"

@@ -13,7 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
@@ -65,6 +68,29 @@ public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHo
                     || d.getCity().equals(cityFilter);
 
             if (matchesName && matchesCategory && matchesCity) {
+                donationList.add(d);
+            }
+        }
+        notifyDataSetChanged();
+
+        if (onFilterListener != null) {
+            onFilterListener.onFilterResult(donationList.size());
+        }
+    }
+    public void filterAdmin(String query, Set<DonationStatus> statusFilter,
+                            DonationCategory categoryFilter, String cityFilter) {
+        donationList.clear();
+        for (Donation d : fullDonationList) {
+            boolean matchesName = query == null || query.isEmpty()
+                    || d.getName().toLowerCase().contains(query.toLowerCase());
+            boolean matchesStatus = statusFilter == null || statusFilter.isEmpty()
+                    || statusFilter.contains(d.getStatus());
+            boolean matchesCategory = categoryFilter == null
+                    || d.getCategory() == categoryFilter;
+            boolean matchesCity = cityFilter == null || cityFilter.isEmpty()
+                    || d.getCity().equals(cityFilter);
+
+            if (matchesName && matchesStatus && matchesCategory && matchesCity) {
                 donationList.add(d);
             }
         }
