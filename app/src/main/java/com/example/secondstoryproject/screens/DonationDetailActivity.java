@@ -26,8 +26,8 @@ public class DonationDetailActivity extends BaseActivity {
 
     private ImageView ivDonation, ivStatus;
     private TextView tvName, tvDescription, tvCategory, tvStatus;
-    private Button btnApprove, btnReject;
-    private LinearLayout layoutAdminActions;
+    private Button btnApprove, btnReject , btnInterested;
+    private LinearLayout layoutAdminActions , layoutInterested;
     private Donation currentDonation;
     private User currentUser;
 
@@ -51,6 +51,10 @@ public class DonationDetailActivity extends BaseActivity {
         btnApprove = findViewById(R.id.btnApprove);
         btnReject = findViewById(R.id.btnReject);
         layoutAdminActions = findViewById(R.id.layout_admin_actions);
+
+        btnInterested = findViewById(R.id.btnInterested);
+        layoutInterested = findViewById(R.id.layout_interested);
+
 
         String donationId = getIntent().getStringExtra("DONATION_ID");
         if (donationId != null) {
@@ -99,15 +103,28 @@ public class DonationDetailActivity extends BaseActivity {
         // הצגת כפתורים למנהל בלבד כאשר הסטטוס הוא מחכה לאישור מנהל
         if (status == DonationStatus.PENDING_APPROVAL && currentUser != null && currentUser.isAdmin()) {
             layoutAdminActions.setVisibility(LinearLayout.VISIBLE);
-            setupButtons();
+            setupButtonsAdmin();
         } else {
             layoutAdminActions.setVisibility(LinearLayout.GONE);
         }
+
+        // הצגת הכפתור רק כאשר המשתמש המחובר הוא אינו תורם התרומה או מנהל וסטטוס זמין לתרומה
+        if (status == DonationStatus.APPROVED_AVAILABLE && currentUser != null && !currentUser.isAdmin()
+        && !currentUser.getId().equals(currentDonation.getGiverID())) {
+            layoutInterested.setVisibility(LinearLayout.VISIBLE);
+            setupButtonsInterested();
+        } else {
+            layoutAdminActions.setVisibility(LinearLayout.GONE);
+        }
+
     }
 
-    private void setupButtons() {
+    private void setupButtonsAdmin() {
         btnApprove.setOnClickListener(v -> showConfirmDialog(true));
         btnReject.setOnClickListener(v -> showConfirmDialog(false));
+    }
+    private void setupButtonsInterested() {
+        btnInterested.setOnClickListener(v -> interestedFunction());
     }
 
     private void showConfirmDialog(boolean isApprove) {
@@ -174,5 +191,10 @@ public class DonationDetailActivity extends BaseActivity {
                     }
                 }
         );
+    }
+
+    private void interestedFunction() {
+        Toast.makeText(DonationDetailActivity.this, "כפתור מעוניין נלחץ", Toast.LENGTH_SHORT).show();
+
     }
 }

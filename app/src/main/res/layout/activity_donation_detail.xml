@@ -59,6 +59,7 @@
         <LinearLayout
             android:id="@+id/layout_admin_actions"
             android:visibility="gone"
+            tools:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -82,6 +83,26 @@
                 android:backgroundTint="#F44336"
                 android:textColor="@android:color/white"/>
 
+        </LinearLayout>
+
+        <!-- כפתור מעוניין -->
+        <LinearLayout
+            android:id="@+id/layout_interested"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnInterested"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="מעוניין בתרומה זאת"
+                android:layout_marginEnd="8dp"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
