@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity {
         );
 
         miniMap = findViewById(R.id.miniMap);
-        miniMap.setTileSource(TileSourceFactory.MAPNIK); //סוג מפה
+        miniMap.setTileSource(TileSourceFactory.OpenTopo); //סוג מפה
         miniMap.setMultiTouchControls(false); // לא גוללים במפה הקטנה
         miniMap.getController().setZoom(7.5); // זום
         miniMap.getController().setCenter(new GeoPoint(31.5, 34.8)); // מרכז ישראל
