@@ -1,5 +1,6 @@
 package com.example.secondstoryproject.screens;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -192,9 +193,62 @@ public class DonationDetailActivity extends BaseActivity {
                 }
         );
     }
-
     private void interestedFunction() {
-        Toast.makeText(DonationDetailActivity.this, "כפתור מעוניין נלחץ", Toast.LENGTH_SHORT).show();
+        if (currentDonation == null || currentUser == null) return;
 
+        String giverName = "התורם"; // נעדכן זאת עם שם אמיתי
+
+        // שולפים את פרטי התורם כדי להציג את שמו
+        databaseService.getUserService().get(currentDonation.getGiverID(),
+                new IDatabaseService.DatabaseCallback<User>() {
+                    @Override
+                    public void onCompleted(User giver) {
+                        runOnUiThread(() -> {
+                            String displayName = giver != null ? giver.getFullName() : "התורם";
+                            showInterestedDialog(displayName);
+                        });
+                    }
+                    @Override
+                    public void onFailed(Exception e) {
+                        runOnUiThread(() -> showInterestedDialog("התורם"));
+                    }
+                });
+    }
+
+    private void showInterestedDialog(String giverName) {
+        new AlertDialog.Builder(this)
+                .setTitle("פתיחת שיחה")
+                .setMessage("תיפתח שיחה עם " + giverName + ". להמשיך?")
+                .setPositiveButton("כן, בואו נדבר!", (dialog, which) -> openOrCreateChat())
+                .setNegativeButton("ביטול", null)
+                .show();
+    }
+
+    private void openOrCreateChat() {
+        DatabaseService.getInstance().getChatService()
+                .getOrCreateDonationChat(
+                        currentDonation.getId(),
+                        currentDonation.getGiverID(),
+                        currentUser.getId(),
+                        new IDatabaseService.DatabaseCallback<String>() {
+                            @Override
+                            public void onCompleted(String chatId) {
+                                runOnUiThread(() -> {
+                                    Intent intent = new Intent(
+                                            DonationDetailActivity.this,
+                                            ChatActivity.class);
+                                    intent.putExtra("CHAT_ID", chatId);
+                                    intent.putExtra("OTHER_USER_NAME",
+                                            currentDonation.getGiverID()); // נעדכן בשלב הבא
+                                    startActivity(intent);
+                                });
+                            }
+                            @Override
+                            public void onFailed(Exception e) {
+                                runOnUiThread(() ->
+                                        Toast.makeText(DonationDetailActivity.this,
+                                                "שגיאה בפתיחת הצאט", Toast.LENGTH_SHORT).show());
+                            }
+                        });
     }
 }

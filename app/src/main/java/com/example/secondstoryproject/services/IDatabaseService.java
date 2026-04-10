@@ -29,6 +29,8 @@ public interface IDatabaseService {
     IDonationService getDonationService();
 
 
+    IChatService getChatService();
+
     /// Generic callback interface for asynchronous database operations.
     /// <p>
     /// All database operations are asynchronous. Use this callback to handle

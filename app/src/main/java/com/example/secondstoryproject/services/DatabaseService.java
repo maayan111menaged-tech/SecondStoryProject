@@ -1,6 +1,7 @@
 package com.example.secondstoryproject.services;
 
 import com.example.secondstoryproject.models.Donation;
+import com.example.secondstoryproject.services.impl.ChatServiceImpl;
 import com.example.secondstoryproject.services.impl.DonationServiceImpl;
 import com.example.secondstoryproject.services.impl.UserServiceImpl;
 
@@ -30,13 +31,17 @@ public class DatabaseService implements IDatabaseService {
     /// service handling Donation-related database operations
     private final IDonationService DonationService;
 
+    private final IChatService chatService;
+
     /// Private constructor — initializes all entity-specific service implementations.
     /// Use {@link #getInstance()} to obtain the shared instance.
     private DatabaseService() {
         userService = new UserServiceImpl();
         DonationService = new DonationServiceImpl();
-
+        chatService = new ChatServiceImpl();
     }
+
+
 
     /// Returns the shared {@link IDatabaseService} instance, creating it on first call.
     /// <p>
@@ -62,5 +67,8 @@ public class DatabaseService implements IDatabaseService {
     public IDonationService getDonationService() {
         return DonationService;
     }
+
+    @Override
+    public IChatService getChatService() { return chatService; }
 
 }

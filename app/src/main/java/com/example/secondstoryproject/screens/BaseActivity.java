@@ -14,12 +14,15 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.models.Chat;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.List;
 
 public abstract class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -99,7 +102,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     if (item.getItemId() == R.id.menu_chat) {
-                        navigateTo(ChatActivity.class);
+                        navigateTo(ChatsListActivity.class);
                     }
                     if (item.getItemId() == R.id.menu_home) {
                         if(isAdmin())   navigateTo(AdminMainActivity.class);
@@ -116,6 +119,9 @@ public abstract class BaseActivity extends AppCompatActivity
             }
         }
 
+        if (hasBottomMenu()) {
+            listenToTotalUnread();
+        }
     }
 
     @Override
@@ -200,5 +206,54 @@ public abstract class BaseActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void listenToTotalUnread() {
+        User currentUser = SharedPreferencesUtil.getUser(this);
+        if (currentUser == null) return;
+
+        DatabaseService.getInstance().getChatService()
+                .getUserChats(currentUser.getId(),
+                        new IDatabaseService.DatabaseCallback<List<Chat>>() {
+                            @Override
+                            public void onCompleted(List<Chat> chats) {
+                                if (chats.isEmpty()) return;
+                                final int[] total = {0};
+                                final int[] count = {0};
+
+                                for (Chat chat : chats) {
+                                    DatabaseService.getInstance().getChatService()
+                                            .listenToUnreadCount(chat.getId(),
+                                                    currentUser.getId(),
+                                                    new IDatabaseService.DatabaseCallback<Integer>() {
+                                                        @Override
+                                                        public void onCompleted(Integer unread) {
+                                                            total[0] += unread;
+                                                            count[0]++;
+                                                            if (count[0] == chats.size()) {
+                                                                updateChatBadge(total[0]);
+                                                            }
+                                                        }
+                                                        @Override
+                                                        public void onFailed(Exception e) {}
+                                                    });
+                                }
+                            }
+                            @Override
+                            public void onFailed(Exception e) {}
+                        });
+    }
+
+    private void updateChatBadge(int count) {
+        runOnUiThread(() -> {
+            com.google.android.material.badge.BadgeDrawable badge =
+                    bottomNav.getOrCreateBadge(R.id.menu_chat);
+            if (count > 0) {
+                badge.setVisible(true);
+                badge.setNumber(count);
+            } else {
+                badge.setVisible(false);
+            }
+        });
     }
 }
