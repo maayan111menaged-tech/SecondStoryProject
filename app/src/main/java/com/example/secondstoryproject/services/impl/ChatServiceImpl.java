@@ -109,7 +109,6 @@ public class ChatServiceImpl implements IChatService {
         messagesRef.addValueEventListener(listener);
         return listener;
     }
-
     @Override
     public void getUserChats(String userId,
                              IDatabaseService.DatabaseCallback<List<Chat>> callback) {
@@ -142,23 +141,86 @@ public class ChatServiceImpl implements IChatService {
                                         if (chat != null) {
                                             chat.setId(chatId);
 
-                                            // טוענים את ה-unread לצאט הזה
-                                            DataSnapshot meta = t.getResult();
-                                            Object unreadObj = meta.child("unread_" + userId).getValue();
+                                            // unread
+                                            Object unreadObj = t.getResult()
+                                                    .child("unread_" + userId).getValue();
                                             int unread = unreadObj != null ?
                                                     ((Long) unreadObj).intValue() : 0;
                                             chat.setUnreadCount(unread);
+
+                                            // מי הצד השני
+                                            String otherUserId = userId.equals(chat.getGiverId())
+                                                    ? chat.getReceiverId() : chat.getGiverId();
+                                            chat.setOtherUserId(otherUserId);
 
                                             chats.add(chat);
                                         }
                                     }
                                     count[0]++;
                                     if (count[0] == chatIds.size()) {
-                                        callback.onCompleted(chats);
+                                        // עכשיו נשלוף שמות — משתמשים ותרומות
+                                        enrichChatsWithNames(chats, userId, callback);
                                     }
                                 });
                     }
                 });
+    }
+    // משלימה שמות לכל הצאטים
+    private void enrichChatsWithNames(List<Chat> chats, String userId,
+                                      IDatabaseService.DatabaseCallback<List<Chat>> callback) {
+
+        if (chats.isEmpty()) {
+            callback.onCompleted(chats);
+            return;
+        }
+
+        final int[] count = {0};
+        final int total = chats.size();
+
+        for (Chat chat : chats) {
+            if ("admin".equals(chat.getType())) {
+                chat.setOtherUserName("צוות Second Story");
+                chat.setDonationName("");
+                count[0]++;
+                if (count[0] == total) callback.onCompleted(chats);
+                continue;
+            }
+
+            // שולפים שם משתמש שני
+            final Chat currentChat = chat;
+            usersRef.child(chat.getOtherUserId()).get()
+                    .addOnCompleteListener(userTask -> {
+                        if (userTask.isSuccessful() && userTask.getResult().exists()) {
+                            String fName = userTask.getResult()
+                                    .child("fName").getValue(String.class);
+                            String lName = userTask.getResult()
+                                    .child("lName").getValue(String.class);
+                            String fullName = (fName != null ? fName : "")
+                                    + " " + (lName != null ? lName : "");
+                            currentChat.setOtherUserName(fullName.trim());
+                        }
+
+                        // שולפים שם תרומה
+                        if (currentChat.getDonationId() != null) {
+                            FirebaseDatabase.getInstance(
+                                            "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
+                                    .getReference("donations")
+                                    .child(currentChat.getDonationId()).get()
+                                    .addOnCompleteListener(donTask -> {
+                                        if (donTask.isSuccessful() && donTask.getResult().exists()) {
+                                            String donName = donTask.getResult()
+                                                    .child("name").getValue(String.class);
+                                            currentChat.setDonationName(donName != null ? donName : "");
+                                        }
+                                        count[0]++;
+                                        if (count[0] == total) callback.onCompleted(chats);
+                                    });
+                        } else {
+                            count[0]++;
+                            if (count[0] == total) callback.onCompleted(chats);
+                        }
+                    });
+        }
     }
     @Override
     public void removeListener(String chatId, ValueEventListener listener) {
@@ -206,5 +268,32 @@ public class ChatServiceImpl implements IChatService {
         };
         ref.addValueEventListener(listener);
         return listener;
+    }
+
+    @Override
+    public void getOrCreateAdminChat(String userId,
+                                     IDatabaseService.DatabaseCallback<String> callback) {
+
+        String chatId = "admin_" + userId;
+        DatabaseReference metaRef = chatsRef.child(chatId).child("metadata");
+
+        metaRef.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                callback.onFailed(task.getException());
+                return;
+            }
+            if (!task.getResult().exists()) {
+                Chat chat = new Chat(chatId, "admin", null, "admin", userId);
+                metaRef.setValue(chat)
+                        .addOnSuccessListener(unused -> {
+                            // מוסיפים אינדקס רק למשתמש — לא לאדמינים ספציפיים
+                            usersRef.child(userId).child("chats").child(chatId).setValue(true);
+                            callback.onCompleted(chatId);
+                        })
+                        .addOnFailureListener(callback::onFailed);
+            } else {
+                callback.onCompleted(chatId);
+            }
+        });
     }
 }

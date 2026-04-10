@@ -26,4 +26,7 @@ public interface IChatService {
     void resetUnread(String chatId, String userId);
     ValueEventListener listenToUnreadCount(String chatId, String userId,
                                            IDatabaseService.DatabaseCallback<Integer> callback);
+
+    void getOrCreateAdminChat(String userId,
+                              IDatabaseService.DatabaseCallback<String> callback);
 }

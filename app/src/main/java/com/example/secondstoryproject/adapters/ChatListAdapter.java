@@ -67,23 +67,29 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         }
 
         void bind(Chat chat) {
-            // שם השיחה
+            // שם + תרומה
             if ("admin".equals(chat.getType())) {
                 tvName.setText("צוות Second Story");
+                tvLastMessage.setText("פנייה לצוות");
             } else {
-                tvName.setText(chat.getId()); // נעדכן עם שם אמיתי בהמשך
+                String name = chat.getOtherUserName() != null ? chat.getOtherUserName() : "";
+                String donation = chat.getDonationName() != null ? chat.getDonationName() : "";
+                tvName.setText(name);
+                tvLastMessage.setText(!donation.isEmpty() ? "📦 " + donation : "");
             }
 
-            // הודעה אחרונה
+            // הודעה אחרונה — רק אם יש
             String last = chat.getLastMessage();
-            tvLastMessage.setText(last != null && !last.isEmpty() ? last : "התחילו לדבר!");
+            if (last != null && !last.isEmpty()) {
+                tvLastMessage.setText(last);
+            }
 
             // זמן
             if (chat.getLastTimestamp() > 0) {
                 tvTime.setText(timeFormat.format(new Date(chat.getLastTimestamp())));
             }
 
-            // עיגול הודעות לא נקראות
+            // עיגול
             int unread = chat.getUnreadCount();
             if (unread > 0) {
                 tvUnread.setVisibility(View.VISIBLE);
@@ -92,7 +98,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
                 tvUnread.setVisibility(View.GONE);
             }
 
-            // לחיצה
             itemView.setOnClickListener(v -> listener.onChatClick(chat));
         }
     }

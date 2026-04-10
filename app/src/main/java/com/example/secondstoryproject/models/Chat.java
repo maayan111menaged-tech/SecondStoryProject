@@ -12,6 +12,10 @@ public class Chat {
     private int unreadCount; // לא נשמר ב-DB, רק בזיכרון
 
 
+    private String donationName;    // שם התרומה
+    private String otherUserName;   // שם המשתמש השני
+    private String otherUserId;     // ID של המשתמש השני
+
     public Chat() {} // חובה ל-Firebase
 
     public Chat(String id, String type, String donationId,
@@ -42,5 +46,13 @@ public class Chat {
 
     public int getUnreadCount() { return unreadCount; }
     public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
+
+    public String getDonationName() { return donationName; }
+    public void setDonationName(String donationName) { this.donationName = donationName; }
+    public String getOtherUserName() { return otherUserName; }
+    public void setOtherUserName(String otherUserName) { this.otherUserName = otherUserName; }
+    public String getOtherUserId() { return otherUserId; }
+    public void setOtherUserId(String otherUserId) { this.otherUserId = otherUserId; }
+
 
 }

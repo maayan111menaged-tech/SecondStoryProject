@@ -2,6 +2,8 @@ package com.example.secondstoryproject.screens;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +22,7 @@ import java.util.List;
 public class ChatsListActivity extends BaseActivity {
 
     private ChatListAdapter chatListAdapter;
+    private LinearLayout layoutEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +30,8 @@ public class ChatsListActivity extends BaseActivity {
         setContentView(R.layout.activity_chats_list);
 
         bottomNav.setSelectedItemId(R.id.menu_chat);
+
+        layoutEmpty = findViewById(R.id.layout_empty);
 
         RecyclerView rvChats = findViewById(R.id.rv_chats);
         rvChats.setLayoutManager(new LinearLayoutManager(this));
@@ -50,8 +55,14 @@ public class ChatsListActivity extends BaseActivity {
                         new IDatabaseService.DatabaseCallback<List<Chat>>() {
                             @Override
                             public void onCompleted(List<Chat> chats) {
-                                runOnUiThread(() -> chatListAdapter.setChats(chats));
+                                chats.sort((a, b) ->
+                                        Long.compare(b.getLastTimestamp(), a.getLastTimestamp()));
+                                runOnUiThread(() -> {
+                                    chatListAdapter.setChats(chats);
+                                    layoutEmpty.setVisibility(chats.isEmpty() ? View.VISIBLE : View.GONE);
+                                });
                             }
+
                             @Override
                             public void onFailed(Exception e) {
                                 runOnUiThread(() ->

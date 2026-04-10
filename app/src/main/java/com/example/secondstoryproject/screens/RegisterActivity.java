@@ -221,9 +221,26 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onCompleted(Void object) {
                 SharedPreferencesUtil.saveUser(RegisterActivity.this, user);
-                Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(mainIntent);
+
+                // יצירת צאט אדמין אוטומטי ← חדש!
+                DatabaseService.getInstance().getChatService()
+                        .getOrCreateAdminChat(user.getId(),
+                                new DatabaseService.DatabaseCallback<String>() {
+                                    @Override
+                                    public void onCompleted(String chatId) {
+                                        // עוברים הלאה בכל מקרה
+                                        Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                                        mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(mainIntent);
+                                    }
+                                    @Override
+                                    public void onFailed(Exception e) {
+                                        // לא קריטי — עוברים בכל מקרה
+                                        Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                                        mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(mainIntent);
+                                    }
+                                });
             }
 
             @Override
