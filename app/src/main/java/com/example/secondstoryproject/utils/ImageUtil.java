@@ -15,41 +15,55 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 
-/// Utility class for image operations
-/// Contains methods for requesting permissions, converting images to base64 and vice versa
+/**
+ * Utility class for image-related operations.
+ * Provides methods for:
+ * - Requesting runtime permissions (camera & storage)
+ * - Converting images to Base64 strings
+ * - Converting Base64 strings back to Bitmap images
+ */
 public class ImageUtil {
 
-    /// Request permissions for camera and storage
-    /// @param activity The activity to request permissions from
-    /// @see ActivityCompat#requestPermissions(Activity, String[], int)
+    /**
+     * Requests runtime permissions required for image handling.
+     * Includes camera access and media storage permissions.
+     * @param activity the activity used to request permissions
+     */
     public static void requestPermission(@NotNull Activity activity) {
-        // Request permissions for camera and storage
         ActivityCompat.requestPermissions(activity,
                 new String[]{
                         Manifest.permission.CAMERA,
-                        Manifest.permission.READ_EXTERNAL_STORAGE, // has no effect since API 29
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE, // has no effect since API 33
-                        Manifest.permission.READ_MEDIA_IMAGES // the correct permission for reading images on API 33
+                        Manifest.permission.READ_EXTERNAL_STORAGE, // ignored from API 29+
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE, // ignored from API 33+
+                        Manifest.permission.READ_MEDIA_IMAGES // required for API 33+
+
                 }, 1);
     }
 
-    /// Convert an image to a base64 string
-    /// @param postImage The image to convert
-    /// @return The base64 string representation of the image
+    /**
+     * Converts an image from an ImageView into a Base64 encoded string.
+     * The image is compressed using JPEG format before encoding.
+     * @param postImage the ImageView containing the image
+     * @return Base64 string representation of the image, or null if no image exists
+     */
     public static @Nullable String toBase64(@NotNull final ImageView postImage) {
         if (postImage.getDrawable() == null) {
             return null;
         }
         Bitmap bitmap = ((BitmapDrawable) postImage.getDrawable()).getBitmap();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        // Compress the bitmap into JPEG format with 100% quality
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
-    /// Convert a base64 string to an image
-    /// @param base64Code The base64 string to convert
-    /// @return The image represented by the base64 string
+    /**
+     * Converts a Base64 encoded string back into a Bitmap image.
+     * @param base64Code the Base64 string to decode
+     * @return the decoded Bitmap, or null if the input is empty
+     */
     public static @Nullable Bitmap fromBase64(@NotNull final String base64Code) {
         if (base64Code.isEmpty()) {
             return null;

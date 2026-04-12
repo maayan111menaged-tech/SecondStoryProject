@@ -12,22 +12,38 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
+import com.example.secondstoryproject.utils.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * RecyclerView Adapter for displaying a leaderboard of users.
+ * Users are ranked based on their donation count (highest first).
+ * Displays user ranking, name, level, donation count, and initials.
+ */
 public class UserAdapterLeaderBoard extends RecyclerView.Adapter<UserAdapterLeaderBoard.ViewHolder> {
 
+    /**
+     * Listener for user interactions.
+     */
     public interface OnUserClickListener {
         void onUserClick(User user);
         void onLongUserClick(User user);
     }
 
+    /** List of users displayed in the leaderboard */
     private final List<User> userList = new ArrayList<>();
+
+    /** Click listener */
     private final OnUserClickListener listener;
 
+    /**
+     * Constructor.
+     * @param listener listener for user interactions
+     */
     public UserAdapterLeaderBoard(@Nullable OnUserClickListener listener) {
         this.listener = listener;
     }
@@ -43,23 +59,25 @@ public class UserAdapterLeaderBoard extends RecyclerView.Adapter<UserAdapterLead
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User user = userList.get(position);
 
-        // מקום בדירוג (מתחיל מ־1)
+        // Display ranking position (starting from 1)
         holder.tvPlace.setText(String.valueOf(position + 1));
 
-        // שם מלא
+        // Display user full name
         holder.tvName.setText(user.getFullName());
 
-        // רמה
+        // Display user level and icon
         holder.tvLevel.setText(user.getLevel().getLabel());
         holder.ivLevelIcon.setImageResource(user.getLevel().getIconRes());
 
-        // מספר תרומות
+        // Display donation count
         holder.tvDonationCount.setText(user.getDonationCounter() + " תרומות");
 
-        // ראשי תיבות
-        holder.tvInitials.setText(getInitials(user));
+        // Display user profile picture
+        if (user.getProfilePhoneUrl() != null && !user.getProfilePhoneUrl().isEmpty()) {
+            holder.ivProfilePic.setImageBitmap(ImageUtil.fromBase64(user.getProfilePhoneUrl()));
+        }
 
-
+        // Click events
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onUserClick(user);
         });
@@ -75,12 +93,16 @@ public class UserAdapterLeaderBoard extends RecyclerView.Adapter<UserAdapterLead
         return userList.size();
     }
 
-
+    /**
+     * Sets and sorts the user list for the leaderboard.
+     * Users are sorted in descending order by donation count.
+     * @param users list of users to display
+     */
     public void setUserList(List<User> users) {
         userList.clear();
         userList.addAll(users);
 
-        // מיון: הכי הרבה תרומות למעלה
+        // Sort users by donation count (highest first)
         Collections.sort(userList, (u1, u2) ->
                 Integer.compare(u2.getDonationCounter(), u1.getDonationCounter())
         );
@@ -88,27 +110,19 @@ public class UserAdapterLeaderBoard extends RecyclerView.Adapter<UserAdapterLead
         notifyDataSetChanged();
     }
 
-    private String getInitials(User user) {
-        String initials = "";
-        if (user.getfName() != null && !user.getfName().isEmpty()) {
-            initials += user.getfName().charAt(0);
-        }
-        if (user.getlName() != null && !user.getlName().isEmpty()) {
-            initials += user.getlName().charAt(0);
-        }
-        return initials.toUpperCase();
-    }
-
+    /**
+     * ViewHolder for leaderboard user item.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvPlace, tvInitials, tvName, tvLevel, tvDonationCount;
-        ImageView ivLevelIcon;
+        TextView tvPlace, tvName, tvLevel, tvDonationCount;
+        ImageView ivLevelIcon,ivProfilePic;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tvPlace = itemView.findViewById(R.id.tv_user_place);
-            tvInitials = itemView.findViewById(R.id.tv_user_initials);
+            ivProfilePic = itemView.findViewById(R.id.tv_user_profile_pic);
             tvName = itemView.findViewById(R.id.tv_item_user_name);
             tvLevel = itemView.findViewById(R.id.tv_item_user_level);
             tvDonationCount = itemView.findViewById(R.id.tv_item_user_donation_counter);

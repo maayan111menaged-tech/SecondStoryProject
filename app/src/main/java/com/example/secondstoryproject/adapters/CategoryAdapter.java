@@ -12,15 +12,33 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.DonationCategory;
 
+/**
+ * RecyclerView Adapter for displaying donation categories.
+ * Each item includes:
+ * - Category name
+ * - Category icon
+ * Clicking an item triggers a category selection event.
+ */
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
+    /** Array of all available donation categories */
     private final DonationCategory[] categories;
+
+    /** Click listener for category selection */
     private final OnCategoryClickListener listener;
 
+    /**
+     * Listener for category click events.
+     */
     public interface OnCategoryClickListener {
         void onCategoryClick(DonationCategory category);
     }
 
+    /**
+     * Constructor.
+     * Initializes the adapter with all enum values.
+     * @param listener callback for category clicks
+     */
     public CategoryAdapter(OnCategoryClickListener listener) {
         this.categories = DonationCategory.values();
         this.listener = listener;
@@ -38,9 +56,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         DonationCategory category = categories[position];
 
+        // Set category name and icon
         holder.tvName.setText(category.getHebrewName());
         holder.imgIcon.setImageResource(category.getIconResId());
 
+        // Handle click
         holder.itemView.setOnClickListener(v ->
                 listener.onCategoryClick(category)
         );
@@ -51,6 +71,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         return categories.length;
     }
 
+    /**
+     * ViewHolder for category item.
+     */
     static class CategoryViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imgIcon;

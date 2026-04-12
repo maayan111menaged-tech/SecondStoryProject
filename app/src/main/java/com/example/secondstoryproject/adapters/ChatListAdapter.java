@@ -17,21 +17,45 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * RecyclerView Adapter for displaying chat conversations list.
+ * Each item includes:
+ * - Chat name (user or admin)
+ * - Last message or donation context
+ * - Last message timestamp
+ * - Unread messages count
+ */
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder> {
 
+    /**
+     * Listener for chat click events.
+     */
     public interface OnChatClickListener {
         void onChatClick(Chat chat);
     }
 
+    /** List of chats displayed */
     private List<Chat> chats = new ArrayList<>();
+
+    /** Click listener */
     private final OnChatClickListener listener;
+
+    /** Time formatter for displaying last message time */
     private final SimpleDateFormat timeFormat =
             new SimpleDateFormat("HH:mm", Locale.getDefault());
 
+    /**
+     * Constructor.
+     * @param listener click listener for chat items
+     */
     public ChatListAdapter(OnChatClickListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * Sets the chat list.
+     * @param chats list of chats
+     */
     public void setChats(List<Chat> chats) {
         this.chats = chats;
         notifyDataSetChanged();
@@ -54,6 +78,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     @Override
     public int getItemCount() { return chats.size(); }
 
+    /**
+     * ViewHolder representing a single chat item.
+     */
     class ChatViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvName, tvLastMessage, tvTime, tvUnread;
@@ -66,8 +93,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             tvUnread = itemView.findViewById(R.id.tv_unread_count);
         }
 
+        /**
+         * Binds chat data to the UI components.
+         * @param chat chat object
+         */
         void bind(Chat chat) {
-            // שם + תרומה
+            // Display chat name and context
             if ("admin".equals(chat.getType())) {
                 tvName.setText("צוות Second Story");
                 tvLastMessage.setText("פנייה לצוות");
@@ -78,18 +109,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
                 tvLastMessage.setText(!donation.isEmpty() ? "📦 " + donation : "");
             }
 
-            // הודעה אחרונה — רק אם יש
+            // Override with last message if exists
             String last = chat.getLastMessage();
             if (last != null && !last.isEmpty()) {
                 tvLastMessage.setText(last);
             }
 
-            // זמן
+            // Display last message time
             if (chat.getLastTimestamp() > 0) {
                 tvTime.setText(timeFormat.format(new Date(chat.getLastTimestamp())));
             }
 
-            // עיגול
+            // Display unread messages count
             int unread = chat.getUnreadCount();
             if (unread > 0) {
                 tvUnread.setVisibility(View.VISIBLE);
@@ -98,6 +129,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
                 tvUnread.setVisibility(View.GONE);
             }
 
+            // Handle click event
             itemView.setOnClickListener(v -> listener.onChatClick(chat));
         }
     }

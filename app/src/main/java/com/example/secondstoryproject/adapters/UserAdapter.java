@@ -22,30 +22,60 @@ import com.google.android.material.chip.Chip;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * RecyclerView Adapter for displaying and managing a list of users.
+ * Supports:
+ * - Click and long-click actions
+ * - Admin promotion actions
+ * - Filtering (by name and admin status)
+ * - Dynamic updates (add, update, remove)
+ */
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
 
-
+    /**
+     * Listener for user item interactions.
+     */
     public interface OnUserClickListener {
         void onUserClick(User user);
         void onLongUserClick(User user);
         void onMakeAdminClick(User user);
     }
+    /**
+     * Listener for filter results.
+     */
     public interface OnFilterListener {
         void onFilterResult(int count);
     }
 
-    private List<User> fullUserList = new ArrayList<>(); // הרשימה המלאה תמיד
+    /** Full list of users (unfiltered) */
+    private List<User> fullUserList = new ArrayList<>();
+
+    /** ID of the currently logged-in user */
     private String currentUserId = "";
 
+    /** Displayed (filtered) user list */
     private final List<User> userList;
+
+    /** Click listener */
     private final OnUserClickListener onUserClickListener;
+
+    /** Filter result listener */
+    private OnFilterListener onFilterListener;
+
+    /**
+     * Constructor.
+     * @param onUserClickListener listener for user interactions
+     */
     public UserAdapter(@Nullable final OnUserClickListener onUserClickListener) {
         userList = new ArrayList<>();
         this.onUserClickListener = onUserClickListener;
     }
 
-    private OnFilterListener onFilterListener;
-
+    /**
+     * Sets the filter listener.
+     *
+     * @param listener the listener to receive filter results
+     */
     public void setOnFilterListener(OnFilterListener listener) {
         this.onFilterListener = listener;
     }
@@ -62,6 +92,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         User user = userList.get(position);
         if (user == null) return;
 
+        // Show "Me" badge if this is the logged-in user
         String currentUserId = SharedPreferencesUtil.getUserId(holder.itemView.getContext());
         if (user.getId().equals(currentUserId)) {
             holder.tvMeBadge.setVisibility(View.VISIBLE);
@@ -69,19 +100,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             holder.tvMeBadge.setVisibility(View.GONE);
         }
 
+        // Bind user data
         holder.tvUserName.setText(user.getUserName());
         holder.tvName.setText(user.getFullName());
         holder.tvEmail.setText(user.getEmail());
         holder.tvPhone.setText(user.getPhoneNumber());
 
+        // Load profile image from Base64
         String base64 = user.getProfilePhoneUrl();
-
         if (base64 != null && !base64.isEmpty()) {
             Bitmap bitmap = ImageUtil.fromBase64(base64);
             holder.ivProfilePic.setImageBitmap(bitmap);
         }
 
-        // if user admin change the MakeAdmin button
+        // Handle admin button state
         if (user.isAdmin()) {
             holder.btnMakeAdmin.setEnabled(false);
             holder.btnMakeAdmin.setText("Already Admin");
@@ -90,22 +122,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             holder.btnMakeAdmin.setText("Make Admin");
         }
 
-
+        // Click events
         holder.itemView.setOnClickListener(v -> {
             if (onUserClickListener != null) {
                 onUserClickListener.onUserClick(user);
             }
         });
-
         holder.itemView.setOnLongClickListener(v -> {
             if (onUserClickListener != null) {
                 onUserClickListener.onLongUserClick(user);
             }
             return true;
         });
-
         holder.btnMakeAdmin.setOnClickListener(v -> {
-
+            // Set temporary loading state
             holder.btnMakeAdmin.setEnabled(false);
             holder.btnMakeAdmin.setText("Loading...");
 
@@ -120,10 +150,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         return userList.size();
     }
 
+    /**
+     * Sets the user list and sorts it so the current user appears first.
+     * @param users list of users
+     * @param currentUserId ID of the logged-in user
+     */
     public void setUserList(List<User> users, String currentUserId) {
         this.currentUserId = currentUserId;
-
         fullUserList.clear();
+
+        // Sort: current user appears first
         List<User> sorted = new ArrayList<>(users);
         sorted.sort((a, b) -> {
             boolean aIsMe = a.getId().equals(currentUserId);
@@ -137,6 +173,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         notifyDataSetChanged();
     }
 
+    /**
+     * Filters users based on search query and admin status.
+     * @param query search text (username)
+     * @param adminFilter true = only admins, false = only non-admins, null = all
+     */
     public void filter(String query, Boolean adminFilter) {
         userList.clear();
         for (User user : fullUserList) {
@@ -155,25 +196,36 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         }
     }
 
+    /**
+     * Adds a new user to the list.
+     */
     public void addUser(User user) {
         userList.add(user);
         notifyItemInserted(userList.size() - 1);
     }
+
+    /**
+     * Updates an existing user (by object reference).
+     */
     public void updateUser(User user) {
         int index = userList.indexOf(user);
         if (index == -1) return;
         userList.set(index, user);
         notifyItemChanged(index);
     }
+
+    /**
+     * Updates a user by ID in both full and filtered lists.
+     */
     public void updateUserById(User updatedUser) {
-        // עדכון ב-fullUserList
+        // Update full list
         for (int i = 0; i < fullUserList.size(); i++) {
             if (fullUserList.get(i).getId().equals(updatedUser.getId())) {
                 fullUserList.set(i, updatedUser);
                 break;
             }
         }
-        // עדכון ב-userList (המסוננת)
+        // Update visible list
         for (int i = 0; i < userList.size(); i++) {
             if (userList.get(i).getId().equals(updatedUser.getId())) {
                 userList.set(i, updatedUser);
@@ -182,6 +234,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             }
         }
     }
+
+    /**
+     * Resets the "Make Admin" button state for a user.
+     */
     public void resetMakeAdminButton(User user) {
         for (int i = 0; i < userList.size(); i++) {
             if (userList.get(i).getId().equals(user.getId())) {
@@ -192,12 +248,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             }
         }
     }
+
+    /**
+     * Removes a user from the list.
+     */
     public void removeUser(User user) {
         int index = userList.indexOf(user);
         if (index == -1) return;
         userList.remove(index);
         notifyItemRemoved(index);
     }
+
+    /**
+     * Sets loading state for a button.
+     */
     public void setLoadingState(Button button, boolean isLoading) {
         if (isLoading) {
             button.setEnabled(false);
@@ -208,6 +272,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         }
     }
 
+    /**
+     * ViewHolder for user item.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvUserName,tvName, tvEmail, tvPhone, tvMeBadge;
         ImageView ivProfilePic;
