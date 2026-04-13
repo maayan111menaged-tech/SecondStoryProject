@@ -5,36 +5,42 @@ import com.example.secondstoryproject.services.impl.ChatServiceImpl;
 import com.example.secondstoryproject.services.impl.DonationServiceImpl;
 import com.example.secondstoryproject.services.impl.UserServiceImpl;
 
-
-/// Singleton implementation of {@link IDatabaseService} that serves as the
-/// application's service locator for all database operations.
-/// <p>
-/// This class lazily initializes a single instance and wires together the
-/// concrete service implementations ({@link UserServiceImpl},
-/// {@link DonationServiceImpl}).
-/// </p>
-/// <p>
-/// Usage:
-/// <pre>{@code
-///     IDatabaseService db = DatabaseService.getInstance();
-///     db.getUserService().get(uid, callback);
-/// }</pre>
-/// </p>
-/// @see IDatabaseService
+/**
+ * Singleton implementation of {@link IDatabaseService}.
+ * Acts as a central access point (Service Locator) for all database-related operations
+ * in the application, including:
+ * - Users
+ * - Donations
+ * - Chats
+ * This class ensures that only one instance exists and provides access to
+ * the different service layers.
+ * <p>Usage example:</p>
+ * <pre>{@code
+ * IDatabaseService db = DatabaseService.getInstance();
+ * db.getUserService().get(userId, callback);
+ * }</pre>
+ *
+ * @see IDatabaseService
+ */
 public class DatabaseService implements IDatabaseService {
 
-    /// the single shared instance (lazily created)
+    /** The single shared instance (lazy initialization) */
     private static DatabaseService instance;
 
-    /// service handling user-related database operations
+    /** Service handling user-related operations */
     private final IUserService userService;
-    /// service handling Donation-related database operations
+
+    /** Service handling donation-related operations */
     private final IDonationService DonationService;
 
+    /** Service handling chat-related operations */
     private final IChatService chatService;
 
-    /// Private constructor — initializes all entity-specific service implementations.
-    /// Use {@link #getInstance()} to obtain the shared instance.
+    /**
+     * Private constructor.
+     * Initializes all service implementations.
+     * Use {@link #getInstance()} to access the singleton instance.
+     */
     private DatabaseService() {
         userService = new UserServiceImpl();
         DonationService = new DonationServiceImpl();
@@ -43,12 +49,11 @@ public class DatabaseService implements IDatabaseService {
 
 
 
-    /// Returns the shared {@link IDatabaseService} instance, creating it on first call.
-    /// <p>
-    /// This method is thread-safe — the {@code synchronized} keyword ensures that
-    /// only one thread can initialize the instance at a time.
-    /// </p>
-    /// @return the singleton {@link IDatabaseService} instance
+    /**
+     * Returns the singleton instance of {@link IDatabaseService}.
+     * This method is thread-safe.
+     * @return the shared database service instance
+     */
     public static synchronized IDatabaseService getInstance() {
         if (instance == null) {
             instance = new DatabaseService();
@@ -56,18 +61,25 @@ public class DatabaseService implements IDatabaseService {
         return instance;
     }
 
-    /// {@inheritDoc}
+    /**
+     * Returns the user service.
+     */
     @Override
     public IUserService getUserService() {
         return userService;
     }
 
-    /// {@inheritDoc}
+    /**
+     * Returns the donation service.
+     */
     @Override
     public IDonationService getDonationService() {
         return DonationService;
     }
 
+    /**
+     * Returns the chat service.
+     */
     @Override
     public IChatService getChatService() { return chatService; }
 

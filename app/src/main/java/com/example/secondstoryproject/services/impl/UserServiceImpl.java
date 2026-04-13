@@ -14,12 +14,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-
-/// implementation of {@link IUserService} backed by Firebase Realtime Database
-/// @see BaseFirebaseService
-/// @see User
+/**
+ * Firebase-based implementation of {@link IUserService}.
+ * Handles all user-related database operations including:
+ * - CRUD operations (via {@link BaseFirebaseService})
+ * - Authentication (login)
+ * - Username validation and lookup
+ * - User statistics
+ * This class extends {@link BaseFirebaseService} to reuse generic
+ * Firebase CRUD functionality.
+ */
 public class UserServiceImpl extends BaseFirebaseService<User> implements IUserService {
 
+    /**
+     * Constructor.
+     * Initializes the service with the "users" database path.
+     */
     public UserServiceImpl() {
         super("users", User.class);
     }
@@ -54,6 +64,13 @@ public class UserServiceImpl extends BaseFirebaseService<User> implements IUserS
         super.update(userId, function, callback);
     }
 
+    /**
+     * Finds a user by username and password.
+     * Used for authentication (login).
+     * @param username username
+     * @param password password
+     * @param callback matching user or null if credentials are invalid
+     */
     @Override
     public void getUserByUserNameAndPassword(@NonNull final String username, @NonNull final String password, @NonNull final DatabaseCallback<User> callback) {
         getAll(new DatabaseCallback<List<User>>() {
@@ -75,6 +92,12 @@ public class UserServiceImpl extends BaseFirebaseService<User> implements IUserS
         });
     }
 
+    /**
+     * Checks if a username already exists in the system.
+     * Used during user registration.
+     * @param username username to check
+     * @param callback true if exists, false otherwise
+     */
     @Override
     public void checkIfUserNameExists(@NonNull final String username, @NonNull final DatabaseCallback<Boolean> callback) {
         getAll(new DatabaseCallback<List<User>>() {
@@ -96,6 +119,11 @@ public class UserServiceImpl extends BaseFirebaseService<User> implements IUserS
         });
     }
 
+    /**
+     * Finds a user by username.
+     * @param username username to search
+     * @param callback matching user or null if not found
+     */
     @Override
     public void findUserByUserName(@NonNull final String username, @NonNull final DatabaseCallback<User> callback) {
         getAll(new DatabaseCallback<List<User>>() {
@@ -117,6 +145,11 @@ public class UserServiceImpl extends BaseFirebaseService<User> implements IUserS
         });
     }
 
+    /**
+     * Returns the total number of registered users.
+     * Used for admin dashboard and statistics.
+     * @param callback number of users
+     */
     @Override
     public void getUsersCount(@NonNull DatabaseCallback<Integer> callback) {
         getAll(new DatabaseCallback<List<User>>() {

@@ -9,11 +9,41 @@ import com.google.firebase.database.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of {@link IChatService} using Firebase Realtime Database.
+ * <p>
+ * Responsible for managing chats between users in the application.
+ * Chats can be:
+ * <ul>
+ *     <li>Donation chats — between giver and receiver</li>
+ *     <li>Admin chats — between user and system/admin team</li>
+ * </ul>
+ * </p>
+ * <p>
+ * This service handles:
+ * <ul>
+ *     <li>Creating chats (if not already existing)</li>
+ *     <li>Sending messages</li>
+ *     <li>Listening to real-time messages</li>
+ *     <li>Managing unread message counters</li>
+ *     <li>Fetching user chats with additional display data</li>
+ * </ul>
+ * </p>
+ * <p>
+ * All operations are asynchronous and return results via {@link IDatabaseService.DatabaseCallback}.
+ * </p>
+ */
 public class ChatServiceImpl implements IChatService {
 
+    /** Reference to chats node in Firebase */
     private final DatabaseReference chatsRef;
+
+    /** Reference to users node in Firebase */
     private final DatabaseReference usersRef;
 
+    /**
+     * Constructor — initializes Firebase references.
+     */
     public ChatServiceImpl() {
         FirebaseDatabase db = FirebaseDatabase.getInstance(
                 "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app");
@@ -21,6 +51,13 @@ public class ChatServiceImpl implements IChatService {
         this.usersRef = db.getReference("users");
     }
 
+    /**
+     * Creates a donation chat if it does not exist, otherwise returns existing chat ID.
+     * @param donationId ID of the donation
+     * @param giverId    ID of the giver (owner of donation)
+     * @param receiverId ID of the interested user
+     * @param callback   returns chat ID
+     */
     @Override
     public void getOrCreateDonationChat(String donationId, String giverId,
                                         String receiverId, IDatabaseService.DatabaseCallback<String> callback) {
@@ -48,6 +85,13 @@ public class ChatServiceImpl implements IChatService {
         });
     }
 
+    /**
+     * Sends a message in a chat and updates metadata (last message, timestamp, unread count).
+     * @param chatId   chat ID
+     * @param senderId sender user ID
+     * @param text     message content
+     * @param callback completion callback
+     */
     @Override
     public void sendMessage(String chatId, String senderId, String text,
                             IDatabaseService.DatabaseCallback<Void> callback) {
@@ -81,6 +125,13 @@ public class ChatServiceImpl implements IChatService {
                 })
                 .addOnFailureListener(callback::onFailed);
     }
+
+    /**
+     * Listens in real-time to messages in a chat.
+     * @param chatId   chat ID
+     * @param callback returns list of messages
+     * @return Firebase listener (must be removed manually)
+     */
     @Override
     public ValueEventListener listenToMessages(String chatId,
                                                IDatabaseService.DatabaseCallback<List<Message>> callback) {
@@ -109,6 +160,12 @@ public class ChatServiceImpl implements IChatService {
         messagesRef.addValueEventListener(listener);
         return listener;
     }
+
+    /**
+     * Retrieves all chats of a user and enriches them with display data (names, donation titles).
+     * @param userId   user ID
+     * @param callback returns list of chats
+     */
     @Override
     public void getUserChats(String userId,
                              IDatabaseService.DatabaseCallback<List<Chat>> callback) {
@@ -165,7 +222,11 @@ public class ChatServiceImpl implements IChatService {
                     }
                 });
     }
-    // משלימה שמות לכל הצאטים
+
+    /**
+     * Enriches chat objects with additional display data:
+     * user names and donation names.
+     */
     private void enrichChatsWithNames(List<Chat> chats, String userId,
                                       IDatabaseService.DatabaseCallback<List<Chat>> callback) {
 
@@ -222,11 +283,18 @@ public class ChatServiceImpl implements IChatService {
                     });
         }
     }
+
+    /**
+     * Removes a real-time listener from a chat.
+     */
     @Override
     public void removeListener(String chatId, ValueEventListener listener) {
         chatsRef.child(chatId).child("messages").removeEventListener(listener);
     }
 
+    /**
+     * Increments unread message count for a user in a chat.
+     */
     @Override
     public void incrementUnread(String chatId, String userId) {
         DatabaseReference ref = chatsRef.child(chatId)
@@ -240,6 +308,9 @@ public class ChatServiceImpl implements IChatService {
         });
     }
 
+    /**
+     * Resets unread message count for a user.
+     */
     @Override
     public void resetUnread(String chatId, String userId) {
         chatsRef.child(chatId)
@@ -248,6 +319,9 @@ public class ChatServiceImpl implements IChatService {
                 .setValue(0);
     }
 
+    /**
+     * Listens in real-time to unread message count for a specific user.
+     */
     @Override
     public ValueEventListener listenToUnreadCount(String chatId, String userId,
                                                   IDatabaseService.DatabaseCallback<Integer> callback) {
@@ -270,6 +344,9 @@ public class ChatServiceImpl implements IChatService {
         return listener;
     }
 
+    /**
+     * Creates or retrieves a chat between a user and the admin team.
+     */
     @Override
     public void getOrCreateAdminChat(String userId,
                                      IDatabaseService.DatabaseCallback<String> callback) {

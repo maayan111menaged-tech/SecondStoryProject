@@ -1,53 +1,65 @@
 package com.example.secondstoryproject.services;
 
-/// Service locator interface for accessing entity-specific database services.
-/// <p>
-/// This is the main entry point for all database operations in the application.
-/// Rather than exposing database methods directly, it provides access to
-/// segregated service interfaces — each responsible for a single entity type.
-/// </p>
-/// <p>
-/// Usage example:
-/// <pre>{@code
-///     IDatabaseService db = DatabaseService.getInstance();
-///     db.getUserService().get(uid, callback);
-///     db.getFoodService().getAll(callback);
-///     db.getCartService().create(cart, callback);
-/// }</pre>
-/// </p>
-/// @see IUserService
-/// @see IDonationService
-/// @see DatabaseService
+/**
+ * Service locator interface for accessing all database-related services.
+ * This is the main entry point for database operations in the application.
+ * Instead of exposing database logic directly, it provides access to
+ * separate service interfaces for each domain:
+ * - Users
+ * - Donations
+ * - Chats
+ * <p>Usage example:</p>
+ * <pre>{@code
+ * IDatabaseService db = DatabaseService.getInstance();
+ * db.getUserService().get(userId, callback);
+ * db.getDonationService().getAll(callback);
+ * db.getChatService().getChatsForUser(userId, callback);
+ * }</pre>
+ * @see IUserService
+ * @see IDonationService
+ * @see IChatService
+ * @see DatabaseService
+ */
 public interface IDatabaseService {
 
-    /// get the user service for performing user-related database operations
-    /// @return an implementation of {@link IUserService}
+    /**
+     * Returns the user service for user-related operations.
+     * @return implementation of {@link IUserService}
+     */
     IUserService getUserService();
 
-    /// get the food service for performing food-related database operations
-    /// @return an implementation of {@link IDonationService}
+    /**
+     * Returns the donation service for donation-related operations.
+     * @return implementation of {@link IDonationService}
+     */
     IDonationService getDonationService();
 
-
+    /**
+     * Returns the chat service for chat-related operations.
+     * @return implementation of {@link IChatService}
+     */
     IChatService getChatService();
 
-    /// Generic callback interface for asynchronous database operations.
-    /// <p>
-    /// All database operations are asynchronous. Use this callback to handle
-    /// the result of an operation when it completes.
-    /// </p>
-    /// <p>
-    /// Exactly one of {@link #onCompleted(Object)} or {@link #onFailed(Exception)}
-    /// will be called for each operation — never both.
-    /// </p>
-    /// @param <T> the type of the result returned on success
+    /**
+     * Generic callback interface for asynchronous database operations.
+     * All database operations are asynchronous.
+     * Use this callback to handle success or failure.
+     * <p>Exactly one method will be called:</p>
+     * - {@link #onCompleted(Object)} on success
+     * - {@link #onFailed(Exception)} on failure
+     * @param <T> type of the result returned on success
+     */
     interface DatabaseCallback<T> {
-        /// called when the operation completes successfully
-        /// @param object the result of the operation, or null for void operations
+        /**
+         * Called when the operation completes successfully.
+         * @param object result of the operation (can be null)
+         */
         void onCompleted(T object);
 
-        /// called when the operation fails
-        /// @param e the exception describing what went wrong
+        /**
+         * Called when the operation fails.
+         * @param e exception describing the failure
+         */
         void onFailed(Exception e);
     }
 }

@@ -11,14 +11,13 @@ import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback
 import java.util.List;
 
 /**
- * Service interface for Donation-related database operations.
- * <p>
- * Provides CRUD operations for {@link Donation} entities.
- * Donations represent items that users can give or share via the app.
- * </p>
- * <p>
- * All operations are asynchronous and return results via {@link DatabaseCallback}.
- * </p>
+ * Service interface for donation-related database operations.
+ * Handles all operations related to {@link Donation} entities, including:
+ * - CRUD operations
+ * - Filtering (by user, status, city)
+ * - Statistics (counts by status and city)
+ * Donations represent items shared by users in the application.
+ * All operations are asynchronous and return results via {@link DatabaseCallback}
  * @see Donation
  * @see DatabaseCallback
  * @see IDatabaseService#getDonationService()
@@ -26,68 +25,86 @@ import java.util.List;
 public interface IDonationService {
 
     /**
-     * Generate a unique ID for a new donation.
-     * @return a new unique ID string
+     * Generates a unique ID for a new donation.
+     * @return generated donation ID
      */
     String generateId();
 
     /**
-     * Create a new donation in the database.
+     * Creates a new donation in the database.
      * The donation's {@link Donation#getId()} is used as the database key.
-     * @param donation the donation to create (must have a valid ID)
-     * @param callback called with {@code null} on success, or an exception on failure.
-     *                 Can be {@code null} if the caller does not need to handle the result.
+     * @param donation donation to create
+     * @param callback optional callback for result
      */
     void create(@NonNull Donation donation, @Nullable DatabaseCallback<Void> callback);
 
     /**
-     * Retrieve a single donation by its ID.
-     * @param donationId the unique ID of the donation
-     * @param callback called with the {@link Donation} object on success, or an exception on failure.
-     *                 The donation may be {@code null} if no donation exists with the given ID.
+     * Retrieves a donation by ID.
+     * @param donationId donation ID
+     * @param callback result callback (may return null if not found)
      */
     void get(@NonNull String donationId, @NonNull DatabaseCallback<Donation> callback);
 
     /**
-     * Retrieve all donations from the database.
-     * @param callback called with a {@link List} of all {@link Donation} objects on success,
-     *                 or an exception on failure. The list may be empty but never null.
+     * Retrieves all donations.
+     * @param callback list of donations (never null, may be empty)
      */
     void getAll(@NonNull DatabaseCallback<List<Donation>> callback);
 
     /**
-     * Delete a donation from the database by its ID.
-     * @param donationId the unique ID of the donation to delete
-     * @param callback called with {@code null} on success, or an exception on failure.
-     *                 Can be {@code null} if the caller does not need to handle the result.
+     * Deletes a donation by ID.
+     * @param donationId donation ID
+     * @param callback optional callback
      */
     void delete(@NonNull String donationId, @Nullable DatabaseCallback<Void> callback);
 
     /**
-     * Retrieve all donations created by a specific user.
-     *
-     * @param giverId the ID of the user who created the donations
-     * @param callback called with a list of donations belonging to that user
+     * Retrieves all donations created by a specific user.
+     * @param giverId user ID (donor)
+     * @param callback list of donations belonging to the user
      */
     void getByGiverId(@NonNull String giverId,
                       @NonNull DatabaseCallback<List<Donation>> callback);
 
-    ///
+    /**
+     * Returns the number of donations with a specific status.
+     * Used for statistics and admin dashboards.
+     * @param status donation status
+     * @param callback number of matching donations
+     */
     void getDonationsCountByStatus(@NonNull DonationStatus status,
                                    @NonNull DatabaseCallback<Integer> callback);
 
-    ///
+    /**
+     * Retrieves all donations with a specific status.
+     * @param status donation status
+     * @param callback list of matching donations
+     */
     void getDonationsByStatus(@NonNull DonationStatus status,
                               @NonNull DatabaseCallback<List<Donation>> callback);
 
+    /**
+     * Returns the number of donations in a specific city.
+     * @param city city to filter by
+     * @param callback number of donations in the city
+     */
     void getDonationsCountByCity(@NonNull IsraelCity city,
                            @NonNull DatabaseCallback<Integer> callback);
 
+    /**
+     * Returns the number of donations grouped by cities.
+     * Used for maps and statistics (e.g. showing donation distribution).
+     * @param callback map of city name → donation count
+     */
      void getDonationsCountByCities(@NonNull DatabaseCallback<java.util.HashMap<String,
              Integer>> callback);
 
-        ///
-    void update(@NonNull String donationId,
+    /**
+     * Updates a donation using a transaction.
+     * @param donationId donation ID
+     * @param function transformation function
+     * @param callback result callback with updated donation
+     */    void update(@NonNull String donationId,
                 @NonNull java.util.function.UnaryOperator<Donation> function,
                 @Nullable DatabaseCallback<Donation> callback);
 

@@ -20,27 +20,33 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 
-/// abstract base class providing generic CRUD operations for Firebase Realtime Database.
-/// @param <T> the type of the entity, must implement {@link Idable}
-/// @see Idable
-/// @see DatabaseReference
+/**
+ * Abstract base service for Firebase Realtime Database operations.
+ * Provides generic CRUD functionality for all entities in the application,
+ * such as Users, Donations, and Chats.
+ * Each specific service (e.g. UserService, DonationService) extends this class
+ * and defines its own database path.
+ * @param <T> entity type (must implement {@link Idable})
+ */
 public abstract class BaseFirebaseService<T extends Idable> {
 
-    /// tag for logging
+    /** Tag used for logging */
     private static final String TAG = "BaseFirebaseService";
 
-
-    /// the reference to the database
+    /** Root reference to Firebase database */
     private final DatabaseReference databaseReference;
 
-    /// the path in the database for this entity type
+    /** Path of the entity in the database (e.g. "users", "donations", "chats") */
     private final String path;
 
-    /// the class of the entity type (needed for Firebase deserialization)
+    /** Class type for Firebase deserialization */
     private final Class<T> clazz;
 
-    /// @param path the path in the database for this entity type (e.g. "users", "foods", "carts")
-    /// @param clazz the class of the entity type
+    /**
+     * Constructor.
+     * @param path  database path for the entity
+     * @param clazz class type of the entity
+     */
     protected BaseFirebaseService(@NonNull final String path, @NonNull final Class<T> clazz) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance("https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app");
         databaseReference = firebaseDatabase.getReference();
@@ -48,63 +54,61 @@ public abstract class BaseFirebaseService<T extends Idable> {
         this.clazz = clazz;
     }
 
-    /// generate a new id for a new entity in the database
-    /// @return a new id
+    /**
+     * Generates a unique ID for a new entity.
+     * @return generated ID string
+     */
     protected String generateId() {
         return databaseReference.child(path).push().getKey();
     }
 
-    /// create or overwrite an entity in the database
-    /// @param item the entity to create
-    /// @param callback the callback to call when the operation is completed
+    /**
+     * Creates or overwrites an entity in the database.
+     * @param item     entity to save
+     * @param callback optional callback
+     */
     protected void create(@NonNull final T item, @Nullable final DatabaseCallback<Void> callback) {
         writeData(path + "/" + item.getId(), item, callback);
     }
 
-    /// get a single entity from the database by id
-    /// @param id the id of the entity
-    /// @param callback the callback to call when the operation is completed
+    /**
+     * Retrieves a single entity by ID.
+     * @param id       entity ID
+     * @param callback result callback
+     */
     protected void get(@NonNull final String id, @NonNull final DatabaseCallback<T> callback) {
         getData(path + "/" + id, callback);
     }
 
-    /// get all entities of this type from the database
-    /// @param callback the callback to call when the operation is completed
+    /**
+     * Retrieves all entities of this type.
+     * @param callback result callback with list
+     */
     protected void getAll(@NonNull final DatabaseCallback<List<T>> callback) {
         getDataList(path, callback);
     }
 
-    private void getDataList(@NonNull final String fullPath, @NonNull final DatabaseCallback<List<T>> callback) {
-        readData(fullPath).get().addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                Log.e(TAG, "Error getting data", task.getException());
-                callback.onFailed(task.getException());
-                return;
-            }
-            List<T> tList = new ArrayList<>();
-            task.getResult().getChildren().forEach(dataSnapshot -> {
-                T t = dataSnapshot.getValue(clazz);
-                tList.add(t);
-            });
-            callback.onCompleted(tList);
-        });
-    }
-    /// delete an entity from the database by id
-    /// @param id the id of the entity to delete
-    /// @param callback the callback to call when the operation is completed
+    /**
+     * Deletes an entity by ID.
+     * @param id       entity ID
+     * @param callback optional callback
+     */
     protected void delete(@NonNull final String id, @Nullable final DatabaseCallback<Void> callback) {
         deleteData(path + "/" + id, callback);
     }
 
-    /// update an entity using a transaction
-    /// @param id the id of the entity to update
-    /// @param function the function to apply to the current value
-    /// @param callback the callback to call when the operation is completed
+
+    /**
+     * Updates an entity using a Firebase transaction.
+     * @param id       entity ID
+     * @param function transformation function
+     * @param callback optional callback with updated entity
+     */
     protected void update(@NonNull final String id, @NonNull final UnaryOperator<T> function, @Nullable final DatabaseCallback<T> callback) {
         runTransaction(path + "/" + id, function, callback);
     }
 
-    // region low-level helpers
+    // ===================== Internal helpers =====================
 
     private DatabaseReference readData(@NonNull final String fullPath) {
         return databaseReference.child(fullPath);
@@ -146,6 +150,22 @@ public abstract class BaseFirebaseService<T extends Idable> {
         });
     }
 
+    private void getDataList(@NonNull final String fullPath, @NonNull final DatabaseCallback<List<T>> callback) {
+        readData(fullPath).get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e(TAG, "Error getting data", task.getException());
+                callback.onFailed(task.getException());
+                return;
+            }
+            List<T> tList = new ArrayList<>();
+            task.getResult().getChildren().forEach(dataSnapshot -> {
+                T t = dataSnapshot.getValue(clazz);
+                tList.add(t);
+            });
+            callback.onCompleted(tList);
+        });
+    }
+
 
     private void runTransaction(@NonNull final String fullPath, @NonNull final UnaryOperator<T> function, @Nullable final DatabaseCallback<T> callback) {
         readData(fullPath).runTransaction(new Transaction.Handler() {
@@ -179,5 +199,7 @@ public abstract class BaseFirebaseService<T extends Idable> {
         });
     }
 
-        // endregion low-level helpers
+    protected DatabaseReference getRootRef() {
+        return databaseReference;
+    }
 }

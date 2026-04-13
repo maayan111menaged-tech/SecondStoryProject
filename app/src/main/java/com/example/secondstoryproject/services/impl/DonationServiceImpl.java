@@ -11,8 +11,14 @@ import com.example.secondstoryproject.services.IDonationService;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/// implementation of {@link IDonationService} backed by Firebase Realtime Database
+/// Implementation of {@link IDonationService} using Firebase Realtime Database.
+/// <p>
+/// This class provides all donation-related operations such as:
+/// creating, retrieving, updating, deleting, and filtering donations.
+/// </p>
+/// <p>
+/// All operations are asynchronous and use {@link DatabaseCallback}.
+/// </p>
 /// @see BaseFirebaseService
 /// @see Donation
 public class DonationServiceImpl extends BaseFirebaseService<Donation> implements IDonationService {
@@ -21,31 +27,37 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
         super("donations", Donation.class);
     }
 
+    /// {@inheritDoc}
     @Override
     public String generateId() {
         return super.generateId();
     }
 
+    /// {@inheritDoc}
     @Override
     public void create(@NonNull Donation donation, @Nullable DatabaseCallback<Void> callback) {
         super.create(donation, callback);
     }
 
+    /// {@inheritDoc}
     @Override
     public void get(@NonNull String donationId, @NonNull DatabaseCallback<Donation> callback) {
         super.get(donationId, callback);
     }
 
+    /// {@inheritDoc}
     @Override
     public void getAll(@NonNull DatabaseCallback<List<Donation>> callback) {
         super.getAll(callback);
     }
 
+    /// {@inheritDoc}
     @Override
     public void delete(@NonNull String donationId, @Nullable DatabaseCallback<Void> callback) {
         super.delete(donationId, callback);
     }
 
+    /// {@inheritDoc}
     @Override
     public void update(@NonNull String donationId,
                        @NonNull java.util.function.UnaryOperator<Donation> function,
@@ -54,6 +66,9 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
         super.update(donationId, function, callback);
     }
 
+    /// Retrieve all donations created by a specific user
+    /// @param giverId The ID of the user who created the donations
+    /// @param callback Returns a filtered list of donations
     @Override
     public void getByGiverId(@NonNull String giverId, @NonNull DatabaseCallback<List<Donation>> callback) {
 
@@ -82,6 +97,9 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
         });
     }
 
+    /// Count how many donations exist with a specific status
+    /// @param status The donation status to filter by
+    /// @param callback Returns the number of matching donations
     @Override
     public void getDonationsCountByStatus(@NonNull DonationStatus status,
                                           @NonNull DatabaseCallback<Integer> callback) {
@@ -110,6 +128,9 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
         });
     }
 
+    /// Retrieve all donations with a specific status
+    /// @param status The donation status to filter by
+    /// @param callback Returns a filtered list of donations
     @Override
     public void getDonationsByStatus(@NonNull DonationStatus status,
                                      @NonNull DatabaseCallback<List<Donation>> callback) {
@@ -138,6 +159,9 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
         });
     }
 
+    /// Count how many donations exist in a specific city
+    /// @param city The city to filter by
+    /// @param callback Returns the number of matching donations
     @Override
     public void getDonationsCountByCity(@NonNull IsraelCity city,
                                           @NonNull DatabaseCallback<Integer> callback) {
@@ -166,6 +190,9 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
         });
     }
 
+    /// Count donations grouped by city
+    /// @param callback Returns a map where:
+    /// key = city name, value = number of donations
     @Override
     public void getDonationsCountByCities(@NonNull DatabaseCallback<java.util.HashMap<String, Integer>> callback) {
 
