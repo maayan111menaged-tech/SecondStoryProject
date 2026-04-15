@@ -31,6 +31,7 @@ public interface IChatService {
     /// @param text The message content
     /// @param callback Called when the message is successfully sent or failed
     void sendMessage(String chatId, String senderId, String text,
+                     boolean senderIsAdmin,
                      IDatabaseService.DatabaseCallback<Void> callback);
 
     /// Listen for real-time updates of messages in a chat
@@ -60,7 +61,6 @@ public interface IChatService {
     /// @param chatId The ID of the chat
     /// @param userId The ID of the user whose unread count should be reset
     void resetUnread(String chatId, String userId);
-
     /// Listen for real-time updates of unread message count
     /// @param chatId The ID of the chat
     /// @param userId The ID of the user
@@ -74,4 +74,9 @@ public interface IChatService {
     /// @param callback Returns the chat ID
     void getOrCreateAdminChat(String userId,
                               IDatabaseService.DatabaseCallback<String> callback);
+
+
+    void getAllAdminChats(IDatabaseService.DatabaseCallback<List<Chat>> callback);
+    void deleteAdminChat(String userId, IDatabaseService.DatabaseCallback<Void> callback);
+
 }

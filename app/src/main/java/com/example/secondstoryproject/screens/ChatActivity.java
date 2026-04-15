@@ -27,7 +27,7 @@ public class ChatActivity extends BaseActivity {
 
     private String chatId;
     private String currentUserId;
-
+    private boolean currentUserIsAdmin;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +46,7 @@ public class ChatActivity extends BaseActivity {
             return;
         }
         currentUserId = currentUser.getId();
-
+        currentUserIsAdmin = currentUser.isAdmin();
         // כותרת
         TextView tvTitle = findViewById(R.id.tv_chat_title);
         tvTitle.setText(otherUserName != null ? "שיחה עם " + otherUserName : "שיחה");
@@ -69,10 +69,13 @@ public class ChatActivity extends BaseActivity {
     }
 
     private void listenToMessages() {
-        // איפוס הודעות לא נקראות בכניסה
-        DatabaseService.getInstance().getChatService()
-                .resetUnread(chatId, currentUserId);
+        String currentUserIdNew = currentUserId;
+        if(currentUserIsAdmin){
+            currentUserIdNew = "admin";
+        }
 
+        DatabaseService.getInstance().getChatService()
+                .resetUnread(chatId, currentUserIdNew);
 
         messagesListener = DatabaseService.getInstance()
                 .getChatService()
@@ -104,6 +107,7 @@ public class ChatActivity extends BaseActivity {
 
         DatabaseService.getInstance().getChatService()
                 .sendMessage(chatId, currentUserId, text,
+                        currentUserIsAdmin,
                         new IDatabaseService.DatabaseCallback<Void>() {
                             @Override
                             public void onCompleted(Void unused) {

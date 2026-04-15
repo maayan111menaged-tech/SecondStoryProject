@@ -100,7 +100,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         void bind(Chat chat) {
             // Display chat name and context
             if ("admin".equals(chat.getType())) {
-                tvName.setText("צוות Second Story");
+                String name = chat.getOtherUserName();
+                tvName.setText(name != null && !name.isEmpty() ? name : "צוות Second Story");
                 tvLastMessage.setText("פנייה לצוות");
             } else {
                 String name = chat.getOtherUserName() != null ? chat.getOtherUserName() : "";

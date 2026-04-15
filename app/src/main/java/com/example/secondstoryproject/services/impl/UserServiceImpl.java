@@ -165,4 +165,25 @@ public class UserServiceImpl extends BaseFirebaseService<User> implements IUserS
         });
     }
 
+    @Override
+    public void isAdmin(@NonNull String userId,
+                        @NonNull DatabaseCallback<Boolean> callback) {
+
+        get(userId, new DatabaseCallback<User>() {
+            @Override
+            public void onCompleted(User user) {
+                if (user == null) {
+                    callback.onCompleted(false);
+                    return;
+                }
+
+                callback.onCompleted(user.isAdmin());
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
 }

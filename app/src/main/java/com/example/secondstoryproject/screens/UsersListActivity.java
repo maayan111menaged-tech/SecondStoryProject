@@ -80,15 +80,25 @@ public class UsersListActivity extends BaseActivity {
 
                                         @Override
                                         public void onCompleted(User result) {
-
-                                            // ✔ זה מה שמתקן את הכפתור!
                                             userAdapter.updateUserById(result);
+
+                                            // מחיקת צאט האדמין כי המשתמש הפך לאדמין
+                                            DatabaseService.getInstance().getChatService()
+                                                    .deleteAdminChat(user.getId(), new IDatabaseService.DatabaseCallback<Void>() {
+                                                        @Override
+                                                        public void onCompleted(Void unused) {
+                                                            Log.d(TAG, "צאט אדמין נמחק למשתמש: " + user.getId());
+                                                        }
+                                                        @Override
+                                                        public void onFailed(Exception e) {
+                                                            Log.e(TAG, "שגיאה במחיקת צאט אדמין", e);
+                                                        }
+                                                    });
 
                                             Toast.makeText(UsersListActivity.this,
                                                     "המשתמש הפך לאדמין",
                                                     Toast.LENGTH_SHORT).show();
                                         }
-
                                         @Override
                                         public void onFailed(Exception e) {
                                             Toast.makeText(UsersListActivity.this,

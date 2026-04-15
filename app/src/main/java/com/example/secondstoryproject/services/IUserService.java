@@ -95,4 +95,12 @@ public interface IUserService {
      * @param callback number of users
      */
     void getUsersCount(@NonNull DatabaseCallback<Integer> callback);
+
+    /**
+     * Checks if a user is an admin.
+     * @param userId user ID
+     * @param callback true if admin, false otherwise
+     */
+    void isAdmin(@NonNull String userId,
+                 @NonNull DatabaseCallback<Boolean> callback);
 }

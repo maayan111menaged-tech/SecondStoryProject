@@ -41,6 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity
         return true; // ברירת מחדל – יש Drawer
     }
     protected boolean hasBottomMenu(){ return true; }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -212,36 +213,73 @@ public abstract class BaseActivity extends AppCompatActivity
         User currentUser = SharedPreferencesUtil.getUser(this);
         if (currentUser == null) return;
 
-        DatabaseService.getInstance().getChatService()
-                .getUserChats(currentUser.getId(),
-                        new IDatabaseService.DatabaseCallback<List<Chat>>() {
-                            @Override
-                            public void onCompleted(List<Chat> chats) {
-                                if (chats.isEmpty()) return;
-                                final int[] total = {0};
-                                final int[] count = {0};
+        if(!isAdmin()){
+            DatabaseService.getInstance().getChatService()
+                    .getUserChats(currentUser.getId(),
+                            new IDatabaseService.DatabaseCallback<List<Chat>>() {
+                                @Override
+                                public void onCompleted(List<Chat> chats) {
+                                    if (chats.isEmpty()) return;
+                                    final int[] total = {0};
+                                    final int[] count = {0};
 
-                                for (Chat chat : chats) {
-                                    DatabaseService.getInstance().getChatService()
-                                            .listenToUnreadCount(chat.getId(),
-                                                    currentUser.getId(),
-                                                    new IDatabaseService.DatabaseCallback<Integer>() {
-                                                        @Override
-                                                        public void onCompleted(Integer unread) {
-                                                            total[0] += unread;
-                                                            count[0]++;
-                                                            if (count[0] == chats.size()) {
-                                                                updateChatBadge(total[0]);
+                                    String id = currentUser.getId();
+                                    for (Chat chat : chats) {
+
+                                        DatabaseService.getInstance().getChatService()
+                                                .listenToUnreadCount(chat.getId(),
+                                                        id,
+                                                        new IDatabaseService.DatabaseCallback<Integer>() {
+                                                            @Override
+                                                            public void onCompleted(Integer unread) {
+                                                                total[0] += unread;
+                                                                count[0]++;
+                                                                if (count[0] == chats.size()) {
+                                                                    updateChatBadge(total[0]);
+                                                                }
                                                             }
-                                                        }
-                                                        @Override
-                                                        public void onFailed(Exception e) {}
-                                                    });
+                                                            @Override
+                                                            public void onFailed(Exception e) {}
+                                                        });
+                                    }
                                 }
-                            }
-                            @Override
-                            public void onFailed(Exception e) {}
-                        });
+                                @Override
+                                public void onFailed(Exception e) {}
+                            });
+        } else {
+
+            DatabaseService.getInstance().getChatService()
+                    .getAllAdminChats(new IDatabaseService.DatabaseCallback<List<Chat>>() {
+                                @Override
+                                public void onCompleted(List<Chat> chats) {
+                                    if (chats.isEmpty()) return;
+                                    final int[] total = {0};
+                                    final int[] count = {0};
+
+                                    for (Chat chat : chats) {
+
+                                        DatabaseService.getInstance().getChatService()
+                                                .listenToUnreadCount(chat.getId(),
+                                                        "admin",
+                                                        new IDatabaseService.DatabaseCallback<Integer>() {
+                                                            @Override
+                                                            public void onCompleted(Integer unread) {
+                                                                total[0] += unread;
+                                                                count[0]++;
+                                                                if (count[0] == chats.size()) {
+                                                                    updateChatBadge(total[0]);
+                                                                }
+                                                            }
+                                                            @Override
+                                                            public void onFailed(Exception e) {}
+                                                        });
+                                    }
+                                }
+                                @Override
+                                public void onFailed(Exception e) {}
+                            });
+        }
+
     }
 
     private void updateChatBadge(int count) {

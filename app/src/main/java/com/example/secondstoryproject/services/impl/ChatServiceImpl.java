@@ -2,6 +2,8 @@ package com.example.secondstoryproject.services.impl;
 
 import com.example.secondstoryproject.models.Chat;
 import com.example.secondstoryproject.models.Message;
+import com.example.secondstoryproject.models.User;
+import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IChatService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.google.firebase.database.*;
@@ -92,8 +94,8 @@ public class ChatServiceImpl implements IChatService {
      * @param text     message content
      * @param callback completion callback
      */
-    @Override
-    public void sendMessage(String chatId, String senderId, String text,
+    @Override    public void sendMessage(String chatId, String senderId, String text,
+                            boolean senderIsAdmin,
                             IDatabaseService.DatabaseCallback<Void> callback) {
 
         DatabaseReference messagesRef = chatsRef.child(chatId).child("messages");
@@ -106,15 +108,23 @@ public class ChatServiceImpl implements IChatService {
                     metaRef.child("lastMessage").setValue(text);
                     metaRef.child("lastTimestamp").setValue(System.currentTimeMillis());
 
-                    // מגדילים unread למשתמש השני
                     metaRef.get().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             DataSnapshot meta = task.getResult();
-                            String giverId = meta.child("giverId").getValue(String.class);
                             String receiverId = meta.child("receiverId").getValue(String.class);
 
-                            // הצד השני — לא השולח
-                            String otherUserId = senderId.equals(giverId) ? receiverId : giverId;
+                            String otherUserId;
+                            String type = meta.child("type").getValue(String.class);
+
+                            if ("admin".equals(type)) {
+                                // אם השולח הוא אדמין → unread למשתמש (receiverId)
+                                // אם השולח הוא משתמש → unread ל"admin"
+                                otherUserId = senderIsAdmin ? receiverId : "admin";
+                            } else {
+                                String giverId = meta.child("giverId").getValue(String.class);
+                                otherUserId = senderId.equals(giverId) ? receiverId : giverId;
+                            }
+
                             if (otherUserId != null) {
                                 incrementUnread(chatId, otherUserId);
                             }
@@ -125,7 +135,6 @@ public class ChatServiceImpl implements IChatService {
                 })
                 .addOnFailureListener(callback::onFailed);
     }
-
     /**
      * Listens in real-time to messages in a chat.
      * @param chatId   chat ID
@@ -223,6 +232,85 @@ public class ChatServiceImpl implements IChatService {
                 });
     }
 
+
+    @Override
+    public void getAllAdminChats(IDatabaseService.DatabaseCallback<List<Chat>> callback) {
+        chatsRef.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                callback.onFailed(task.getException());
+                return;
+            }
+
+            List<String> adminChatIds = new ArrayList<>();
+            for (DataSnapshot child : task.getResult().getChildren()) {
+                if (child.getKey() != null && child.getKey().startsWith("admin_")) {
+                    adminChatIds.add(child.getKey());
+                }
+            }
+
+            if (adminChatIds.isEmpty()) {
+                callback.onCompleted(new ArrayList<>());
+                return;
+            }
+
+            List<Chat> chats = new ArrayList<>();
+            final int[] count = {0};
+
+            for (String chatId : adminChatIds) {
+                chatsRef.child(chatId).child("metadata").get()
+                        .addOnCompleteListener(t -> {
+                            if (t.isSuccessful() && t.getResult().exists()) {
+                                Chat chat = t.getResult().getValue(Chat.class);
+                                if (chat != null) {
+                                    chat.setId(chatId);
+
+                                    // unread — סך כל ההודעות הלא נקראות מהמשתמש
+                                    Object unreadObj = t.getResult()
+                                            .child("unread_admin").getValue();
+                                    int unread = unreadObj != null ?
+                                            ((Long) unreadObj).intValue() : 0;
+                                    chat.setUnreadCount(unread);
+
+                                    chats.add(chat);
+                                }
+                            }
+                            count[0]++;
+                            if (count[0] == adminChatIds.size()) {
+                                enrichAdminChatsWithNames(chats, callback);
+                            }
+                        });
+            }
+        });
+    }
+
+    // שולף את שם המשתמש לכל צאט אדמין
+    private void enrichAdminChatsWithNames(List<Chat> chats,
+                                           IDatabaseService.DatabaseCallback<List<Chat>> callback) {
+
+        if (chats.isEmpty()) {
+            callback.onCompleted(chats);
+            return;
+        }
+
+        final int[] count = {0};
+        final int total = chats.size();
+
+        for (Chat chat : chats) {
+            String userId = chat.getReceiverId(); // המשתמש הוא תמיד receiverId בצאט אדמין
+            usersRef.child(userId).get()
+                    .addOnCompleteListener(userTask -> {
+                        if (userTask.isSuccessful() && userTask.getResult().exists()) {
+                            String userName = userTask.getResult()
+                                    .child("userName").getValue(String.class);
+                            chat.setOtherUserName(userName.trim());
+                        }
+                        count[0]++;
+                        if (count[0] == total) callback.onCompleted(chats);
+                    });
+        }
+    }
+
+
     /**
      * Enriches chat objects with additional display data:
      * user names and donation names.
@@ -252,13 +340,9 @@ public class ChatServiceImpl implements IChatService {
             usersRef.child(chat.getOtherUserId()).get()
                     .addOnCompleteListener(userTask -> {
                         if (userTask.isSuccessful() && userTask.getResult().exists()) {
-                            String fName = userTask.getResult()
-                                    .child("fName").getValue(String.class);
-                            String lName = userTask.getResult()
-                                    .child("lName").getValue(String.class);
-                            String fullName = (fName != null ? fName : "")
-                                    + " " + (lName != null ? lName : "");
-                            currentChat.setOtherUserName(fullName.trim());
+                            String userName = userTask.getResult()
+                                    .child("userName").getValue(String.class);
+                            currentChat.setOtherUserName(userName.trim());
                         }
 
                         // שולפים שם תרומה
@@ -283,6 +367,7 @@ public class ChatServiceImpl implements IChatService {
                     });
         }
     }
+
 
     /**
      * Removes a real-time listener from a chat.
@@ -318,6 +403,7 @@ public class ChatServiceImpl implements IChatService {
                 .child("unread_" + userId)
                 .setValue(0);
     }
+
 
     /**
      * Listens in real-time to unread message count for a specific user.
@@ -373,4 +459,20 @@ public class ChatServiceImpl implements IChatService {
             }
         });
     }
+
+    @Override
+    public void deleteAdminChat(String userId, IDatabaseService.DatabaseCallback<Void> callback) {
+        String chatId = "admin_" + userId;
+
+        // מוחקים את הצאט עצמו
+        chatsRef.child(chatId).removeValue()
+                .addOnSuccessListener(unused -> {
+                    // מוחקים את האינדקס מה-users
+                    usersRef.child(userId).child("chats").child(chatId).removeValue()
+                            .addOnSuccessListener(unused2 -> callback.onCompleted(null))
+                            .addOnFailureListener(callback::onFailed);
+                })
+                .addOnFailureListener(callback::onFailed);
+    }
+
 }

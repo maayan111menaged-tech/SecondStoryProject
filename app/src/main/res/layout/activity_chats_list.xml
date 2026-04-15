@@ -23,39 +23,4 @@
         android:clipToPadding="false"
         android:paddingBottom="16dp" />
 
-    <LinearLayout
-        android:id="@+id/layout_empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="💬"
-            android:textSize="48sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="אין שיחות עדיין"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="כשתמצא תרומה שמעניינת אותך\nלחץ על מעוניין כדי להתחיל שיחה"
-            android:textSize="14sp"
-            android:textColor="#888888"
-            android:gravity="center"
-            android:layout_marginTop="4dp" />
-
-    </LinearLayout>
-
 </LinearLayout>
