@@ -194,7 +194,8 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
     /// @param callback Returns a map where:
     /// key = city name, value = number of donations
     @Override
-    public void getDonationsCountByCities(@NonNull DatabaseCallback<java.util.HashMap<String, Integer>> callback) {
+    public void getDonationsCountByCities(@NonNull DonationStatus status,
+                                          @NonNull DatabaseCallback<java.util.HashMap<String, Integer>> callback) {
 
         super.getAll(new DatabaseCallback<List<Donation>>() {
             @Override
@@ -203,6 +204,8 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
                 java.util.HashMap<String, Integer> cityCountMap = new java.util.HashMap<>();
 
                 for (Donation donation : donations) {
+
+                    if (donation.getStatus() != status) continue;
 
                     if (donation.getCity() == null) continue;
 

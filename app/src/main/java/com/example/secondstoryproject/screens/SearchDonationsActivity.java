@@ -41,6 +41,10 @@ public class SearchDonationsActivity extends BaseActivity {
     private String cityFilter = null;
     private boolean filtersVisible = false;
 
+    private AutoCompleteTextView spinnerCity;
+    private MaterialButton btnToggle;
+    private LinearLayout layoutFilters;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +77,20 @@ public class SearchDonationsActivity extends BaseActivity {
         setupCategoryFilter();
         setupCityFilter();
         setupClearFilters();
+
+
+        // סינון אוטומטי לפי עיר אם הגענו מהמפה
+        spinnerCity = findViewById(R.id.spinner_city);
+        btnToggle = findViewById(R.id.btn_toggle_filters);
+        layoutFilters = findViewById(R.id.layout_filters);
+        String cityFromMap = getIntent().getStringExtra("CITY_FILTER");
+        if (cityFromMap != null) {
+            cityFilter = cityFromMap;
+            spinnerCity.setText(cityFromMap, false);
+            filtersVisible = true;
+            layoutFilters.setVisibility(View.VISIBLE);
+            btnToggle.setText("🔍 Hide Filters");
+        }
     }
 
     private void setupToggleFilters() {
@@ -167,6 +185,7 @@ public class SearchDonationsActivity extends BaseActivity {
                             }
                         }
                         donationAdapter.setDonationList(available);
+                        donationAdapter.filter(searchQuery, categoryFilter, cityFilter);
                         tvDonationCount.setText("Total: " + available.size());
                     }
 

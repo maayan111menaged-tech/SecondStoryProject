@@ -86,7 +86,7 @@ public class ChatActivity extends BaseActivity {
                             messageAdapter.setMessages(messages);
                             // גלול למטה אוטומטית
                             if (!messages.isEmpty()) {
-                                rvMessages.scrollToPosition(messages.size() - 1);
+                                rvMessages.scrollToPosition(messageAdapter.getItemCount() - 1);
                             }
                         });
                     }

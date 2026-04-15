@@ -96,7 +96,7 @@ public interface IDonationService {
      * Used for maps and statistics (e.g. showing donation distribution).
      * @param callback map of city name → donation count
      */
-     void getDonationsCountByCities(@NonNull DatabaseCallback<java.util.HashMap<String,
+     void getDonationsCountByCities(@NonNull DonationStatus status, @NonNull DatabaseCallback<java.util.HashMap<String,
              Integer>> callback);
 
     /**
