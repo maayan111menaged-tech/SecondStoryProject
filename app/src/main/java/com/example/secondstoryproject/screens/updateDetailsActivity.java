@@ -25,6 +25,7 @@ import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.Validator;
 import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
@@ -102,65 +103,46 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
 
         etDate.setFocusable(false);
         etDate.setClickable(true);
-        etDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /// צור את ה-DatePicker
-                MaterialDatePicker.Builder<Long> datePickerBuilder = MaterialDatePicker.Builder.datePicker();
-                datePickerBuilder.setTitleText("בחר תאריך");
+        etDate.setOnClickListener(v -> {
+            CalendarConstraints constraints = new CalendarConstraints.Builder()
+                    .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
+                    .setValidator(DateValidatorPointBackward.now()) // ← החסימה האמיתית
+                    .build();
 
-                /// הגבלת תאריכים לעבר
-                CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-                constraintsBuilder.setEnd(MaterialDatePicker.todayInUtcMilliseconds()); // עד היום
-                datePickerBuilder.setCalendarConstraints(constraintsBuilder.build());
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText("בחר תאריך לידה")
+                    .setCalendarConstraints(constraints)
+                    .build();
 
-                /// אם יש כבר תאריך בשדה, הגדר אותו בתור תאריך התחלתי
-                String existingDate = etDate.getText().toString();
-                if (!existingDate.isEmpty()) {
-                    try {
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        Date parsedDate = dateFormat.parse(existingDate);
-                        if (parsedDate != null) {
-                            datePickerBuilder.setSelection(parsedDate.getTime());
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            String existingDate = etDate.getText().toString();
+            if (!existingDate.isEmpty()) {
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date parsedDate = dateFormat.parse(existingDate);
+                    if (parsedDate != null) {
+                        datePicker = MaterialDatePicker.Builder.datePicker()
+                                .setTitleText("בחר תאריך לידה")
+                                .setCalendarConstraints(constraints)
+                                .setSelection(parsedDate.getTime())
+                                .build();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                MaterialDatePicker<Long> datePicker = datePickerBuilder.build();
-
-                // כאשר המשתמש בוחר תאריך
-                datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
-                    @Override
-                    public void onPositiveButtonClick(Long selection) {
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        String formattedDate = dateFormat.format(new Date(selection));
-                        etDate.setText(formattedDate);
-                    }
-                });
-
-                // ביטול או סגירה - רק מאפס את הפוקוס
-                datePicker.addOnNegativeButtonClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        etDate.clearFocus();
-                    }
-                });
-                datePicker.addOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        etDate.clearFocus();
-                    }
-                });
-
-                // הצג את ה-DatePicker
-                datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
             }
-        });
 
+            MaterialDatePicker<Long> finalDatePicker = datePicker;
+            finalDatePicker.addOnPositiveButtonClickListener(selection -> {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                etDate.setText(dateFormat.format(new Date(selection)));
+            });
+
+            finalDatePicker.addOnNegativeButtonClickListener(v1 -> etDate.clearFocus());
+            finalDatePicker.addOnDismissListener(dialog -> etDate.clearFocus());
+            finalDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+        });
         /// set the click listener
         btnUpdateProfile.setOnClickListener(this);
     } // סוגר הסופי של onCreate
@@ -267,7 +249,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
             etEmail.requestFocus();
             return false;
         }
-        if (birthDate == null || birthDate.trim().isEmpty()) {
+        if (!Validator.isBirthDateValid(birthDate)) {
             Log.e(TAG, "checkInput: Date cannot be empty");
             etDate.setError("Please select a date");
             etDate.requestFocus();

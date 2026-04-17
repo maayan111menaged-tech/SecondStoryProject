@@ -8,6 +8,9 @@ import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.IsraelCity;
 
 import java.util.Date;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+
 
 /**
  * Provides utility methods for validating user input across the application.
@@ -116,12 +119,21 @@ public class Validator {
     }
 
     /**
-     * Checks whether a given date is in the future.
-     * @param date the date to validate
-     * @return true if the date is after the current time, false otherwise
+     * Validates a date of birth string (format: dd/MM/yyyy).
+     * Must be a valid date in the past (not in the future).
+     * @param dateStr the date string to validate
+     * @return true if valid and in the past, false otherwise
      */
-    public static boolean isFutureDate(@Nullable Date date) {
-        return date != null && date.after(new Date());
+    public static boolean isBirthDateValid(@Nullable String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) return false;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            sdf.setLenient(false);
+            Date date = sdf.parse(dateStr);
+            return date != null && date.before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

@@ -21,6 +21,7 @@ import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.example.secondstoryproject.utils.Validator;
 import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputEditText;
@@ -76,39 +77,24 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         etDate.setFocusable(false);
         etDate.setClickable(true);
         etDate.setOnClickListener(v -> {
-            MaterialDatePicker.Builder<Long> datePickerBuilder = MaterialDatePicker.Builder.datePicker();
-            datePickerBuilder.setTitleText("בחר תאריך");
+            CalendarConstraints constraints = new CalendarConstraints.Builder()
+                    .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
+                    .setValidator(DateValidatorPointBackward.now()) // ← זה החסימה האמיתית!
+                    .build();
 
-            CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-            constraintsBuilder.setEnd(MaterialDatePicker.todayInUtcMilliseconds());
-            datePickerBuilder.setCalendarConstraints(constraintsBuilder.build());
-
-            String existingDate = etDate.getText().toString();
-            if (!existingDate.isEmpty()) {
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    Date parsedDate = dateFormat.parse(existingDate);
-                    if (parsedDate != null) {
-                        datePickerBuilder.setSelection(parsedDate.getTime());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            MaterialDatePicker<Long> datePicker = datePickerBuilder.build();
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText("בחר תאריך לידה")
+                    .setCalendarConstraints(constraints)
+                    .build();
 
             datePicker.addOnPositiveButtonClickListener(selection -> {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                String formattedDate = dateFormat.format(new Date(selection));
-                etDate.setText(formattedDate);
+                etDate.setText(dateFormat.format(new Date(selection)));
             });
 
             datePicker.addOnNegativeButtonClickListener(v1 -> etDate.clearFocus());
             datePicker.addOnDismissListener(dialog -> etDate.clearFocus());
-
             datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
         });
 
@@ -162,8 +148,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             return false;
         }
 
-        if (date == null || date.trim().isEmpty()) {
-            etDate.setError("Please select a date");
+        if (!Validator.isBirthDateValid(date)) {
+            etDate.setError("Please select a date in the future");
             etDate.requestFocus();
             return false;
         }
