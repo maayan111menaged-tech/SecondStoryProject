@@ -74,9 +74,6 @@
             android:name=".screens.PickCatergoryActivity"
             android:exported="false" />
         <activity
-            android:name=".screens.navpageActivity"
-            android:exported="false" />
-        <activity
             android:name=".screens.LeaderBoardActivity"
             android:exported="false" />
         <activity

@@ -1,5 +1,9 @@
 package com.example.secondstoryproject.models;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class Chat {
     private String id;
     private String type;        // "donation" או "admin"
@@ -9,11 +13,14 @@ public class Chat {
     private String lastMessage;
     private long lastTimestamp;
 
+    @Exclude
     private int unreadCount; // לא נשמר ב-DB, רק בזיכרון
 
-
+    @Exclude
     private String donationName;    // שם התרומה
+    @Exclude
     private String otherUserName;   // שם המשתמש השני
+    @Exclude
     private String otherUserId;     // ID של המשתמש השני
 
     public Chat() {} // חובה ל-Firebase
@@ -44,14 +51,21 @@ public class Chat {
     public long getLastTimestamp() { return lastTimestamp; }
     public void setLastTimestamp(long lastTimestamp) { this.lastTimestamp = lastTimestamp; }
 
+    @Exclude
     public int getUnreadCount() { return unreadCount; }
+    @Exclude
     public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
-
+    @Exclude
     public String getDonationName() { return donationName; }
+    @Exclude
     public void setDonationName(String donationName) { this.donationName = donationName; }
+    @Exclude
     public String getOtherUserName() { return otherUserName; }
+    @Exclude
     public void setOtherUserName(String otherUserName) { this.otherUserName = otherUserName; }
+    @Exclude
     public String getOtherUserId() { return otherUserId; }
+    @Exclude
     public void setOtherUserId(String otherUserId) { this.otherUserId = otherUserId; }
 
 

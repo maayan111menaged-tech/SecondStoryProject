@@ -107,6 +107,8 @@ public class Donation implements Idable {
         statusHistory.add(new StatusLog(status, new Date(), reason));
     }
 
+
+    
     // ----- StatusLog פנימי -----
     public static class StatusLog {
         private DonationStatus status;

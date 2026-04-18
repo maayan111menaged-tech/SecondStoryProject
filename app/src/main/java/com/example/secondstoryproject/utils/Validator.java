@@ -124,6 +124,7 @@ public class Validator {
      * @param dateStr the date string to validate
      * @return true if valid and in the past, false otherwise
      */
+
     public static boolean isBirthDateValid(@Nullable String dateStr) {
         if (dateStr == null || dateStr.trim().isEmpty()) return false;
         try {

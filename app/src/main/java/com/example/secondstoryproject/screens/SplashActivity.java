@@ -12,6 +12,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.models.User;
+import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 public class SplashActivity extends BaseActivity {
     @Override
@@ -35,9 +37,17 @@ public class SplashActivity extends BaseActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, LandingActivity.class));
+                if (SharedPreferencesUtil.isUserLoggedIn(SplashActivity.this)) {
+                    User currentUser = SharedPreferencesUtil.getUser(SplashActivity.this);
+                    Class<?> targetActivity = currentUser.isAdmin()
+                            ? AdminMainActivity.class
+                            : MainActivity.class;
+                    startActivity(new Intent(SplashActivity.this, targetActivity));
+                } else {
+                    startActivity(new Intent(SplashActivity.this, LandingActivity.class));
+                }
                 finish();
             }
-        },3000);
+        }, 3000);
     }
 }
