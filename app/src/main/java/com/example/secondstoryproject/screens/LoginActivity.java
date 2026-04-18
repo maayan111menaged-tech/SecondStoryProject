@@ -129,7 +129,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void onCompleted(User user) {
                 if (user == null) {
                     Log.d(TAG,"got null as a user, USER DOES NOT EXIST");
-                    Toast.makeText(LoginActivity.this, "לא קיים", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this,
+                            "שם משתמש או סיסמה אינם נכונים",
+                            Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -152,8 +154,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             @Override
             public void onFailed(Exception e) {
                 Log.e(TAG, "onFailed: Failed to retrieve user data", e);
-                etPassword.setError("Invalid user name or password");
-                etPassword.requestFocus();
+                Toast.makeText(LoginActivity.this,
+                        "שגיאה טכנית, נסה שוב מאוחר יותר",
+                        Toast.LENGTH_LONG).show();
                 SharedPreferencesUtil.signOutUser(LoginActivity.this);
             }
         });

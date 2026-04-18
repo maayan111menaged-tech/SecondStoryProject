@@ -149,7 +149,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         }
 
         if (!Validator.isBirthDateValid(date)) {
-            etDate.setError("Please select a date in the future");
+            etDate.setError("Please select a valid birth date");
             etDate.requestFocus();
             return false;
         }

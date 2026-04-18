@@ -17,8 +17,7 @@ import com.example.secondstoryproject.R;
 public class LandingActivity extends BaseActivity {
     @Override
     protected boolean hasSideMenu() {
-        return false; // לא צריך Drawer
-    }
+        return false;   }
     @Override
     protected boolean hasBottomMenu(){ return false; }
 
