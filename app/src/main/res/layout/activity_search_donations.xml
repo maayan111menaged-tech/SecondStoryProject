@@ -145,23 +145,6 @@
                     android:padding="8dp"
                     android:clipToPadding="false" />
 
-                <TextView
-                    android:id="@+id/empty_state"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="No Donations Found"
-                    android:gravity="center"
-                    android:textSize="18sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:visibility="gone" />
-
-                <ProgressBar
-                    android:id="@+id/progress_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="gone" />
-
             </FrameLayout>
 
         </com.google.android.material.card.MaterialCardView>
