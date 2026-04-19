@@ -44,8 +44,8 @@ public class Donation implements Idable {
         this.giverID = giverID;
         this.receiverID = receiverID;
 
+        //יוצרים רשימה חדשה ומוסיפים את הסטטוס ההתחלתי להיסטוריה
         this.statusHistory = new ArrayList<>();
-        // מוסיפים את הסטטוס ההתחלתי להיסטוריה
         addStatusLog(status, null);
 
 

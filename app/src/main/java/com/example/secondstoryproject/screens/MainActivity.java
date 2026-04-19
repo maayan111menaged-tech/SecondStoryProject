@@ -28,6 +28,10 @@ import androidx.preference.PreferenceManager;
 
 public class MainActivity extends BaseActivity {
 
+    @Override
+    protected int getSelectedBottomNavItem() {
+        return R.id.menu_home;
+    }
     private static final String TAG = "MainActivity";
     ProgressBar rateProgressBar;
     ImageView currentRateIcon, nextRateIcon;
@@ -38,7 +42,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bottomNav.setSelectedItemId(R.id.menu_home);
 
         rateProgressBar = findViewById(R.id.rateProgressBar);
         currentRateIcon = findViewById(R.id.currentRateIcon);

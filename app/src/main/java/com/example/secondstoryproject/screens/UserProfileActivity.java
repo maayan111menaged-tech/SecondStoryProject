@@ -30,6 +30,10 @@ import java.util.List;
 
 public class UserProfileActivity extends BaseActivity {
 
+    @Override
+    protected int getSelectedBottomNavItem() {
+        return R.id.menu_profile;
+    }
     private TextView tvUserName, tvFullName, tvLevel,  tvPhone, tvEmail, tvBirthday;
     private ImageView ivProfile, ivLevel;
     private Button btnEdit;
@@ -52,8 +56,6 @@ public class UserProfileActivity extends BaseActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        bottomNav.setSelectedItemId(R.id.menu_profile);
-
 
         tvUserName = findViewById(R.id.tvUserName);
         tvFullName = findViewById(R.id.tvFullName);

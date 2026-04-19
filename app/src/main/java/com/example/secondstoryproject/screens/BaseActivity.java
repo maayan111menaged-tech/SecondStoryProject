@@ -41,7 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity
         return true; // ברירת מחדל – יש Drawer
     }
     protected boolean hasBottomMenu(){ return true; }
-
+    protected int getSelectedBottomNavItem() { return -1; }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,8 +115,14 @@ public abstract class BaseActivity extends AppCompatActivity
                     return true;
                 }
             });
-            for (int i = 0; i < bottomNav.getMenu().size(); i++) {
-                bottomNav.getMenu().getItem(i).setChecked(false);
+
+            int selectedItem = getSelectedBottomNavItem();
+            if (selectedItem != -1) {
+                bottomNav.setSelectedItemId(selectedItem);
+            }else{
+                for (int i = 0; i < bottomNav.getMenu().size(); i++) {
+                    bottomNav.getMenu().getItem(i).setChecked(false);
+                }
             }
         }
 

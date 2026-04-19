@@ -172,7 +172,7 @@
             android:id="@+id/btnNextToUploadPic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="המשך לפרסום תמונה"/>
+            android:text="המשך להוספת תמונה"/>
 
     </LinearLayout>
 

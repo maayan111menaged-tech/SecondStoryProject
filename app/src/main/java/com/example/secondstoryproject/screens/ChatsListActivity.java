@@ -21,14 +21,17 @@ import java.util.List;
 
 public class ChatsListActivity extends BaseActivity {
 
+    @Override
+    protected int getSelectedBottomNavItem() {
+        return R.id.menu_chat;
+    }
+
     private ChatListAdapter chatListAdapter;
     private RecyclerView rvChats;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats_list);
-
-        bottomNav.setSelectedItemId(R.id.menu_chat);
 
         rvChats = findViewById(R.id.rv_chats);
         rvChats.setLayoutManager(new LinearLayoutManager(this));

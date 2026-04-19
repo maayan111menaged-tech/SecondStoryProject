@@ -94,7 +94,8 @@ public class ChatServiceImpl implements IChatService {
      * @param text     message content
      * @param callback completion callback
      */
-    @Override    public void sendMessage(String chatId, String senderId, String text,
+    @Override
+    public void sendMessage(String chatId, String senderId, String text,
                             boolean senderIsAdmin,
                             IDatabaseService.DatabaseCallback<Void> callback) {
 
