@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.core.graphics.Insets;
@@ -29,6 +30,7 @@ public class AcceptDonationActivity extends BaseActivity {
     private RecyclerView rvDonations;
     private DonationAdapter adapter;
     private LinearLayout layoutEmpty;
+    private TextView tvDonationCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class AcceptDonationActivity extends BaseActivity {
         rvDonations.setLayoutManager(new LinearLayoutManager(this));
 
         layoutEmpty = findViewById(R.id.layout_empty);
+        tvDonationCount = findViewById(R.id.tv_donation_to_accept_count);
 
         // מעבר לפרטי התרומה
         adapter = new DonationAdapter(donation -> {
@@ -81,7 +84,7 @@ public class AcceptDonationActivity extends BaseActivity {
                                     if (dateB == null) return -1;
                                     return dateA.compareTo(dateB);
                                 });
-
+                                tvDonationCount.setText("Total: " + donations.size());
                                 adapter.setDonations(donations);
 
                                 if (donations.isEmpty()) {

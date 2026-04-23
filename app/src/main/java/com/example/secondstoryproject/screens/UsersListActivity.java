@@ -5,7 +5,9 @@ import static com.example.secondstoryproject.utils.SharedPreferencesUtil.getUser
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,13 +38,16 @@ public class UsersListActivity extends BaseActivity {
     private String searchQuery = "";
     private Boolean adminFilter = null; // null = הכל
 
+    private LinearLayout layoutEmpty;
+    private RecyclerView usersList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users_list);
 
+        layoutEmpty = findViewById(R.id.layout_empty);
 
-        RecyclerView usersList = findViewById(R.id.rv_users_list);
+        usersList = findViewById(R.id.rv_users_list);
         tvUserCount = findViewById(R.id.tv_user_count);
         usersList.setLayoutManager(new LinearLayoutManager(this));
         userAdapter = new UserAdapter(new UserAdapter.OnUserClickListener() {
@@ -155,6 +160,14 @@ public class UsersListActivity extends BaseActivity {
                 String currentUserId = SharedPreferencesUtil.getUserId(UsersListActivity.this);
                 userAdapter.setUserList(users, currentUserId);
                 tvUserCount.setText("Total users: " + users.size());
+
+                if (users.isEmpty()) {
+                    usersList.setVisibility(View.GONE);
+                    layoutEmpty.setVisibility(View.VISIBLE);
+                } else {
+                    usersList.setVisibility(View.VISIBLE);
+                    layoutEmpty.setVisibility(View.GONE);
+                }
             }
 
             @Override

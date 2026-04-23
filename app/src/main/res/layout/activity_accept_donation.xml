@@ -7,36 +7,70 @@
     android:layout_height="match_parent"
     tools:context=".screens.AcceptDonationActivity">
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/rv_donations"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp"/>
-
     <LinearLayout
-        android:id="@+id/layout_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/ic_giving_heart"
-            android:alpha="0.4"/>
-
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- כותרת -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="אין תרומות לאישור"
-            android:textSize="18sp"
-            android:textColor="#AAAAAA"
-            android:layout_marginTop="16dp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accept Donations"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnBackground"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_donation_to_accept_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total: 0"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+        </LinearLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/rv_donations"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"/>
+
+        <LinearLayout
+            android:id="@+id/layout_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_giving_heart"
+                android:alpha="0.4"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="אין תרומות לאישור"
+                android:textSize="18sp"
+                android:textColor="#AAAAAA"
+                android:layout_marginTop="16dp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
