@@ -39,6 +39,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         void onUserClick(User user);
         void onLongUserClick(User user);
         void onMakeAdminClick(User user);
+        void onDeleteClick(User user);
+        void onChatClick(User user);
     }
     /**
      * Listener for filter results.
@@ -141,6 +143,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
 
             if (onUserClickListener != null) {
                 onUserClickListener.onMakeAdminClick(user);
+            }
+        });
+        holder.btnDeleteUser.setOnClickListener(v -> {
+            if (onUserClickListener != null) {
+                onUserClickListener.onDeleteClick(user);
+            }
+        });
+
+        holder.btnChatUser.setOnClickListener(v -> {
+            if (onUserClickListener != null) {
+                onUserClickListener.onChatClick(user);
             }
         });
     }
@@ -276,9 +289,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
      * ViewHolder for user item.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUserName,tvName, tvEmail, tvPhone, tvMeBadge;
+        TextView tvUserName, tvName, tvEmail, tvPhone, tvMeBadge;
         ImageView ivProfilePic;
-        Button btnMakeAdmin;
+        Button btnMakeAdmin, btnDeleteUser, btnChatUser;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -288,9 +301,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             tvPhone = itemView.findViewById(R.id.tv_item_user_phone);
             ivProfilePic = itemView.findViewById(R.id.iv_user_profile_pic);
             btnMakeAdmin = itemView.findViewById(R.id.btn_make_admin);
-
+            btnDeleteUser = itemView.findViewById(R.id.btn_delete_user);
+            btnChatUser = itemView.findViewById(R.id.btn_chat_user);
             tvMeBadge = itemView.findViewById(R.id.tv_me_badge);
-
         }
     }
 }

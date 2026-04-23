@@ -127,7 +127,7 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:visibility="gone"
-                    tools:visibility="visible">
+                    tools:visibility="invisible">
 
                     <ImageView
                         android:layout_width="100dp"

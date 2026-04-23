@@ -119,6 +119,44 @@ public class UsersListActivity extends BaseActivity {
                                 })
                         .show();
             }
+
+            @Override
+            public void onDeleteClick(User user) {
+                new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
+                        .setTitle("מחיקת משתמש")
+                        .setMessage("האם אתה בטוח שברצונך למחוק את " + user.getUserName() + "?")
+                        .setPositiveButton("מחק", (dialog, which) -> {
+                            DatabaseService.getInstance().getUserService().delete(
+                                    user.getId(),
+                                    new IDatabaseService.DatabaseCallback<Void>() {
+                                        @Override
+                                        public void onCompleted(Void unused) {
+                                            runOnUiThread(() -> {
+                                                userAdapter.removeUser(user);
+                                                Toast.makeText(UsersListActivity.this,
+                                                        "המשתמש נמחק", Toast.LENGTH_SHORT).show();
+                                            });
+                                        }
+                                        @Override
+                                        public void onFailed(Exception e) {
+                                            runOnUiThread(() ->
+                                                    Toast.makeText(UsersListActivity.this,
+                                                            "שגיאה במחיקת משתמש", Toast.LENGTH_SHORT).show());
+                                        }
+                                    }
+                            );
+                        })
+                        .setNegativeButton("ביטול", null)
+                        .show();
+            }
+
+            @Override
+            public void onChatClick(User user) {
+                Intent intent = new Intent(UsersListActivity.this, ChatActivity.class);
+                intent.putExtra("CHAT_ID", user.getId());
+                intent.putExtra("OTHER_USER_NAME", user.getUserName());
+                startActivity(intent);
+            }
         });
         usersList.setAdapter(userAdapter);
 
