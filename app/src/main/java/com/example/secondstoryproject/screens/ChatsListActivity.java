@@ -28,6 +28,8 @@ public class ChatsListActivity extends BaseActivity {
 
     private ChatListAdapter chatListAdapter;
     private RecyclerView rvChats;
+    private LinearLayout layoutEmpty;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +37,8 @@ public class ChatsListActivity extends BaseActivity {
 
         rvChats = findViewById(R.id.rv_chats);
         rvChats.setLayoutManager(new LinearLayoutManager(this));
+
+        layoutEmpty = findViewById(R.id.layout_empty);
 
         chatListAdapter = new ChatListAdapter(chat -> openChat(chat));
         rvChats.setAdapter(chatListAdapter);
@@ -58,6 +62,14 @@ public class ChatsListActivity extends BaseActivity {
                                 Long.compare(b.getLastTimestamp(), a.getLastTimestamp())); // מיון לפי זמן ההודעה האחרונה
                         runOnUiThread(() -> {
                             chatListAdapter.setChats(chats);
+
+                            if (chats.isEmpty()) {
+                                rvChats.setVisibility(View.GONE);
+                                layoutEmpty.setVisibility(View.VISIBLE);
+                            } else {
+                                rvChats.setVisibility(View.VISIBLE);
+                                layoutEmpty.setVisibility(View.GONE);
+                            }
                         });
                     }
                     @Override

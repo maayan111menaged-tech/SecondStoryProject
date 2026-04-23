@@ -3,6 +3,8 @@ package com.example.secondstoryproject.screens;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.core.graphics.Insets;
@@ -26,6 +28,7 @@ public class AcceptDonationActivity extends BaseActivity {
 
     private RecyclerView rvDonations;
     private DonationAdapter adapter;
+    private LinearLayout layoutEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,8 @@ public class AcceptDonationActivity extends BaseActivity {
 
         rvDonations = findViewById(R.id.rv_donations);
         rvDonations.setLayoutManager(new LinearLayoutManager(this));
+
+        layoutEmpty = findViewById(R.id.layout_empty);
 
         // מעבר לפרטי התרומה
         adapter = new DonationAdapter(donation -> {
@@ -78,6 +83,14 @@ public class AcceptDonationActivity extends BaseActivity {
                                 });
 
                                 adapter.setDonations(donations);
+
+                                if (donations.isEmpty()) {
+                                    rvDonations.setVisibility(View.GONE);
+                                    layoutEmpty.setVisibility(View.VISIBLE);
+                                } else {
+                                    rvDonations.setVisibility(View.VISIBLE);
+                                    layoutEmpty.setVisibility(View.GONE);
+                                }
                             }
 
                             @Override

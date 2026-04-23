@@ -54,13 +54,13 @@ public enum DonationStatus {
     // האם התרומה עדיין פעילה במערכת
     public boolean isActive() {
         return this == PENDING_APPROVAL ||
-                this == APPROVED_AVAILABLE ||
-                this == MATCHED ;
+                this == APPROVED_AVAILABLE;
     }
 
     // האם התרומה הסתיימה (לא פעילה)
     public boolean isFinished() {
-        return this == DELIVERED ||
+        return this == MATCHED ||
+                this == DELIVERED ||
                 this == REJECTED ||
                 this == CANCELLED ;
     }

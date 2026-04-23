@@ -83,14 +83,16 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgProfile"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:src="@drawable/ic_profile"
                 android:scaleType="centerCrop"
-                android:background="@drawable/circle_border"
-                android:padding="2dp"/>
+                android:padding="2dp"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                app:strokeColor="#36b3b8"
+                app:strokeWidth="2dp"/>
 
             <ImageButton
                 android:id="@+id/btnEditProfilePic"
