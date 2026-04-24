@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.adapters.UserAdapter;
+import com.example.secondstoryproject.models.Donation;
+import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
@@ -74,33 +76,69 @@ public class UsersListActivity extends BaseActivity {
                         .setTitle("Make Admin")
                         .setMessage("האם תרצה להפוך את " + user.getUserName() + " לאדמין?")
                         .setPositiveButton("כן", (dialog, which) -> {
-                            user.setAdmin(true);
-                            DatabaseService.getInstance().getUserService().update(
-                                    user.getId(),
-                                    oldUser -> user,
-                                    new IDatabaseService.DatabaseCallback<User>() {
-                                        @Override
-                                        public void onCompleted(User result) {
-                                            userAdapter.updateUserById(result);
-                                            DatabaseService.getInstance().getChatService()
-                                                    .deleteAdminChat(user.getId(),
-                                                            new IDatabaseService.DatabaseCallback<Void>() {
-                                                                @Override public void onCompleted(Void unused) {
-                                                                    Log.d(TAG, "צאט אדמין נמחק: " + user.getId());
+                            DatabaseService.getInstance().getDonationService()
+                                    .getByGiverId(user.getId(),
+                                            new IDatabaseService.DatabaseCallback<List<Donation>>() {
+                                                @Override
+                                                public void onCompleted(List<Donation> donations) {
+                                                    boolean hasActiveDonations = false;
+                                                    for (Donation d : donations) {
+                                                        DonationStatus s = d.getStatus();
+                                                        if (s == DonationStatus.PENDING_APPROVAL ||
+                                                                s == DonationStatus.APPROVED_AVAILABLE ||
+                                                                s == DonationStatus.MATCHED) {
+                                                            hasActiveDonations = true;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    if (hasActiveDonations) {
+                                                        new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
+                                                                .setTitle("לא ניתן להפוך לאדמין")
+                                                                .setMessage("למשתמש " + user.getUserName() + " יש תרומות פעילות או ממתינות.\nיש לסגור אותן לפני הפיכתו לאדמין.")
+                                                                .setPositiveButton("הבנתי", null)
+                                                                .show();
+                                                        userAdapter.resetMakeAdminButton(user);
+                                                        return;
+                                                    }
+
+                                                    // אין תרומות פעילות — ממשיכים
+                                                    user.setAdmin(true);
+                                                    DatabaseService.getInstance().getUserService().update(
+                                                            user.getId(),
+                                                            oldUser -> user,
+                                                            new IDatabaseService.DatabaseCallback<User>() {
+                                                                @Override
+                                                                public void onCompleted(User result) {
+                                                                    userAdapter.updateUserById(result);
+                                                                    DatabaseService.getInstance().getChatService()
+                                                                            .deleteAdminChat(user.getId(),
+                                                                                    new IDatabaseService.DatabaseCallback<Void>() {
+                                                                                        @Override public void onCompleted(Void unused) {
+                                                                                            Log.d(TAG, "צאט אדמין נמחק: " + user.getId());
+                                                                                        }
+                                                                                        @Override public void onFailed(Exception e) {
+                                                                                            Log.e(TAG, "שגיאה במחיקת צאט אדמין", e);
+                                                                                        }
+                                                                                    });
+                                                                    Toast.makeText(UsersListActivity.this,
+                                                                            "המשתמש הפך לאדמין", Toast.LENGTH_SHORT).show();
                                                                 }
-                                                                @Override public void onFailed(Exception e) {
-                                                                    Log.e(TAG, "שגיאה במחיקת צאט אדמין", e);
+                                                                @Override
+                                                                public void onFailed(Exception e) {
+                                                                    Toast.makeText(UsersListActivity.this,
+                                                                            "שגיאה בעדכון המשתמש", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             });
-                                            Toast.makeText(UsersListActivity.this,
-                                                    "המשתמש הפך לאדמין", Toast.LENGTH_SHORT).show();
-                                        }
-                                        @Override
-                                        public void onFailed(Exception e) {
-                                            Toast.makeText(UsersListActivity.this,
-                                                    "שגיאה בעדכון המשתמש", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                                }
+
+                                                @Override
+                                                public void onFailed(Exception e) {
+                                                    Toast.makeText(UsersListActivity.this,
+                                                            "שגיאה בבדיקת תרומות המשתמש", Toast.LENGTH_SHORT).show();
+                                                    userAdapter.resetMakeAdminButton(user);
+                                                }
+                                            });
                         })
                         .setNegativeButton("לא", (dialog, which) -> {
                             userAdapter.resetMakeAdminButton(user);
