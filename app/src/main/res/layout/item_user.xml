@@ -75,6 +75,17 @@
                     android:visibility="gone"
                     tools:visibility="visible"/>
 
+                <TextView
+                    android:id="@+id/tv_user_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="לא פעיל ⛔"
+                    android:textSize="11sp"
+                    android:textColor="#E53935"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
             </LinearLayout>
             <TextView
                 android:id="@+id/tv_item_user_fullname"
@@ -162,6 +173,7 @@
                 android:backgroundTint="#E53935"
                 android:padding="0dp"
                 style="@style/Widget.Material3.Button.IconButton"/>
+
 
             <Button
                 android:id="@+id/btn_Info_user"

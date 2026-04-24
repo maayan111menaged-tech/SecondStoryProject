@@ -7,7 +7,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import java.util.ArrayList;
 
 @IgnoreExtraProperties
-public class User implements Idable{
+public class User implements Idable {
 
     private String id;
     private String userName;
@@ -17,11 +17,12 @@ public class User implements Idable{
     private String email;
     private String phoneNumber;
     private String dateOfBirth;
-    private int donationCounter; //כמות התרומות שנתן
-    private String profilePhoneUrl; // the name is wrong - CHANGE IT!!!
+    private int donationCounter;
+    private String profilePhoneUrl;
     private boolean isAdmin;
-    private ArrayList<Donation> donationList; //יכלול גם תרומות שקיבל ושנתן
-    private ArrayList<Rate> rateList; // פידבקים שקיבל
+    private boolean isActive = true; //ברירת מחדל פעיל
+    private ArrayList<Donation> donationList;
+    private ArrayList<Rate> rateList;
 
     public enum NotificationType {
         PHONE_NUMBER,
@@ -43,9 +44,9 @@ public class User implements Idable{
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;
 
-        // ערכי ברירת מחדל
         this.donationCounter = 0;
         this.isAdmin = false;
+        this.isActive = true;
         this.profilePhoneUrl = null;
 
         this.donationList = new ArrayList<>();
@@ -53,7 +54,7 @@ public class User implements Idable{
         this.notifications = NotificationType.EMAIL;
     }
 
-    //בנאי מלא
+    // בנאי מלא
     public User(String id, String userName, String password,
                 String fName, String lName,
                 String email, String phoneNumber, String dateOfBirth,
@@ -70,6 +71,7 @@ public class User implements Idable{
 
         this.donationCounter = donationCounter;
         this.isAdmin = isAdmin;
+        this.isActive = true;
         this.profilePhoneUrl = profilePhoneUrl;
 
         this.donationList = new ArrayList<>();
@@ -81,6 +83,7 @@ public class User implements Idable{
     public User() {
         this.donationCounter = 0;
         this.isAdmin = false;
+        this.isActive = true;
 
         this.donationList = new ArrayList<>();
         this.rateList = new ArrayList<>();
@@ -105,33 +108,29 @@ public class User implements Idable{
     public String getDateOfBirth() { return dateOfBirth; }
     public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
     public int getDonationCounter() { return donationCounter; }
-    public void setDonationCounter(int donationCounter) {this.donationCounter = donationCounter;}
+    public void setDonationCounter(int donationCounter) { this.donationCounter = donationCounter; }
     public String getProfilePhoneUrl() { return profilePhoneUrl; }
-    public void setProfilePhoneUrl(String profilePhoneUrl) {this.profilePhoneUrl = profilePhoneUrl;}
+    public void setProfilePhoneUrl(String profilePhoneUrl) { this.profilePhoneUrl = profilePhoneUrl; }
     public boolean isAdmin() { return isAdmin; }
     public void setAdmin(boolean admin) { isAdmin = admin; }
+
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean active) { isActive = active; }
+
     public ArrayList<Donation> getDonationList() { return donationList; }
-    public void setDonationList(ArrayList<Donation> donationList) {this.donationList = donationList;}
+    public void setDonationList(ArrayList<Donation> donationList) { this.donationList = donationList; }
     public ArrayList<Rate> getRateList() { return rateList; }
-    public void setRateList(ArrayList<Rate> rateList) {this.rateList = rateList;}
+    public void setRateList(ArrayList<Rate> rateList) { this.rateList = rateList; }
     public NotificationType getNotifications() { return notifications; }
-    public void setNotifications(NotificationType notifications) {this.notifications = notifications;}
+    public void setNotifications(NotificationType notifications) { this.notifications = notifications; }
 
-//    public String getCity() {return city;}
-//    public void setCity(String city) {this.city = city;}
-
-
-
-    // additional methods
     @Exclude
     public UserLevel getLevel() {
         return UserLevel.fromDonationCount(donationCounter);
     }
 
     @Exclude
-    public String getFullName(){
+    public String getFullName() {
         return this.fName + " " + this.lName;
     }
-
-
 }

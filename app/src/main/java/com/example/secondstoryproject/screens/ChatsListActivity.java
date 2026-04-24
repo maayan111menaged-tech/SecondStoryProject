@@ -59,10 +59,9 @@ public class ChatsListActivity extends BaseActivity {
                     @Override
                     public void onCompleted(List<Chat> chats) {
                         chats.sort((a, b) ->
-                                Long.compare(b.getLastTimestamp(), a.getLastTimestamp())); // מיון לפי זמן ההודעה האחרונה
+                                Long.compare(b.getLastTimestamp(), a.getLastTimestamp()));
                         runOnUiThread(() -> {
                             chatListAdapter.setChats(chats);
-
                             if (chats.isEmpty()) {
                                 rvChats.setVisibility(View.GONE);
                                 layoutEmpty.setVisibility(View.VISIBLE);
@@ -81,11 +80,8 @@ public class ChatsListActivity extends BaseActivity {
                 };
 
         if (currentUser.isAdmin()) {
-            // אדמין — מביא את כל צ'אטי האדמין
-            DatabaseService.getInstance().getChatService()
-                    .getAllAdminChats(callback);
+            DatabaseService.getInstance().getChatService().getAllAdminChats(callback);
         } else {
-            // משתמש רגיל
             DatabaseService.getInstance().getChatService()
                     .getUserChats(currentUser.getId(), callback);
         }
@@ -95,6 +91,7 @@ public class ChatsListActivity extends BaseActivity {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("CHAT_ID", chat.getId());
         intent.putExtra("OTHER_USER_NAME", chat.getOtherUserName());
+        intent.putExtra("OTHER_USER_ID", chat.getOtherUserId());
         startActivity(intent);
     }
 }

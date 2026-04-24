@@ -135,6 +135,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     return;
                 }
 
+                // בדיקה האם המשתמש פעיל או חסום
+                if (!user.isActive()) {
+                    Toast.makeText(LoginActivity.this,
+                            "החשבון שלך חסום. אי אפשר להתחבר אליו עד לשחרור החסימה.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 Log.d(TAG, "onCompleted: User logged in: " + user.toString());
                 SharedPreferencesUtil.saveUser(LoginActivity.this, user);
 

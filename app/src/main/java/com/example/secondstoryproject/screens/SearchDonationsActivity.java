@@ -22,12 +22,15 @@ import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationCategory;
 import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.models.IsraelCity;
+import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SearchDonationsActivity extends BaseActivity {
 
@@ -55,7 +58,6 @@ public class SearchDonationsActivity extends BaseActivity {
             return insets;
         });
 
-
         tvDonationCount = findViewById(R.id.tv_donation_count);
 
         RecyclerView recyclerView = findViewById(R.id.rv_donations_list);
@@ -78,11 +80,10 @@ public class SearchDonationsActivity extends BaseActivity {
         setupCityFilter();
         setupClearFilters();
 
-
-        // סינון אוטומטי לפי עיר אם הגענו מהמפה
         spinnerCity = findViewById(R.id.spinner_city);
         btnToggle = findViewById(R.id.btn_toggle_filters);
         layoutFilters = findViewById(R.id.layout_filters);
+
         String cityFromMap = getIntent().getStringExtra("CITY_FILTER");
         if (cityFromMap != null) {
             cityFilter = cityFromMap;
@@ -93,10 +94,64 @@ public class SearchDonationsActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadDonationsWithActiveUsersOnly();
+    }
+
+    /**
+     * ✅ טוען תרומות + משתמשים, ומסנן תרומות שהתורם שלהן פעיל בלבד.
+     */
+    private void loadDonationsWithActiveUsersOnly() {
+        // קודם טוענים את כל המשתמשים לבניית מפה uid → isActive
+        DatabaseService.getInstance().getUserService().getAll(
+                new DatabaseService.DatabaseCallback<List<User>>() {
+                    @Override
+                    public void onCompleted(List<User> users) {
+                        // בונים מפה מהירה: userId → isActive
+                        Map<String, Boolean> activeMap = new HashMap<>();
+                        for (User u : users) {
+                            activeMap.put(u.getId(), u.isActive());
+                        }
+
+                        // עכשיו טוענים תרומות
+                        DatabaseService.getInstance().getDonationService()
+                                .getAll(new DatabaseService.DatabaseCallback<List<Donation>>() {
+                                    @Override
+                                    public void onCompleted(List<Donation> donations) {
+                                        List<Donation> available = new ArrayList<>();
+                                        for (Donation d : donations) {
+                                            boolean isApproved = d.getStatus() == DonationStatus.APPROVED_AVAILABLE;
+                                            // ✅ מציגים רק אם התורם פעיל (ברירת מחדל: פעיל אם לא נמצא במפה)
+                                            Boolean donorActive = activeMap.get(d.getGiverID());
+                                            boolean isDonorActive = donorActive == null || donorActive;
+                                            if (isApproved && isDonorActive) {
+                                                available.add(d);
+                                            }
+                                        }
+                                        donationAdapter.setDonationList(available);
+                                        donationAdapter.filter(searchQuery, categoryFilter, cityFilter);
+                                        tvDonationCount.setText("Total: " + available.size());
+                                    }
+
+                                    @Override
+                                    public void onFailed(Exception e) {
+                                        Log.e(TAG, "Failed to get donations", e);
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailed(Exception e) {
+                        Log.e(TAG, "Failed to get users", e);
+                    }
+                });
+    }
+
     private void setupToggleFilters() {
         MaterialButton btnToggle = findViewById(R.id.btn_toggle_filters);
         LinearLayout layoutFilters = findViewById(R.id.layout_filters);
-
         btnToggle.setOnClickListener(v -> {
             filtersVisible = !filtersVisible;
             layoutFilters.setVisibility(filtersVisible ? View.VISIBLE : View.GONE);
@@ -119,18 +174,15 @@ public class SearchDonationsActivity extends BaseActivity {
 
     private void setupCategoryFilter() {
         AutoCompleteTextView spinnerCategory = findViewById(R.id.spinner_category);
-
         List<String> categoryNames = new ArrayList<>();
         categoryNames.add("All Categories");
         for (DonationCategory cat : DonationCategory.values()) {
             categoryNames.add(cat.getHebrewName());
         }
-
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, categoryNames);
         spinnerCategory.setAdapter(adapter);
         spinnerCategory.setText("All Categories", false);
-
         spinnerCategory.setOnItemClickListener((parent, view, position, id) -> {
             categoryFilter = position == 0 ? null : DonationCategory.values()[position - 1];
             donationAdapter.filter(searchQuery, categoryFilter, cityFilter);
@@ -139,17 +191,14 @@ public class SearchDonationsActivity extends BaseActivity {
 
     private void setupCityFilter() {
         AutoCompleteTextView spinnerCity = findViewById(R.id.spinner_city);
-
         String[] cities = IsraelCity.getHebrewNames();
         List<String> cityList = new ArrayList<>();
         cityList.add("All Cities");
         cityList.addAll(Arrays.asList(cities));
-
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, cityList);
         spinnerCity.setAdapter(adapter);
         spinnerCity.setText("All Cities", false);
-
         spinnerCity.setOnItemClickListener((parent, view, position, id) -> {
             cityFilter = position == 0 ? null : cities[position - 1];
             donationAdapter.filter(searchQuery, categoryFilter, cityFilter);
@@ -159,40 +208,12 @@ public class SearchDonationsActivity extends BaseActivity {
     private void setupClearFilters() {
         findViewById(R.id.btn_clear_filters).setOnClickListener(v -> {
             ((EditText) findViewById(R.id.et_search_donation)).setText("");
-            ((AutoCompleteTextView) findViewById(R.id.spinner_category))
-                    .setText("All Categories", false);
-            ((AutoCompleteTextView) findViewById(R.id.spinner_city))
-                    .setText("All Cities", false);
-
+            ((AutoCompleteTextView) findViewById(R.id.spinner_category)).setText("All Categories", false);
+            ((AutoCompleteTextView) findViewById(R.id.spinner_city)).setText("All Cities", false);
             searchQuery = "";
             categoryFilter = null;
             cityFilter = null;
             donationAdapter.filter(searchQuery, categoryFilter, cityFilter);
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        DatabaseService.getInstance().getDonationService()
-                .getAll(new DatabaseService.DatabaseCallback<List<Donation>>() {
-                    @Override
-                    public void onCompleted(List<Donation> donations) {
-                        List<Donation> available = new ArrayList<>();
-                        for (Donation d : donations) {
-                            if (d.getStatus() == DonationStatus.APPROVED_AVAILABLE) {
-                                available.add(d);
-                            }
-                        }
-                        donationAdapter.setDonationList(available);
-                        donationAdapter.filter(searchQuery, categoryFilter, cityFilter);
-                        tvDonationCount.setText("Total: " + available.size());
-                    }
-
-                    @Override
-                    public void onFailed(Exception e) {
-                        Log.e(TAG, "Failed to get donations", e);
-                    }
-                });
     }
 }

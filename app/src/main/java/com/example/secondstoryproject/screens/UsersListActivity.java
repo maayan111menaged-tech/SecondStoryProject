@@ -11,11 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,24 +31,24 @@ public class UsersListActivity extends BaseActivity {
     private TextView tvUserCount;
 
     private String searchQuery = "";
-    private Boolean adminFilter = null; // null = הכל
+    private Boolean adminFilter = null;
 
     private LinearLayout layoutEmpty;
     private RecyclerView usersList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users_list);
 
         layoutEmpty = findViewById(R.id.layout_empty);
-
         usersList = findViewById(R.id.rv_users_list);
         tvUserCount = findViewById(R.id.tv_user_count);
         usersList.setLayoutManager(new LinearLayoutManager(this));
+
         userAdapter = new UserAdapter(new UserAdapter.OnUserClickListener() {
             @Override
             public void onUserClick(User user) {
-                // Handle user click
                 Log.d(TAG, "User clicked: " + user);
                 Intent intent = new Intent(UsersListActivity.this, updateDetailsActivity.class);
                 intent.putExtra("USER_UID", user.getId());
@@ -62,89 +57,91 @@ public class UsersListActivity extends BaseActivity {
 
             @Override
             public void onLongUserClick(User user) {
-                // Handle long user click
                 Log.d(TAG, "User long clicked: " + user);
             }
+
+            @Override
+            public void onInfoClick(User user) {
+                Intent intent = new Intent(UsersListActivity.this, updateDetailsActivity.class);
+                intent.putExtra("USER_UID", user.getId());
+                intent.putExtra("VIEW_ONLY", true);
+                startActivity(intent);
+            }
+
             @Override
             public void onMakeAdminClick(User user) {
-
-                String name = user.getUserName();
-
                 new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
                         .setTitle("Make Admin")
-                        .setMessage("האם תרצה להפוך את " + name + " לאדמין?")
+                        .setMessage("האם תרצה להפוך את " + user.getUserName() + " לאדמין?")
                         .setPositiveButton("כן", (dialog, which) -> {
-
-                            // 👇 כאן "Loading" לוגי (לא UI ישיר)
                             user.setAdmin(true);
-
                             DatabaseService.getInstance().getUserService().update(
                                     user.getId(),
                                     oldUser -> user,
                                     new IDatabaseService.DatabaseCallback<User>() {
-
                                         @Override
                                         public void onCompleted(User result) {
                                             userAdapter.updateUserById(result);
-
-                                            // מחיקת צאט האדמין כי המשתמש הפך לאדמין
                                             DatabaseService.getInstance().getChatService()
-                                                    .deleteAdminChat(user.getId(), new IDatabaseService.DatabaseCallback<Void>() {
-                                                        @Override
-                                                        public void onCompleted(Void unused) {
-                                                            Log.d(TAG, "צאט אדמין נמחק למשתמש: " + user.getId());
-                                                        }
-                                                        @Override
-                                                        public void onFailed(Exception e) {
-                                                            Log.e(TAG, "שגיאה במחיקת צאט אדמין", e);
-                                                        }
-                                                    });
-
+                                                    .deleteAdminChat(user.getId(),
+                                                            new IDatabaseService.DatabaseCallback<Void>() {
+                                                                @Override public void onCompleted(Void unused) {
+                                                                    Log.d(TAG, "צאט אדמין נמחק: " + user.getId());
+                                                                }
+                                                                @Override public void onFailed(Exception e) {
+                                                                    Log.e(TAG, "שגיאה במחיקת צאט אדמין", e);
+                                                                }
+                                                            });
                                             Toast.makeText(UsersListActivity.this,
-                                                    "המשתמש הפך לאדמין",
-                                                    Toast.LENGTH_SHORT).show();
+                                                    "המשתמש הפך לאדמין", Toast.LENGTH_SHORT).show();
                                         }
                                         @Override
                                         public void onFailed(Exception e) {
                                             Toast.makeText(UsersListActivity.this,
-                                                    "שגיאה בעדכון המשתמש",
-                                                    Toast.LENGTH_SHORT).show();
+                                                    "שגיאה בעדכון המשתמש", Toast.LENGTH_SHORT).show();
                                         }
-                                    }
-                            );
+                                    });
                         })
-                        .setNegativeButton("לא", (dialog, which) ->{
+                        .setNegativeButton("לא", (dialog, which) -> {
                             userAdapter.resetMakeAdminButton(user);
                             dialog.dismiss();
-                                })
+                        })
                         .show();
             }
 
             @Override
-            public void onDeleteClick(User user) {
+            public void onToggleActiveClick(User user) {
+                boolean currentlyActive = user.isActive();
+                String action = currentlyActive ? "השבת" : "הפעל";
+                String message = currentlyActive
+                        ? "האם להשבית את " + user.getUserName() + "?\nהמשתמש לא יוכל להתחבר."
+                        : "האם להפעיל מחדש את " + user.getUserName() + "?";
+
                 new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
-                        .setTitle("מחיקת משתמש")
-                        .setMessage("האם אתה בטוח שברצונך למחוק את " + user.getUserName() + "?")
-                        .setPositiveButton("מחק", (dialog, which) -> {
-                            DatabaseService.getInstance().getUserService().delete(
+                        .setTitle(action + " משתמש")
+                        .setMessage(message)
+                        .setPositiveButton(action, (dialog, which) -> {
+                            user.setActive(!currentlyActive);
+                            DatabaseService.getInstance().getUserService().update(
                                     user.getId(),
-                                    new IDatabaseService.DatabaseCallback<Void>() {
+                                    oldUser -> user,
+                                    new IDatabaseService.DatabaseCallback<User>() {
                                         @Override
-                                        public void onCompleted(Void unused) {
-                                            runOnUiThread(() -> {
-                                                userAdapter.removeUser(user);
-                                                Toast.makeText(UsersListActivity.this,
-                                                        "המשתמש נמחק", Toast.LENGTH_SHORT).show();
-                                            });
+                                        public void onCompleted(User result) {
+                                            userAdapter.updateUserById(result);
+                                            String msg = result.isActive()
+                                                    ? "המשתמש הופעל מחדש ✅"
+                                                    : "המשתמש הושבת ⛔";
+                                            Toast.makeText(UsersListActivity.this,
+                                                    msg, Toast.LENGTH_SHORT).show();
                                         }
                                         @Override
                                         public void onFailed(Exception e) {
-                                            runOnUiThread(() ->
-                                                    Toast.makeText(UsersListActivity.this,
-                                                            "שגיאה במחיקת משתמש", Toast.LENGTH_SHORT).show());
+                                            user.setActive(currentlyActive);
+                                            Toast.makeText(UsersListActivity.this,
+                                                    "שגיאה בעדכון הסטטוס", Toast.LENGTH_SHORT).show();
                                         }
-                                    }
-                            );
+                                    });
                         })
                         .setNegativeButton("ביטול", null)
                         .show();
@@ -153,11 +150,14 @@ public class UsersListActivity extends BaseActivity {
             @Override
             public void onChatClick(User user) {
                 Intent intent = new Intent(UsersListActivity.this, ChatActivity.class);
-                intent.putExtra("CHAT_ID", user.getId());
+                // ✅ תיקון: chatId בפורמט הנכון + העברת otherUserId
+                intent.putExtra("CHAT_ID", "admin_" + user.getId());
                 intent.putExtra("OTHER_USER_NAME", user.getUserName());
+                intent.putExtra("OTHER_USER_ID", user.getId());
                 startActivity(intent);
             }
         });
+
         usersList.setAdapter(userAdapter);
 
         EditText etSearch = findViewById(R.id.et_search);
@@ -184,35 +184,32 @@ public class UsersListActivity extends BaseActivity {
         });
 
         userAdapter.setOnFilterListener(count ->
-                tvUserCount.setText("Total users: " + count)
-        );
+                tvUserCount.setText("Total users: " + count));
     }
-
 
     @Override
-    protected void onResume(                                                                                                                                                                                                ) {
+    protected void onResume() {
         super.onResume();
-        DatabaseService.getInstance().getUserService().getAll(new DatabaseService.DatabaseCallback<List<User>>() {
-            @Override
-            public void onCompleted(List<User> users) {
-                String currentUserId = SharedPreferencesUtil.getUserId(UsersListActivity.this);
-                userAdapter.setUserList(users, currentUserId);
-                tvUserCount.setText("Total users: " + users.size());
+        DatabaseService.getInstance().getUserService().getAll(
+                new DatabaseService.DatabaseCallback<List<User>>() {
+                    @Override
+                    public void onCompleted(List<User> users) {
+                        String currentUserId = SharedPreferencesUtil.getUserId(UsersListActivity.this);
+                        userAdapter.setUserList(users, currentUserId);
+                        tvUserCount.setText("Total users: " + users.size());
 
-                if (users.isEmpty()) {
-                    usersList.setVisibility(View.GONE);
-                    layoutEmpty.setVisibility(View.VISIBLE);
-                } else {
-                    usersList.setVisibility(View.VISIBLE);
-                    layoutEmpty.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onFailed(Exception e) {
-                Log.e(TAG, "Failed to get users list", e);
-            }
-        });
+                        if (users.isEmpty()) {
+                            usersList.setVisibility(View.GONE);
+                            layoutEmpty.setVisibility(View.VISIBLE);
+                        } else {
+                            usersList.setVisibility(View.VISIBLE);
+                            layoutEmpty.setVisibility(View.GONE);
+                        }
+                    }
+                    @Override
+                    public void onFailed(Exception e) {
+                        Log.e(TAG, "Failed to get users list", e);
+                    }
+                });
     }
-
 }

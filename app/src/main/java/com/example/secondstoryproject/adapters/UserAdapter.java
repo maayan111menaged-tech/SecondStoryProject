@@ -2,6 +2,7 @@ package com.example.secondstoryproject.adapters;
 import static com.example.secondstoryproject.utils.SharedPreferencesUtil.getUserId;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         void onUserClick(User user);
         void onLongUserClick(User user);
         void onMakeAdminClick(User user);
-        void onDeleteClick(User user);
+        void onToggleActiveClick(User user);
+        void onInfoClick(User user);
         void onChatClick(User user);
     }
     /**
@@ -91,11 +93,38 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        String currentUserId = SharedPreferencesUtil.getUserId(holder.itemView.getContext());
+
         User user = userList.get(position);
         if (user == null) return;
 
+        // טיפול בפעיל לא פעיל
+        if (!user.isActive()) {
+            holder.itemView.setAlpha(0.7f);
+            holder.tvStatus.setVisibility(View.VISIBLE);
+            holder.tvStatus.setText("⛔ לא פעיל");
+            holder.tvStatus.setTextColor(Color.parseColor("#E53935"));
+
+            holder.btnToggleActive.setText("+");
+            holder.btnToggleActive.setBackgroundTintList(
+                    android.content.res.ColorStateList.valueOf(Color.parseColor("#43A047")));
+        } else {
+            holder.itemView.setAlpha(1.0f);
+            holder.tvStatus.setVisibility(View.GONE);
+
+            holder.btnToggleActive.setText("-");
+            holder.btnToggleActive.setBackgroundTintList(
+                    android.content.res.ColorStateList.valueOf(Color.parseColor("#E53935")));
+        }
+
+        // טיפול בהשבתה עצמית או השבתת אדמין אחר
+        if(user.getId().equals(currentUserId) || user.isAdmin()){
+            holder.btnToggleActive.setAlpha(0.5f);
+            holder.btnToggleActive.setEnabled(false);
+
+        }
+
         // Show "Me" badge if this is the logged-in user
-        String currentUserId = SharedPreferencesUtil.getUserId(holder.itemView.getContext());
         if (user.getId().equals(currentUserId)) {
             holder.tvMeBadge.setVisibility(View.VISIBLE);
         } else {
@@ -115,13 +144,19 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             holder.ivProfilePic.setImageBitmap(bitmap);
         }
 
-        // Handle admin button state
+        // כפתור Make Admin – disabled אם כבר אדמין או אם לא פעיל
         if (user.isAdmin()) {
             holder.btnMakeAdmin.setEnabled(false);
             holder.btnMakeAdmin.setText("Already Admin");
+            holder.btnMakeAdmin.setAlpha(0.5f);
+        } else if (!user.isActive()) {
+            holder.btnMakeAdmin.setEnabled(false);
+            holder.btnMakeAdmin.setText("Make Admin");
+            holder.btnMakeAdmin.setAlpha(0.5f);
         } else {
             holder.btnMakeAdmin.setEnabled(true);
             holder.btnMakeAdmin.setText("Make Admin");
+            holder.btnMakeAdmin.setAlpha(1.0f);
         }
 
         // Click events
@@ -145,12 +180,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
                 onUserClickListener.onMakeAdminClick(user);
             }
         });
-        holder.btnDeleteUser.setOnClickListener(v -> {
-            if (onUserClickListener != null) {
-                onUserClickListener.onDeleteClick(user);
-            }
+        holder.btnToggleActive.setOnClickListener(v -> {
+            if (onUserClickListener != null) onUserClickListener.onToggleActiveClick(user);
         });
 
+        // ✅ כפתור INFO
+        holder.btnInfoUser.setOnClickListener(v -> {
+            if (onUserClickListener != null) onUserClickListener.onInfoClick(user);
+        });
         holder.btnChatUser.setOnClickListener(v -> {
             if (onUserClickListener != null) {
                 onUserClickListener.onChatClick(user);
@@ -289,9 +326,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
      * ViewHolder for user item.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUserName, tvName, tvEmail, tvPhone, tvMeBadge;
+        TextView tvUserName, tvName, tvEmail, tvPhone, tvMeBadge , tvStatus;
         ImageView ivProfilePic;
-        Button btnMakeAdmin, btnDeleteUser, btnChatUser;
+        Button btnMakeAdmin, btnToggleActive, btnInfoUser, btnChatUser;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -301,9 +338,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             tvPhone = itemView.findViewById(R.id.tv_item_user_phone);
             ivProfilePic = itemView.findViewById(R.id.iv_user_profile_pic);
             btnMakeAdmin = itemView.findViewById(R.id.btn_make_admin);
-            btnDeleteUser = itemView.findViewById(R.id.btn_delete_user);
+            btnToggleActive = itemView.findViewById(R.id.btn_delete_user);
+            btnInfoUser   = itemView.findViewById(R.id.btn_Info_user);
             btnChatUser = itemView.findViewById(R.id.btn_chat_user);
             tvMeBadge = itemView.findViewById(R.id.tv_me_badge);
+            tvStatus      = itemView.findViewById(R.id.tv_user_status);
         }
     }
 }

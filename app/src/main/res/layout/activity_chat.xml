@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,6 +18,34 @@
         android:textColor="@android:color/black"
         android:text="שיחה" />
 
+    <LinearLayout
+        android:id="@+id/layout_inactive_user_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="10dp"
+        android:background="#FFEBEE"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⛔"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="משתמש זה אינו פעיל. לא ניתן לשלוח הודעות."
+            android:textSize="14sp"
+            android:textColor="#C62828"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
     <!-- רשימת הודעות -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_messages"
@@ -28,6 +57,7 @@
 
     <!-- שורת שליחת הודעה -->
     <LinearLayout
+        android:id="@+id/layout_message_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
