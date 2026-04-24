@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -121,26 +123,68 @@ public class UserProfileActivity extends BaseActivity {
 
     }
     private void loadUserDonations() {
-
         databaseService.getDonationService().getByGiverId(
                 currentUser.getId(),
                 new IDatabaseService.DatabaseCallback<List<Donation>>() {
-
                     @Override
                     public void onCompleted(List<Donation> donations) {
-
                         userDonations.clear();
                         userDonations.addAll(donations);
                         donationAdapter.notifyDataSetChanged();
+                        updateDonationsLayout(donations.size());
                     }
 
                     @Override
                     public void onFailed(Exception e) {
-
+                        updateDonationsLayout(0);
                     }
                 }
         );
+    }
+    private void updateDonationsLayout(int count) {
+        if (count == 0) {
+            rvUserDonations.setVisibility(View.GONE);
+            btnLeft.setVisibility(View.GONE);
+            btnRight.setVisibility(View.GONE);
+            findViewById(R.id.emptyDonationsView).setVisibility(View.VISIBLE);
 
+        } else {
+            rvUserDonations.setVisibility(View.VISIBLE);
+            findViewById(R.id.emptyDonationsView).setVisibility(View.GONE);
+
+            if (count < 3) {
+                btnLeft.setVisibility(View.GONE);
+                btnRight.setVisibility(View.GONE);
+
+                rvUserDonations.setLayoutManager(
+                        new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
+                            @Override
+                            public boolean canScrollHorizontally() { return false; }
+                        }
+                );
+
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rvUserDonations.getLayoutParams();
+                params.addRule(RelativeLayout.CENTER_IN_PARENT);
+                params.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
+                rvUserDonations.setLayoutParams(params);
+                rvUserDonations.setPadding(0, 0, 0, 0);
+
+            } else {
+                btnLeft.setVisibility(View.VISIBLE);
+                btnRight.setVisibility(View.VISIBLE);
+
+                rvUserDonations.setLayoutManager(
+                        new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+                );
+
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rvUserDonations.getLayoutParams();
+                params.addRule(RelativeLayout.ALIGN_PARENT_START);
+                params.addRule(RelativeLayout.ALIGN_PARENT_END);
+                params.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+                rvUserDonations.setLayoutParams(params);
+                rvUserDonations.setPadding(32, 0, 32, 0);
+            }
+        }
     }
     private void scrollRecycler(int direction) {
         LinearLayoutManager layoutManager = (LinearLayoutManager) rvUserDonations.getLayoutManager();
