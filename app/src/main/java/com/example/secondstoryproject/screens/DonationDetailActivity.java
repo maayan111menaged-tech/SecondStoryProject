@@ -2,6 +2,7 @@ package com.example.secondstoryproject.screens;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -22,15 +24,23 @@ import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
+import com.google.android.material.chip.Chip;
 
 public class DonationDetailActivity extends BaseActivity {
 
     private ImageView ivDonation, ivStatus;
-    private TextView tvName, tvDescription, tvCategory, tvStatus;
-    private Button btnApprove, btnReject , btnInterested;
-    private LinearLayout layoutAdminActions , layoutInterested;
+    private TextView tvName, tvDescription, tvStatus;
+    private Button btnApprove, btnReject, btnInterested;
+    private LinearLayout layout_admin_actions, layout_interested;
     private Donation currentDonation;
     private User currentUser;
+    private Chip chipCategory;
+
+    // 🔧 FIX 1: הצהרה על כל ה-Views שחסרו
+    private LinearLayout layoutGiverRow, layoutRejectionReason;
+    private TextView tvRejectionReason, tvGiverName;
+    private ImageView ivGiverAvatar;
+    private CardView cardAdminActions, cardInterested;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +56,24 @@ public class DonationDetailActivity extends BaseActivity {
         ivStatus = findViewById(R.id.ivStatus);
         tvName = findViewById(R.id.tvName);
         tvDescription = findViewById(R.id.tvDescription);
-        tvCategory = findViewById(R.id.tvCategory);
         tvStatus = findViewById(R.id.tvStatus);
+        chipCategory = findViewById(R.id.chipCategory);
 
         btnApprove = findViewById(R.id.btnApprove);
         btnReject = findViewById(R.id.btnReject);
-        layoutAdminActions = findViewById(R.id.layout_admin_actions);
+        layout_admin_actions = findViewById(R.id.layout_admin_actions);
 
         btnInterested = findViewById(R.id.btnInterested);
-        layoutInterested = findViewById(R.id.layout_interested);
+        layout_interested = findViewById(R.id.layout_interested);
 
+        // 🔧 FIX 1: אתחול כל ה-Views שחסרו
+        layoutGiverRow = findViewById(R.id.layoutGiverRow);
+        layoutRejectionReason = findViewById(R.id.layoutRejectionReason);
+        tvRejectionReason = findViewById(R.id.tvRejectionReason);
+        tvGiverName = findViewById(R.id.tvGiverName);
+        ivGiverAvatar = findViewById(R.id.ivGiverAvatar);
+        cardAdminActions = findViewById(R.id.cardAdminActions);
+        cardInterested = findViewById(R.id.cardInterested);
 
         String donationId = getIntent().getStringExtra("DONATION_ID");
         if (donationId != null) {
@@ -86,7 +104,7 @@ public class DonationDetailActivity extends BaseActivity {
 
         tvName.setText(donation.getName());
         tvDescription.setText(donation.getDescription());
-        tvCategory.setText(donation.getCategory() != null ? donation.getCategory().name() : "לא מוגדר");
+        chipCategory.setText(donation.getCategory() != null ? donation.getCategory().name() : "לא מוגדר");
 
         DonationStatus status = donation.getStatus();
         if (status != null) {
@@ -101,36 +119,79 @@ public class DonationDetailActivity extends BaseActivity {
             ivDonation.setImageResource(R.drawable.ic_profile);
         }
 
-        // הצגת כפתורים למנהל בלבד כאשר הסטטוס הוא מחכה לאישור מנהל
+        // 🔧 FIX 2: מציגים גם את ה-CardView החיצוני, לא רק את ה-LinearLayout הפנימי
         if (status == DonationStatus.PENDING_APPROVAL && currentUser != null && currentUser.isAdmin()) {
-            layoutAdminActions.setVisibility(LinearLayout.VISIBLE);
+            cardAdminActions.setVisibility(View.VISIBLE);
+            layout_admin_actions.setVisibility(LinearLayout.VISIBLE);
             setupButtonsAdmin();
         } else {
-            layoutAdminActions.setVisibility(LinearLayout.GONE);
+            cardAdminActions.setVisibility(View.GONE);
+            layout_admin_actions.setVisibility(LinearLayout.GONE);
         }
 
-        // הצגת הכפתור רק כאשר המשתמש המחובר הוא אינו תורם התרומה או מנהל וסטטוס זמין לתרומה
+        // 🔧 FIX 2: מציגים גם את ה-CardView החיצוני, לא רק את ה-LinearLayout הפנימי
         if (status == DonationStatus.APPROVED_AVAILABLE && currentUser != null && !currentUser.isAdmin()
-        && !currentUser.getId().equals(currentDonation.getGiverID())) {
-            layoutInterested.setVisibility(LinearLayout.VISIBLE);
+                && !currentUser.getId().equals(currentDonation.getGiverID())) {
+            cardInterested.setVisibility(View.VISIBLE);
+            layout_interested.setVisibility(LinearLayout.VISIBLE);
             setupButtonsInterested();
         } else {
-            layoutInterested.setVisibility(LinearLayout.GONE);
+            cardInterested.setVisibility(View.GONE);
+            layout_interested.setVisibility(LinearLayout.GONE);
         }
 
+        // הראה את layoutGiverRow רק כשהמשתמש אינו התורם עצמו
+        if (!currentUser.getId().equals(donation.getGiverID())) {
+            layoutGiverRow.setVisibility(View.VISIBLE);
+            loadGiverDetails(donation.getGiverID());
+        } else {
+            layoutGiverRow.setVisibility(View.GONE);
+        }
+
+        // הצג סיבת דחייה רק לתורם עצמו כשנדחתה
+        if (status == DonationStatus.REJECTED &&
+                currentUser.getId().equals(donation.getGiverID())) {
+            layoutRejectionReason.setVisibility(View.VISIBLE);
+            tvRejectionReason.setText(donation.getRejectionReason());
+        } else {
+            layoutRejectionReason.setVisibility(View.GONE);
+        }
+    }
+
+    // 🔧 הוספה: פונקציה נפרדת לטעינת פרטי התורם בשורת הגיבר
+    private void loadGiverDetails(String giverId) {
+        databaseService.getUserService().get(giverId, new IDatabaseService.DatabaseCallback<User>() {
+            @Override
+            public void onCompleted(User giver) {
+                runOnUiThread(() -> {
+                    if (giver != null) {
+                        tvGiverName.setText(giver.getFullName());
+                        String avatar = giver.getProfilePhoneUrl();
+                        if (avatar != null && !avatar.isEmpty()) {
+                            ivGiverAvatar.setImageBitmap(ImageUtil.fromBase64(avatar));
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                // נשאר עם ערך ברירת מחדל "שם תורם"
+            }
+        });
     }
 
     private void setupButtonsAdmin() {
         btnApprove.setOnClickListener(v -> showConfirmDialog(true));
         btnReject.setOnClickListener(v -> showConfirmDialog(false));
     }
+
     private void setupButtonsInterested() {
         btnInterested.setOnClickListener(v -> interestedFunction());
     }
 
     private void showConfirmDialog(boolean isApprove) {
         if (isApprove) {
-            // אישור
             new AlertDialog.Builder(this)
                     .setTitle("אישור תרומה")
                     .setMessage("לאשר את התרומה?")
@@ -139,7 +200,6 @@ public class DonationDetailActivity extends BaseActivity {
                     .setNegativeButton("ביטול", null)
                     .show();
         } else {
-            // דחייה עם סיבה
             EditText input = new EditText(this);
             input.setHint("כתוב סיבה לדחייה...");
 
@@ -159,10 +219,6 @@ public class DonationDetailActivity extends BaseActivity {
         }
     }
 
-    /**
-     * פונקציה אחת לעדכון סטטוס – גם אישור וגם דחייה
-     * משתמשת ב-donation.updateStatus() כדי לשמור גם היסטוריה
-     */
     private void updateDonationStatus(DonationStatus newStatus, String reason) {
         if (currentDonation == null) return;
 
@@ -170,7 +226,7 @@ public class DonationDetailActivity extends BaseActivity {
 
         DatabaseService.getInstance().getDonationService().update(
                 currentDonation.getId(),
-                donation -> currentDonation, // מחזירים את ה-donation עם הסטטוס החדש
+                donation -> currentDonation,
                 new IDatabaseService.DatabaseCallback<Donation>() {
                     @Override
                     public void onCompleted(Donation updatedDonation) {
@@ -193,12 +249,10 @@ public class DonationDetailActivity extends BaseActivity {
                 }
         );
     }
+
     private void interestedFunction() {
         if (currentDonation == null || currentUser == null) return;
 
-        String giverName = "התורם"; // נעדכן זאת עם שם אמיתי
-
-        // שולפים את פרטי התורם כדי להציג את שמו
         databaseService.getUserService().get(currentDonation.getGiverID(),
                 new IDatabaseService.DatabaseCallback<User>() {
                     @Override
@@ -208,6 +262,7 @@ public class DonationDetailActivity extends BaseActivity {
                             showInterestedDialog(displayName);
                         });
                     }
+
                     @Override
                     public void onFailed(Exception e) {
                         runOnUiThread(() -> showInterestedDialog("התורם"));
@@ -219,12 +274,14 @@ public class DonationDetailActivity extends BaseActivity {
         new AlertDialog.Builder(this)
                 .setTitle("פתיחת שיחה")
                 .setMessage("תיפתח שיחה עם " + giverName + ". להמשיך?")
-                .setPositiveButton("כן, בואו נדבר!", (dialog, which) -> openOrCreateChat())
+                // 🔧 FIX 3: מעבירים את giverName לפונקציה
+                .setPositiveButton("כן, בואו נדבר!", (dialog, which) -> openOrCreateChat(giverName))
                 .setNegativeButton("ביטול", null)
                 .show();
     }
 
-    private void openOrCreateChat() {
+    // 🔧 FIX 3: מקבלים את שם התורם כפרמטר במקום להעביר את ה-ID
+    private void openOrCreateChat(String giverName) {
         DatabaseService.getInstance().getChatService()
                 .getOrCreateDonationChat(
                         currentDonation.getId(),
@@ -238,11 +295,11 @@ public class DonationDetailActivity extends BaseActivity {
                                             DonationDetailActivity.this,
                                             ChatActivity.class);
                                     intent.putExtra("CHAT_ID", chatId);
-                                    intent.putExtra("OTHER_USER_NAME",
-                                            currentDonation.getGiverID()); // נעדכן בשלב הבא
+                                    intent.putExtra("OTHER_USER_NAME", giverName); // ✅ שם אמיתי
                                     startActivity(intent);
                                 });
                             }
+
                             @Override
                             public void onFailed(Exception e) {
                                 runOnUiThread(() ->
