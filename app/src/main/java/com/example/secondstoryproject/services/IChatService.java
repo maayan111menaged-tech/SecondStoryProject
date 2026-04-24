@@ -79,4 +79,7 @@ public interface IChatService {
     void getAllAdminChats(IDatabaseService.DatabaseCallback<List<Chat>> callback);
     void deleteAdminChat(String userId, IDatabaseService.DatabaseCallback<Void> callback);
 
+    void deleteAllUserChats(String userId, IDatabaseService.DatabaseCallback<Void> callback);
+    void markUserAsDeleted(String userId, IDatabaseService.DatabaseCallback<Void> callback);
+    void deleteChat(String chatId, String userId, IDatabaseService.DatabaseCallback<Void> callback);
 }

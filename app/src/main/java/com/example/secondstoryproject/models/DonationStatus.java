@@ -10,14 +10,11 @@ public enum DonationStatus {
     APPROVED_AVAILABLE("APPROVED_AVAILABLE", "זמין לתרומה", R.drawable.ic_available),
 
     MATCHED("MATCHED", "נמצא מקבל", R.drawable.ic_matched),
-    ///IN_DELIVERY("IN_DELIVERY", "בדרך למסירה", R.drawable.ic_delivery),
-
-    DELIVERED("DELIVERED", "נמסר", R.drawable.ic_delivered),
 
     REJECTED("REJECTED", "נדחה", R.drawable.ic_rejected),
-    CANCELLED("CANCELLED", "בוטל", R.drawable.ic_cancelled);
+    CANCELLED("CANCELLED", "בוטל", R.drawable.ic_cancelled),
 
-    ///EXPIRED("EXPIRED", "פג תוקף", R.drawable.ic_expired);
+    DONOR_DELETED("DONOR_DELETED", "תורם הוסר", R.drawable.ic_cancelled);
 
     // ---- שדות ----
     private final String englishName;
@@ -59,10 +56,8 @@ public enum DonationStatus {
 
     // האם התרומה הסתיימה (לא פעילה)
     public boolean isFinished() {
-        return this == MATCHED ||
-                this == DELIVERED ||
-                this == REJECTED ||
-                this == CANCELLED ;
+        return this == MATCHED || this == REJECTED ||
+                this == CANCELLED || this == DONOR_DELETED;
     }
 
     // האם התרומה זמינה למקבל

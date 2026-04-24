@@ -18,6 +18,8 @@ import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class ChatActivity extends BaseActivity {
     private RecyclerView rvMessages;
     private EditText etMessage;
     private MaterialButton btnSend;
+    private MaterialButton btnDeleteChat;
     private MessageAdapter messageAdapter;
     private ValueEventListener messagesListener;
 
@@ -34,7 +37,9 @@ public class ChatActivity extends BaseActivity {
     private String currentUserId;
     private boolean currentUserIsAdmin;
 
-    private LinearLayout layoutInactiveUser;
+    // באנר דינמי
+    private LinearLayout layoutBanner;
+    private TextView tvBannerMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,82 +67,141 @@ public class ChatActivity extends BaseActivity {
         layoutManager.setStackFromEnd(true);
         rvMessages.setLayoutManager(layoutManager);
 
-        messageAdapter = new MessageAdapter(currentUserId, currentUserIsAdmin);
+        messageAdapter = new MessageAdapter(currentUserId,currentUserIsAdmin);
         rvMessages.setAdapter(messageAdapter);
 
-        layoutInactiveUser = findViewById(R.id.layout_inactive_user_banner);
+        layoutBanner = findViewById(R.id.layout_user_status_banner);
+        tvBannerMessage = findViewById(R.id.tv_banner_message);
+        btnDeleteChat = findViewById(R.id.btn_delete_chat);
         etMessage = findViewById(R.id.et_message);
         btnSend = findViewById(R.id.btn_send);
         btnSend.setOnClickListener(v -> sendMessage());
 
         listenToMessages();
 
-        // ✅ בדיקת סטטוס הצד השני
-        checkOtherUserActive(otherUserId);
+        // ✅ בדיקת מצב הצד השני – נמחק או לא פעיל
+        checkChatStatus(otherUserId);
     }
 
     /**
-     * ✅ מחלץ את userId של הצד השני ובודק אם הוא פעיל.
-     *
-     * סדר עדיפויות:
-     * 1. OTHER_USER_ID מה-Intent (הכי מדויק)
-     * 2. חילוץ מה-chatId לפי הפורמט
+     * קורא את כל ה-metadata בקריאה אחת.
+     * 1. donorDeleted=true  → באנר מחיקה + כפתור מחיקת צ'אט
+     * 2. הצד השני לא פעיל  → באנר השבתה בלבד
      */
-    private void checkOtherUserActive(String otherUserIdFromIntent) {
-        String otherUserId = otherUserIdFromIntent;
+    private void checkChatStatus(String otherUserIdFromIntent) {
+        FirebaseDatabase.getInstance(
+                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("chats")
+                .child(chatId)
+                .child("metadata")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful() || !task.getResult().exists()) return;
 
-        if (otherUserId == null) {
-            if (chatId.startsWith("admin_")) {
-                // "admin_receiverId"
-                otherUserId = chatId.substring("admin_".length());
+                    DataSnapshot meta = task.getResult();
 
-            } else if (chatId.startsWith("donation_")) {
-                // "donation_donationId_receiverId" → החלק האחרון
-                String[] parts = chatId.split("_");
-                if (parts.length >= 3) {
-                    String receiverId = parts[parts.length - 1];
-                    // אם ה-receiver הוא המשתמש הנוכחי, הצד השני הוא ה-giver – לא ידוע כאן
-                    otherUserId = receiverId.equals(currentUserId) ? null : receiverId;
-                }
-            }
-        }
+                    // שלב 1: בדיקת donorDeleted
+                    Boolean isDeleted = meta.child("donorDeleted").getValue(Boolean.class);
+                    if (Boolean.TRUE.equals(isDeleted)) {
+                        runOnUiThread(this::showDeletedUserBanner);
+                        return;
+                    }
 
-        // אדמין לא מושבת – לא צריך לבדוק
-        if (otherUserId == null || otherUserId.equals("admin")) return;
+                    // שלב 2: זיהוי הצד השני מה-metadata
+                    String resolvedOtherUserId = otherUserIdFromIntent;
 
-        final String finalOtherUserId = otherUserId;
-        DatabaseService.getInstance().getUserService().get(finalOtherUserId,
-                new IDatabaseService.DatabaseCallback<User>() {
-                    @Override
-                    public void onCompleted(User otherUser) {
-                        if (otherUser != null && !otherUser.isActive()) {
-                            runOnUiThread(() -> showInactiveBanner());
+                    if (resolvedOtherUserId == null) {
+                        String type       = meta.child("type").getValue(String.class);
+                        String giverId    = meta.child("giverId").getValue(String.class);
+                        String receiverId = meta.child("receiverId").getValue(String.class);
+
+                        if ("admin".equals(type)) {
+                            // אדמין – הצד השני הוא ה-receiver
+                            // יוזר רגיל – הצד השני הוא "admin" (אין User object)
+                            resolvedOtherUserId = currentUserIsAdmin ? receiverId : null;
+                        } else {
+                            resolvedOtherUserId = currentUserId.equals(giverId)
+                                    ? receiverId : giverId;
                         }
                     }
-                    @Override
-                    public void onFailed(Exception e) {
-                        android.util.Log.e("ChatActivity", "Failed to check user status", e);
-                    }
+
+                    // אם הצד השני הוא "admin" (מחרוזת) – אין User לבדוק
+                    if (resolvedOtherUserId == null
+                            || "admin".equals(resolvedOtherUserId)) return;
+
+                    // שלב 3: בדיקת isActive של הצד השני
+                    final String finalOtherUserId = resolvedOtherUserId;
+                    DatabaseService.getInstance().getUserService()
+                            .get(finalOtherUserId, new IDatabaseService.DatabaseCallback<User>() {
+                                @Override
+                                public void onCompleted(User otherUser) {
+                                    if (otherUser != null && !otherUser.isActive()) {
+                                        runOnUiThread(() -> showInactiveBanner());
+                                    }
+                                }
+                                @Override
+                                public void onFailed(Exception e) {
+                                    android.util.Log.e("ChatActivity",
+                                            "Failed to check user status", e);
+                                }
+                            });
                 });
     }
 
     /**
-     * ✅ מציג באנר + חוסם קלט (disabled) במקום להסתיר.
+     * ✅ באנר למשתמש לא פעיל – חוסם שליחה בלבד
      */
     private void showInactiveBanner() {
-        // הצג באנר
-        if (layoutInactiveUser != null) {
-            layoutInactiveUser.setVisibility(View.VISIBLE);
-        }
+        layoutBanner.setVisibility(View.VISIBLE);
+        tvBannerMessage.setText("משתמש זה אינו פעיל. לא ניתן לשלוח הודעות.");
+        btnDeleteChat.setVisibility(View.GONE);
 
-        // חסום כתיבה בשדה הטקסט
         etMessage.setEnabled(false);
         etMessage.setHint("לא ניתן לשלוח הודעות");
         etMessage.setAlpha(0.5f);
-
-        // חסום כפתור שליחה
         btnSend.setEnabled(false);
         btnSend.setAlpha(0.5f);
+    }
+
+    /**
+     * ✅ באנר למשתמש שנמחק – חוסם שליחה + מציג כפתור מחיקת שיחה
+     */
+    private void showDeletedUserBanner() {
+        layoutBanner.setVisibility(View.VISIBLE);
+        tvBannerMessage.setText("משתמש זה הוסר מהמערכת. ניתן למחוק את השיחה.");
+        btnDeleteChat.setVisibility(View.VISIBLE);
+
+        etMessage.setEnabled(false);
+        etMessage.setHint("לא ניתן לשלוח הודעות");
+        etMessage.setAlpha(0.5f);
+        btnSend.setEnabled(false);
+        btnSend.setAlpha(0.5f);
+
+        // ✅ לחיצה על מחק שיחה
+        btnDeleteChat.setOnClickListener(v -> {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("מחיקת שיחה")
+                    .setMessage("האם למחוק את השיחה לצמיתות?")
+                    .setPositiveButton("מחק", (d, w) -> {
+                        DatabaseService.getInstance().getChatService()
+                                .deleteChat(chatId, currentUserId,
+                                        new IDatabaseService.DatabaseCallback<Void>() {
+                                            @Override
+                                            public void onCompleted(Void unused) {
+                                                Toast.makeText(ChatActivity.this,
+                                                        "השיחה נמחקה", Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            }
+                                            @Override
+                                            public void onFailed(Exception e) {
+                                                Toast.makeText(ChatActivity.this,
+                                                        "שגיאה במחיקת השיחה", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                    })
+                    .setNegativeButton("ביטול", null)
+                    .show();
+        });
     }
 
     private void listenToMessages() {

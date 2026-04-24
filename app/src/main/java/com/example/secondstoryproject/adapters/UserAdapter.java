@@ -117,7 +117,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
                     android.content.res.ColorStateList.valueOf(Color.parseColor("#E53935")));
         }
 
-        // טיפול בהשבתה עצמית או השבתת אדמין אחר
+        //איפוס וטיפול בהשבתה עצמית או השבתת אדמין אחר
+        holder.btnToggleActive.setAlpha(1.0f);
+        holder.btnToggleActive.setEnabled(true);
+
         if(user.getId().equals(currentUserId) || user.isAdmin()){
             holder.btnToggleActive.setAlpha(0.5f);
             holder.btnToggleActive.setEnabled(false);
@@ -250,6 +253,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
      * Adds a new user to the list.
      */
     public void addUser(User user) {
+        fullUserList.add(user);   // ← חשוב! כדי שהפילטר יעבוד
         userList.add(user);
         notifyItemInserted(userList.size() - 1);
     }
@@ -303,6 +307,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
      * Removes a user from the list.
      */
     public void removeUser(User user) {
+        fullUserList.removeIf(u -> u.getId().equals(user.getId()));
+
         int index = userList.indexOf(user);
         if (index == -1) return;
         userList.remove(index);

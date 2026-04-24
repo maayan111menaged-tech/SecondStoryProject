@@ -18,31 +18,60 @@
         android:textColor="@android:color/black"
         android:text="שיחה" />
 
+    <!--
+        ✅ באנר דינמי – משמש לשני מקרים:
+        1. משתמש לא פעיל (isActive=false)  → טקסט + קלט חסום
+        2. משתמש נמחק (donorDeleted=true)  → טקסט + כפתור "מחק שיחה"
+        הטקסט והכפתור מוגדרים מ-ChatActivity לפי המצב
+    -->
     <LinearLayout
-        android:id="@+id/layout_inactive_user_banner"
+        android:id="@+id/layout_user_status_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="10dp"
+        android:orientation="vertical"
         android:background="#FFEBEE"
+        android:padding="12dp"
         android:visibility="gone"
         tools:visibility="visible">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- שורת אייקון + טקסט -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⛔"
-            android:textSize="16sp"
-            android:layout_marginEnd="8dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
+            <TextView
+                android:id="@+id/tv_banner_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⛔"
+                android:textSize="16sp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tv_banner_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="#C62828"
+                android:textStyle="bold"
+                tools:text="משתמש זה אינו פעיל." />
+
+        </LinearLayout>
+
+        <!-- ✅ כפתור מחק שיחה – גלוי רק כשהמשתמש נמחק -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_delete_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="משתמש זה אינו פעיל. לא ניתן לשלוח הודעות."
-            android:textSize="14sp"
-            android:textColor="#C62828"
-            android:textStyle="bold" />
+            android:layout_marginTop="8dp"
+            android:text="🗑 מחק שיחה"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#E53935"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </LinearLayout>
 

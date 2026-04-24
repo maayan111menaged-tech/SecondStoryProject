@@ -11,41 +11,11 @@ import com.google.firebase.database.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implementation of {@link IChatService} using Firebase Realtime Database.
- * <p>
- * Responsible for managing chats between users in the application.
- * Chats can be:
- * <ul>
- *     <li>Donation chats — between giver and receiver</li>
- *     <li>Admin chats — between user and system/admin team</li>
- * </ul>
- * </p>
- * <p>
- * This service handles:
- * <ul>
- *     <li>Creating chats (if not already existing)</li>
- *     <li>Sending messages</li>
- *     <li>Listening to real-time messages</li>
- *     <li>Managing unread message counters</li>
- *     <li>Fetching user chats with additional display data</li>
- * </ul>
- * </p>
- * <p>
- * All operations are asynchronous and return results via {@link IDatabaseService.DatabaseCallback}.
- * </p>
- */
 public class ChatServiceImpl implements IChatService {
 
-    /** Reference to chats node in Firebase */
     private final DatabaseReference chatsRef;
-
-    /** Reference to users node in Firebase */
     private final DatabaseReference usersRef;
 
-    /**
-     * Constructor — initializes Firebase references.
-     */
     public ChatServiceImpl() {
         FirebaseDatabase db = FirebaseDatabase.getInstance(
                 "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app");
@@ -53,25 +23,14 @@ public class ChatServiceImpl implements IChatService {
         this.usersRef = db.getReference("users");
     }
 
-    /**
-     * Creates a donation chat if it does not exist, otherwise returns existing chat ID.
-     * @param donationId ID of the donation
-     * @param giverId    ID of the giver (owner of donation)
-     * @param receiverId ID of the interested user
-     * @param callback   returns chat ID
-     */
     @Override
     public void getOrCreateDonationChat(String donationId, String giverId,
                                         String receiverId, IDatabaseService.DatabaseCallback<String> callback) {
-
         String chatId = "donation_" + donationId + "_" + receiverId;
         DatabaseReference metaRef = chatsRef.child(chatId).child("metadata");
 
         metaRef.get().addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                callback.onFailed(task.getException());
-                return;
-            }
+            if (!task.isSuccessful()) { callback.onFailed(task.getException()); return; }
             if (!task.getResult().exists()) {
                 Chat chat = new Chat(chatId, "donation", donationId, giverId, receiverId);
                 metaRef.setValue(chat)
@@ -87,18 +46,10 @@ public class ChatServiceImpl implements IChatService {
         });
     }
 
-    /**
-     * Sends a message in a chat and updates metadata (last message, timestamp, unread count).
-     * @param chatId   chat ID
-     * @param senderId sender user ID
-     * @param text     message content
-     * @param callback completion callback
-     */
     @Override
     public void sendMessage(String chatId, String senderId, String text,
                             boolean senderIsAdmin,
                             IDatabaseService.DatabaseCallback<Void> callback) {
-
         DatabaseReference messagesRef = chatsRef.child(chatId).child("messages");
         String messageId = messagesRef.push().getKey();
         Message message = new Message(messageId, senderId, text, System.currentTimeMillis());
@@ -114,73 +65,115 @@ public class ChatServiceImpl implements IChatService {
                         if (task.isSuccessful()) {
                             DataSnapshot meta = task.getResult();
                             String receiverId = meta.child("receiverId").getValue(String.class);
-
-                            String otherUserId;
                             String type = meta.child("type").getValue(String.class);
-
+                            String otherUserId;
                             if ("admin".equals(type)) {
-                                // אם השולח הוא אדמין → unread למשתמש (receiverId)
-                                // אם השולח הוא משתמש → unread ל"admin"
                                 otherUserId = senderIsAdmin ? receiverId : "admin";
                             } else {
                                 String giverId = meta.child("giverId").getValue(String.class);
                                 otherUserId = senderId.equals(giverId) ? receiverId : giverId;
                             }
-
-                            if (otherUserId != null) {
-                                incrementUnread(chatId, otherUserId);
-                            }
+                            if (otherUserId != null) incrementUnread(chatId, otherUserId);
                         }
                     });
-
                     callback.onCompleted(null);
                 })
                 .addOnFailureListener(callback::onFailed);
     }
-    /**
-     * Listens in real-time to messages in a chat.
-     * @param chatId   chat ID
-     * @param callback returns list of messages
-     * @return Firebase listener (must be removed manually)
-     */
+
     @Override
     public ValueEventListener listenToMessages(String chatId,
                                                IDatabaseService.DatabaseCallback<List<Message>> callback) {
-
         DatabaseReference messagesRef = chatsRef.child(chatId).child("messages");
-
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 List<Message> messages = new ArrayList<>();
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Message msg = child.getValue(Message.class);
-                    if (msg != null) {
-                        msg.setId(child.getKey());
-                        messages.add(msg);
-                    }
+                    if (msg != null) { msg.setId(child.getKey()); messages.add(msg); }
                 }
                 callback.onCompleted(messages);
             }
             @Override
-            public void onCancelled(DatabaseError error) {
-                callback.onFailed(error.toException());
-            }
+            public void onCancelled(DatabaseError error) { callback.onFailed(error.toException()); }
         };
-
         messagesRef.addValueEventListener(listener);
         return listener;
     }
 
+    @Override
+    public void getUserChats(String userId, IDatabaseService.DatabaseCallback<List<Chat>> callback) {
+        usersRef.child(userId).child("chats").get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) { callback.onFailed(task.getException()); return; }
+                    List<String> chatIds = new ArrayList<>();
+                    for (DataSnapshot child : task.getResult().getChildren()) chatIds.add(child.getKey());
+                    if (chatIds.isEmpty()) { callback.onCompleted(new ArrayList<>()); return; }
+
+                    List<Chat> chats = new ArrayList<>();
+                    final int[] count = {0};
+                    for (String chatId : chatIds) {
+                        chatsRef.child(chatId).child("metadata").get()
+                                .addOnCompleteListener(t -> {
+                                    if (t.isSuccessful() && t.getResult().exists()) {
+                                        Chat chat = t.getResult().getValue(Chat.class);
+                                        if (chat != null) {
+                                            chat.setId(chatId);
+                                            Object unreadObj = t.getResult().child("unread_" + userId).getValue();
+                                            chat.setUnreadCount(unreadObj != null ? ((Long) unreadObj).intValue() : 0);
+                                            String otherUserId = userId.equals(chat.getGiverId())
+                                                    ? chat.getReceiverId() : chat.getGiverId();
+                                            chat.setOtherUserId(otherUserId);
+                                            chats.add(chat);
+                                        }
+                                    }
+                                    count[0]++;
+                                    if (count[0] == chatIds.size()) enrichChatsWithNames(chats, userId, callback);
+                                });
+                    }
+                });
+    }
+
+    @Override
+    public void getAllAdminChats(IDatabaseService.DatabaseCallback<List<Chat>> callback) {
+        chatsRef.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) { callback.onFailed(task.getException()); return; }
+            List<String> adminChatIds = new ArrayList<>();
+            for (DataSnapshot child : task.getResult().getChildren()) {
+                if (child.getKey() != null && child.getKey().startsWith("admin_"))
+                    adminChatIds.add(child.getKey());
+            }
+            if (adminChatIds.isEmpty()) { callback.onCompleted(new ArrayList<>()); return; }
+
+            List<Chat> chats = new ArrayList<>();
+            final int[] count = {0};
+            for (String chatId : adminChatIds) {
+                chatsRef.child(chatId).child("metadata").get()
+                        .addOnCompleteListener(t -> {
+                            if (t.isSuccessful() && t.getResult().exists()) {
+                                Chat chat = t.getResult().getValue(Chat.class);
+                                if (chat != null) {
+                                    chat.setId(chatId);
+                                    Object unreadObj = t.getResult().child("unread_admin").getValue();
+                                    chat.setUnreadCount(unreadObj != null ? ((Long) unreadObj).intValue() : 0);
+                                    chats.add(chat);
+                                }
+                            }
+                            count[0]++;
+                            if (count[0] == adminChatIds.size()) enrichAdminChatsWithNames(chats, callback);
+                        });
+            }
+        });
+    }
+
     /**
-     * Retrieves all chats of a user and enriches them with display data (names, donation titles).
-     * @param userId   user ID
-     * @param callback returns list of chats
+     * ✅ מוחק את כל הצ'אטים של משתמש שנמחק.
+     * מוחק את node הצ'אט מ-chats + האינדקס מ-users של שני הצדדים.
      */
     @Override
-    public void getUserChats(String userId,
-                             IDatabaseService.DatabaseCallback<List<Chat>> callback) {
-
+    public void deleteAllUserChats(String userId, IDatabaseService.DatabaseCallback<Void> callback) {
+        // שלב 1: מביאים את כל הצ'אטים של המשתמש
         usersRef.child(userId).child("chats").get()
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
@@ -189,122 +182,59 @@ public class ChatServiceImpl implements IChatService {
                     }
 
                     List<String> chatIds = new ArrayList<>();
+
+                    // צ'אט מנהלי
+                    chatIds.add("admin_" + userId);
+
+                    // צ'אטי תרומות
                     for (DataSnapshot child : task.getResult().getChildren()) {
-                        chatIds.add(child.getKey());
+                        String chatId = child.getKey();
+                        if (chatId != null && !chatId.equals("admin_" + userId)) {
+                            chatIds.add(chatId);
+                        }
                     }
 
                     if (chatIds.isEmpty()) {
-                        callback.onCompleted(new ArrayList<>());
+                        callback.onCompleted(null);
                         return;
                     }
 
-                    List<Chat> chats = new ArrayList<>();
-                    final int[] count = {0};
+                    final int[] done = {0};
+                    final int total = chatIds.size();
 
                     for (String chatId : chatIds) {
-                        chatsRef.child(chatId).child("metadata").get()
+                        // מוחקים את הצ'אט עצמו
+                        chatsRef.child(chatId).removeValue()
                                 .addOnCompleteListener(t -> {
-                                    if (t.isSuccessful() && t.getResult().exists()) {
-                                        Chat chat = t.getResult().getValue(Chat.class);
-                                        if (chat != null) {
-                                            chat.setId(chatId);
-
-                                            // unread
-                                            Object unreadObj = t.getResult()
-                                                    .child("unread_" + userId).getValue();
-                                            int unread = unreadObj != null ?
-                                                    ((Long) unreadObj).intValue() : 0;
-                                            chat.setUnreadCount(unread);
-
-                                            // מי הצד השני
-                                            String otherUserId = userId.equals(chat.getGiverId())
-                                                    ? chat.getReceiverId() : chat.getGiverId();
-                                            chat.setOtherUserId(otherUserId);
-
-                                            chats.add(chat);
-                                        }
-                                    }
-                                    count[0]++;
-                                    if (count[0] == chatIds.size()) {
-                                        // עכשיו נשלוף שמות — משתמשים ותרומות
-                                        enrichChatsWithNames(chats, userId, callback);
+                                    done[0]++;
+                                    if (done[0] == total) {
+                                        // מוחקים את האינדקס מה-user
+                                        usersRef.child(userId).child("chats").removeValue()
+                                                .addOnSuccessListener(u -> callback.onCompleted(null))
+                                                .addOnFailureListener(callback::onFailed);
                                     }
                                 });
                     }
                 });
     }
 
-
-    @Override
-    public void getAllAdminChats(IDatabaseService.DatabaseCallback<List<Chat>> callback) {
-        chatsRef.get().addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                callback.onFailed(task.getException());
-                return;
-            }
-
-            List<String> adminChatIds = new ArrayList<>();
-            for (DataSnapshot child : task.getResult().getChildren()) {
-                if (child.getKey() != null && child.getKey().startsWith("admin_")) {
-                    adminChatIds.add(child.getKey());
-                }
-            }
-
-            if (adminChatIds.isEmpty()) {
-                callback.onCompleted(new ArrayList<>());
-                return;
-            }
-
-            List<Chat> chats = new ArrayList<>();
-            final int[] count = {0};
-
-            for (String chatId : adminChatIds) {
-                chatsRef.child(chatId).child("metadata").get()
-                        .addOnCompleteListener(t -> {
-                            if (t.isSuccessful() && t.getResult().exists()) {
-                                Chat chat = t.getResult().getValue(Chat.class);
-                                if (chat != null) {
-                                    chat.setId(chatId);
-
-                                    // unread — סך כל ההודעות הלא נקראות מהמשתמש
-                                    Object unreadObj = t.getResult()
-                                            .child("unread_admin").getValue();
-                                    int unread = unreadObj != null ?
-                                            ((Long) unreadObj).intValue() : 0;
-                                    chat.setUnreadCount(unread);
-
-                                    chats.add(chat);
-                                }
-                            }
-                            count[0]++;
-                            if (count[0] == adminChatIds.size()) {
-                                enrichAdminChatsWithNames(chats, callback);
-                            }
-                        });
-            }
-        });
-    }
-
-    // שולף את שם המשתמש לכל צאט אדמין
     private void enrichAdminChatsWithNames(List<Chat> chats,
                                            IDatabaseService.DatabaseCallback<List<Chat>> callback) {
-
-        if (chats.isEmpty()) {
-            callback.onCompleted(chats);
-            return;
-        }
-
+        if (chats.isEmpty()) { callback.onCompleted(chats); return; }
         final int[] count = {0};
         final int total = chats.size();
-
         for (Chat chat : chats) {
-            String userId = chat.getReceiverId(); // המשתמש הוא תמיד receiverId בצאט אדמין
+            String userId = chat.getReceiverId();
             usersRef.child(userId).get()
                     .addOnCompleteListener(userTask -> {
                         if (userTask.isSuccessful() && userTask.getResult().exists()) {
                             String userName = userTask.getResult()
                                     .child("userName").getValue(String.class);
-                            chat.setOtherUserName(userName.trim());
+                            chat.setOtherUserName(
+                                    userName != null ? userName.trim() : "משתמש שנמחק");
+                        } else {
+                            // node לא קיים = משתמש נמחק מה-DB
+                            chat.setOtherUserName("משתמש שנמחק");
                         }
                         count[0]++;
                         if (count[0] == total) callback.onCompleted(chats);
@@ -312,22 +242,11 @@ public class ChatServiceImpl implements IChatService {
         }
     }
 
-
-    /**
-     * Enriches chat objects with additional display data:
-     * user names and donation names.
-     */
     private void enrichChatsWithNames(List<Chat> chats, String userId,
                                       IDatabaseService.DatabaseCallback<List<Chat>> callback) {
-
-        if (chats.isEmpty()) {
-            callback.onCompleted(chats);
-            return;
-        }
-
+        if (chats.isEmpty()) { callback.onCompleted(chats); return; }
         final int[] count = {0};
         final int total = chats.size();
-
         for (Chat chat : chats) {
             if ("admin".equals(chat.getType())) {
                 chat.setOtherUserName("צוות Second Story");
@@ -336,18 +255,17 @@ public class ChatServiceImpl implements IChatService {
                 if (count[0] == total) callback.onCompleted(chats);
                 continue;
             }
-
-            // שולפים שם משתמש שני
             final Chat currentChat = chat;
             usersRef.child(chat.getOtherUserId()).get()
                     .addOnCompleteListener(userTask -> {
                         if (userTask.isSuccessful() && userTask.getResult().exists()) {
                             String userName = userTask.getResult()
                                     .child("userName").getValue(String.class);
-                            currentChat.setOtherUserName(userName.trim());
+                            currentChat.setOtherUserName(
+                                    userName != null ? userName.trim() : "משתמש שנמחק");
+                        } else {
+                            currentChat.setOtherUserName("משתמש שנמחק");
                         }
-
-                        // שולפים שם תרומה
                         if (currentChat.getDonationId() != null) {
                             FirebaseDatabase.getInstance(
                                             "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
@@ -357,7 +275,8 @@ public class ChatServiceImpl implements IChatService {
                                         if (donTask.isSuccessful() && donTask.getResult().exists()) {
                                             String donName = donTask.getResult()
                                                     .child("name").getValue(String.class);
-                                            currentChat.setDonationName(donName != null ? donName : "");
+                                            currentChat.setDonationName(
+                                                    donName != null ? donName : "");
                                         }
                                         count[0]++;
                                         if (count[0] == total) callback.onCompleted(chats);
@@ -370,23 +289,14 @@ public class ChatServiceImpl implements IChatService {
         }
     }
 
-
-    /**
-     * Removes a real-time listener from a chat.
-     */
     @Override
     public void removeListener(String chatId, ValueEventListener listener) {
         chatsRef.child(chatId).child("messages").removeEventListener(listener);
     }
 
-    /**
-     * Increments unread message count for a user in a chat.
-     */
     @Override
     public void incrementUnread(String chatId, String userId) {
-        DatabaseReference ref = chatsRef.child(chatId)
-                .child("metadata")
-                .child("unread_" + userId);
+        DatabaseReference ref = chatsRef.child(chatId).child("metadata").child("unread_" + userId);
         ref.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Integer current = task.getResult().getValue(Integer.class);
@@ -395,28 +305,15 @@ public class ChatServiceImpl implements IChatService {
         });
     }
 
-    /**
-     * Resets unread message count for a user.
-     */
     @Override
     public void resetUnread(String chatId, String userId) {
-        chatsRef.child(chatId)
-                .child("metadata")
-                .child("unread_" + userId)
-                .setValue(0);
+        chatsRef.child(chatId).child("metadata").child("unread_" + userId).setValue(0);
     }
 
-
-    /**
-     * Listens in real-time to unread message count for a specific user.
-     */
     @Override
     public ValueEventListener listenToUnreadCount(String chatId, String userId,
                                                   IDatabaseService.DatabaseCallback<Integer> callback) {
-        DatabaseReference ref = chatsRef.child(chatId)
-                .child("metadata")
-                .child("unread_" + userId);
-
+        DatabaseReference ref = chatsRef.child(chatId).child("metadata").child("unread_" + userId);
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -424,34 +321,22 @@ public class ChatServiceImpl implements IChatService {
                 callback.onCompleted(count != null ? count : 0);
             }
             @Override
-            public void onCancelled(DatabaseError error) {
-                callback.onFailed(error.toException());
-            }
+            public void onCancelled(DatabaseError error) { callback.onFailed(error.toException()); }
         };
         ref.addValueEventListener(listener);
         return listener;
     }
 
-    /**
-     * Creates or retrieves a chat between a user and the admin team.
-     */
     @Override
-    public void getOrCreateAdminChat(String userId,
-                                     IDatabaseService.DatabaseCallback<String> callback) {
-
+    public void getOrCreateAdminChat(String userId, IDatabaseService.DatabaseCallback<String> callback) {
         String chatId = "admin_" + userId;
         DatabaseReference metaRef = chatsRef.child(chatId).child("metadata");
-
         metaRef.get().addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                callback.onFailed(task.getException());
-                return;
-            }
+            if (!task.isSuccessful()) { callback.onFailed(task.getException()); return; }
             if (!task.getResult().exists()) {
                 Chat chat = new Chat(chatId, "admin", null, "admin", userId);
                 metaRef.setValue(chat)
                         .addOnSuccessListener(unused -> {
-                            // מוסיפים אינדקס רק למשתמש — לא לאדמינים ספציפיים
                             usersRef.child(userId).child("chats").child(chatId).setValue(true);
                             callback.onCompleted(chatId);
                         })
@@ -462,19 +347,81 @@ public class ChatServiceImpl implements IChatService {
         });
     }
 
+    /**
+     * ✅ מסמן את כל הצ'אטים של משתמש שנמחק עם donorDeleted=true.
+     * הצ'אטים לא נמחקים – הצד השני רואה באנר ויכול למחוק בעצמו.
+     */
     @Override
-    public void deleteAdminChat(String userId, IDatabaseService.DatabaseCallback<Void> callback) {
-        String chatId = "admin_" + userId;
+    public void markUserAsDeleted(String userId, IDatabaseService.DatabaseCallback<Void> callback) {
+        // סורק את כל הצ'אטים ב-DB במקום להסתמך על האינדקס של המשתמש
+        // כך לא נפספס צ'אט גם אם האינדקס חסר
+        chatsRef.get().addOnCompleteListener(allChatsTask -> {
+            if (!allChatsTask.isSuccessful()) {
+                callback.onFailed(allChatsTask.getException());
+                return;
+            }
 
-        // מוחקים את הצאט עצמו
+            List<String> chatIds = new ArrayList<>();
+            chatIds.add("admin_" + userId); // צ'אט מנהלי תמיד
+
+            for (DataSnapshot chatSnap : allChatsTask.getResult().getChildren()) {
+                String chatId = chatSnap.getKey();
+                if (chatId == null) continue;
+
+                DataSnapshot meta = chatSnap.child("metadata");
+                String giverId    = meta.child("giverId").getValue(String.class);
+                String receiverId = meta.child("receiverId").getValue(String.class);
+
+                // המשתמש יכול להיות giver או receiver
+                if (userId.equals(giverId) || userId.equals(receiverId)) {
+                    if (!chatIds.contains(chatId)) chatIds.add(chatId);
+                }
+            }
+
+            final int[] done = {0};
+            final int total = chatIds.size();
+
+            if (total == 0) {
+                usersRef.child(userId).child("chats").removeValue()
+                        .addOnCompleteListener(r -> callback.onCompleted(null));
+                return;
+            }
+
+            for (String chatId : chatIds) {
+                chatsRef.child(chatId).child("metadata")
+                        .child("donorDeleted").setValue(true)
+                        .addOnCompleteListener(t -> {
+                            done[0]++;
+                            if (done[0] == total) {
+                                // מוחק את האינדקס של המשתמש המחוק
+                                usersRef.child(userId).child("chats").removeValue()
+                                        .addOnCompleteListener(r -> callback.onCompleted(null));
+                            }
+                        });
+            }
+        });
+    }
+    /**
+     * ✅ מחיקה מלאה של צ'אט אחד מה-DB (נקרא ע"י הצד השני אחרי שרואה את הבאנר).
+     */
+    @Override
+    public void deleteChat(String chatId, String userId, IDatabaseService.DatabaseCallback<Void> callback) {
         chatsRef.child(chatId).removeValue()
-                .addOnSuccessListener(unused -> {
-                    // מוחקים את האינדקס מה-users
-                    usersRef.child(userId).child("chats").child(chatId).removeValue()
-                            .addOnSuccessListener(unused2 -> callback.onCompleted(null))
-                            .addOnFailureListener(callback::onFailed);
-                })
+                .addOnSuccessListener(unused ->
+                        usersRef.child(userId).child("chats").child(chatId).removeValue()
+                                .addOnSuccessListener(u -> callback.onCompleted(null))
+                                .addOnFailureListener(callback::onFailed))
                 .addOnFailureListener(callback::onFailed);
     }
 
+    @Override
+    public void deleteAdminChat(String userId, IDatabaseService.DatabaseCallback<Void> callback) {
+        String chatId = "admin_" + userId;
+        chatsRef.child(chatId).removeValue()
+                .addOnSuccessListener(unused ->
+                        usersRef.child(userId).child("chats").child(chatId).removeValue()
+                                .addOnSuccessListener(unused2 -> callback.onCompleted(null))
+                                .addOnFailureListener(callback::onFailed))
+                .addOnFailureListener(callback::onFailed);
+    }
 }

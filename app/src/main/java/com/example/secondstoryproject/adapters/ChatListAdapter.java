@@ -98,30 +98,27 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
          * @param chat chat object
          */
         void bind(Chat chat) {
-            // Display chat name and context
-            if ("admin".equals(chat.getType())) {
+            if("admin".equals(chat.getType())) {
                 String name = chat.getOtherUserName();
-                tvName.setText(name != null && !name.isEmpty() ? name : "צוות Second Story");
+                tvName.setText((name != null && !name.isEmpty()) ? name : "צוות Second Story");
                 tvLastMessage.setText("פנייה לצוות");
             } else {
-                String name = chat.getOtherUserName() != null ? chat.getOtherUserName() : "";
+                String name = chat.getOtherUserName();
+                // ✅ fallback אם השם ריק/null (משתמש שנמחק לפני שה-enrich רץ)
+                tvName.setText((name != null && !name.isEmpty()) ? name : "משתמש שנמחק");
                 String donation = chat.getDonationName() != null ? chat.getDonationName() : "";
-                tvName.setText(name);
                 tvLastMessage.setText(!donation.isEmpty() ? "📦 " + donation : "");
             }
 
-            // Override with last message if exists
             String last = chat.getLastMessage();
             if (last != null && !last.isEmpty()) {
                 tvLastMessage.setText(last);
             }
 
-            // Display last message time
             if (chat.getLastTimestamp() > 0) {
                 tvTime.setText(timeFormat.format(new Date(chat.getLastTimestamp())));
             }
 
-            // Display unread messages count
             int unread = chat.getUnreadCount();
             if (unread > 0) {
                 tvUnread.setVisibility(View.VISIBLE);
@@ -130,7 +127,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
                 tvUnread.setVisibility(View.GONE);
             }
 
-            // Handle click event
             itemView.setOnClickListener(v -> listener.onChatClick(chat));
         }
     }
