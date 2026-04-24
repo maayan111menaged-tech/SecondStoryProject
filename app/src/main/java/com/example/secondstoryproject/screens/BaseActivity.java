@@ -180,8 +180,6 @@ public abstract class BaseActivity extends AppCompatActivity
             navigateTo(LeaderBoardActivity.class);
         } else if(id == R.id.nav_users_list){
             navigateTo(UsersListActivity.class);
-        } else if (id == R.id.nav_settings) {
-            ///navigateTo(SettingsActivity.class);
         } else if (id == R.id.nav_signOut) {
             drawerLayout.closeDrawer(GravityCompat.START);
             showLogoutDialog();

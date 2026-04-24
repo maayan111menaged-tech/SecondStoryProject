@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.core.view.GravityCompat;
 
@@ -34,8 +36,11 @@ public class MainActivity extends BaseActivity {
     }
     private static final String TAG = "MainActivity";
     ProgressBar rateProgressBar;
-    ImageView currentRateIcon, nextRateIcon;
+    ImageView currentRateIcon, nextRateIcon ,maxLevelIcon;;
     private MapView miniMap;
+    TextView progressText, remainingText, totalDonationsText;
+    TextView currentLevelName, nextLevelName, maxLevelTitle, maxLevelSub;
+    LinearLayout normalLevelLayout, maxLevelLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,16 @@ public class MainActivity extends BaseActivity {
         rateProgressBar = findViewById(R.id.rateProgressBar);
         currentRateIcon = findViewById(R.id.currentRateIcon);
         nextRateIcon = findViewById(R.id.nextRateIcon);
+        progressText = findViewById(R.id.progressText);
+        remainingText = findViewById(R.id.remainingText);
+        totalDonationsText = findViewById(R.id.totalDonationsText);
+        currentLevelName = findViewById(R.id.currentLevelName);
+        nextLevelName = findViewById(R.id.nextLevelName);
+        maxLevelLayout = findViewById(R.id.maxLevelLayout);
+        normalLevelLayout = findViewById(R.id.normalLevelLayout);
+        maxLevelIcon = findViewById(R.id.maxLevelIcon);
+        maxLevelTitle = findViewById(R.id.maxLevelTitle);
+        maxLevelSub = findViewById(R.id.maxLevelSub);
 
         User currentUser = SharedPreferencesUtil.getUser(this);
         updateUserLevelUI(currentUser);
@@ -138,28 +153,38 @@ public class MainActivity extends BaseActivity {
     private void updateUserLevelUI(User user) {
         int donations = user.getDonationCounter();
         UserLevel currentLevel = UserLevel.fromDonationCount(donations);
-
-        int min = currentLevel.getMinDonations();
-        int max = currentLevel.getMaxDonations() + 1;
-
-        int progress;
-        if (max == Integer.MAX_VALUE) {
-            progress = 100;
-        } else {
-            progress = (donations - min) * 100 / (max - min);
-        }
-
-        rateProgressBar.setProgress(progress);
-        currentRateIcon.setImageResource(currentLevel.getIconRes());
-
         UserLevel[] levels = UserLevel.values();
         int nextIndex = currentLevel.ordinal() + 1;
+        boolean isMaxLevel = nextIndex >= levels.length;
 
-        if (nextIndex < levels.length) {
-            nextRateIcon.setVisibility(View.VISIBLE);
-            nextRateIcon.setImageResource(levels[nextIndex].getIconRes());
+        if (isMaxLevel) {
+            normalLevelLayout.setVisibility(View.GONE);
+            maxLevelLayout.setVisibility(View.VISIBLE);
+
+            maxLevelIcon.setImageResource(currentLevel.getIconRes());
+            maxLevelTitle.setText(currentLevel.getLabel());
+            maxLevelSub.setText("הגעת לרמה הגבוהה ביותר עם " + donations + " תרומות!");
+
         } else {
-            nextRateIcon.setVisibility(View.INVISIBLE);
+            normalLevelLayout.setVisibility(View.VISIBLE);
+            maxLevelLayout.setVisibility(View.GONE);
+
+            UserLevel nextLevel = levels[nextIndex];
+            int min = currentLevel.getMinDonations();
+            int nextMin = nextLevel.getMinDonations();
+            int doneInLevel = donations - min;
+            int totalInLevel = nextMin - min;
+            int remaining = nextMin - donations;
+            int progress = doneInLevel * 100 / totalInLevel;
+
+            rateProgressBar.setProgress(progress);
+            currentRateIcon.setImageResource(currentLevel.getIconRes());
+            nextRateIcon.setImageResource(nextLevel.getIconRes());
+            currentLevelName.setText(currentLevel.getLabel());
+            nextLevelName.setText(nextLevel.getLabel());
+            progressText.setText(doneInLevel + " מתוך " + totalInLevel);
+            remainingText.setText("עוד " + remaining + " לרמה הבאה");
+            totalDonationsText.setText("סה\"כ תרומות: " + donations);
         }
     }
 

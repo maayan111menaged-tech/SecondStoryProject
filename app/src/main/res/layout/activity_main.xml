@@ -147,36 +147,163 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:layoutDirection="rtl"
-            android:gravity="center_vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <ImageView
-                android:id="@+id/currentRateIcon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/ic_bronze"
-                android:contentDescription="Current Rate Icon"/>
+            <!-- תצוגה רגילה (לא מקסימלית) -->
+            <LinearLayout
+                android:id="@+id/normalLevelLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <ProgressBar
-                android:id="@+id/rateProgressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="20dp"
-                android:layoutDirection="rtl"
-                android:progress="0"
-                android:max="100"
-                android:progressDrawable="@drawable/progress_bar_style"/>
+                <!-- שמות רמות -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layoutDirection="rtl">
 
-            <ImageView
-                android:id="@+id/nextRateIcon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/ic_silver"
-                android:contentDescription="Next Rate Icon"/>
+                    <TextView
+                        android:id="@+id/currentLevelName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/akitrg__"
+                        android:textSize="10pt"
+                        android:textColor="@color/black"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/nextLevelName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/akitrg__"
+                        android:textSize="10pt"
+                        android:textColor="#888888"/>
+                </LinearLayout>
+
+                <!-- אייקונים + בר -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_vertical"
+                    android:layoutDirection="rtl">
+
+                    <ImageView
+                        android:id="@+id/currentRateIcon"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:contentDescription="Current Rate Icon"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp">
+
+                        <!-- תוויות מעל הבר -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layoutDirection="rtl">
+
+                            <TextView
+                                android:id="@+id/progressText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="9pt"
+                                android:textColor="#36b3b8"
+                                android:fontFamily="@font/akitrg__"/>
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1"/>
+
+                            <TextView
+                                android:id="@+id/remainingText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="9pt"
+                                android:textColor="#888888"
+                                android:fontFamily="@font/akitrg__"/>
+                        </LinearLayout>
+
+                        <ProgressBar
+                            android:id="@+id/rateProgressBar"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="16dp"
+                            android:layout_marginTop="4dp"
+                            android:layoutDirection="rtl"
+                            android:progress="0"
+                            android:max="100"
+                            android:progressDrawable="@drawable/progress_bar_style"/>
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/nextRateIcon"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:contentDescription="Next Rate Icon"/>
+                </LinearLayout>
+
+                <!-- סה"כ תרומות -->
+                <TextView
+                    android:id="@+id/totalDonationsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/akitrg__"
+                    android:textSize="9pt"
+                    android:textColor="#888888"/>
+            </LinearLayout>
+
+            <!-- תצוגה מקסימלית -->
+            <LinearLayout
+                android:id="@+id/maxLevelLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/maxLevelIcon"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:contentDescription="Max Level Icon"/>
+
+                <TextView
+                    android:id="@+id/maxLevelTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/akitrg__"
+                    android:textSize="13pt"
+                    android:textStyle="bold"
+                    android:textColor="#36b3b8"/>
+
+                <TextView
+                    android:id="@+id/maxLevelSub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/akitrg__"
+                    android:textSize="10pt"
+                    android:textColor="#888888"/>
+            </LinearLayout>
+
         </LinearLayout>
-
     </LinearLayout>
 </ScrollView>
