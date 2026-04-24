@@ -62,7 +62,7 @@ public class ChatActivity extends BaseActivity {
         layoutManager.setStackFromEnd(true);
         rvMessages.setLayoutManager(layoutManager);
 
-        messageAdapter = new MessageAdapter(currentUserId);
+        messageAdapter = new MessageAdapter(currentUserId, currentUserIsAdmin);
         rvMessages.setAdapter(messageAdapter);
 
         layoutInactiveUser = findViewById(R.id.layout_inactive_user_banner);

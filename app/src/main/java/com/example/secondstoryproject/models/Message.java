@@ -5,6 +5,7 @@ public class Message {
     private String senderId;
     private String text;
     private long timestamp;
+    private boolean adminSender;
 
     public Message() {} // חובה ל-Firebase
 
@@ -13,6 +14,7 @@ public class Message {
         this.senderId = senderId;
         this.text = text;
         this.timestamp = timestamp;
+        this.adminSender = false;
     }
 
     public String getId() { return id; }
@@ -23,6 +25,6 @@ public class Message {
     public void setText(String text) { this.text = text; }
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
-
-
+    public boolean isAdminSender() { return adminSender; }
+    public void setAdminSender(boolean adminSender) { this.adminSender = adminSender; }
 }

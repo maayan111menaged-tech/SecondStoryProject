@@ -13,45 +13,21 @@ import com.example.secondstoryproject.models.Message;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * RecyclerView Adapter for displaying chat messages.
- * Supports:
- * - Sent and received message layouts
- * - Date headers for grouping messages by day
- * Messages are displayed with:
- * - Text content
- * - Timestamp
- * - Grouped under formatted date headers
- */
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    /** View type for messages sent by the current user */
     private static final int VIEW_TYPE_SENT = 1;
-
-    /** View type for messages received from others */
     private static final int VIEW_TYPE_RECEIVED = 2;
-
-    /** View type for date header items */
     private static final int VIEW_TYPE_DATE_HEADER = 3;
 
-    /**
-     * Internal list item representing either a message or a date header.
-     */
     private static class ListItem {
         boolean isHeader;
         String headerText;
         Message message;
 
-        /**
-         * Creates a date header item.
-         * @param text formatted date string
-         * @return header item
-         */
         static ListItem header(String text) {
             ListItem item = new ListItem();
             item.isHeader = true;
@@ -59,11 +35,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             return item;
         }
 
-        /**
-         * Creates a message item.
-         * @param msg message object
-         * @return message item
-         */
         static ListItem message(Message msg) {
             ListItem item = new ListItem();
             item.isHeader = false;
@@ -72,52 +43,31 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    /** ID of the currently logged-in user */
     private final String currentUserId;
-
-    /** List of items (messages + headers) */
+    private final boolean currentUserIsAdmin;
     private List<ListItem> items = new ArrayList<>();
 
-    /** Time formatter (HH:mm) */
     private final SimpleDateFormat timeFormat =
             new SimpleDateFormat("HH:mm", Locale.getDefault());
-
-    /** Date formatter (Hebrew format) */
     private final SimpleDateFormat dateFormat =
             new SimpleDateFormat("d בMMMM", new Locale("he"));
 
-
-    /**
-     * Constructor.
-     * @param currentUserId ID of the current user (used to determine sent/received messages)
-     */
-    public MessageAdapter(String currentUserId) {
+    public MessageAdapter(String currentUserId, boolean currentUserIsAdmin) {
         this.currentUserId = currentUserId;
+        this.currentUserIsAdmin = currentUserIsAdmin;
     }
 
-
-    /**
-     * Sets the messages list and rebuilds the internal list with date headers.
-     * @param messages list of messages
-     */
     public void setMessages(List<Message> messages) {
         items = buildItemList(messages);
         notifyDataSetChanged();
     }
 
-    /**
-     * Builds a list of items including date headers and messages.
-     * Inserts a date header whenever the date changes between messages.
-     * @param messages list of messages
-     * @return list containing headers and messages
-     */    private List<ListItem> buildItemList(List<Message> messages) {
+    private List<ListItem> buildItemList(List<Message> messages) {
         List<ListItem> result = new ArrayList<>();
         String lastDate = null;
 
         for (Message msg : messages) {
             String msgDate = dateFormat.format(new Date(msg.getTimestamp()));
-
-            // Add header if date changed
             if (!msgDate.equals(lastDate)) {
                 result.add(ListItem.header(msgDate));
                 lastDate = msgDate;
@@ -131,8 +81,16 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         ListItem item = items.get(position);
         if (item.isHeader) return VIEW_TYPE_DATE_HEADER;
-        return item.message.getSenderId().equals(currentUserId)
-                ? VIEW_TYPE_SENT : VIEW_TYPE_RECEIVED;
+
+        boolean isSent;
+        if (currentUserIsAdmin) {
+            // כל אדמין רואה הודעות אדמין כ"נשלחו", הודעות משתמש כ"התקבלו"
+            isSent = item.message.isAdminSender();
+        } else {
+            isSent = item.message.getSenderId().equals(currentUserId);
+        }
+
+        return isSent ? VIEW_TYPE_SENT : VIEW_TYPE_RECEIVED;
     }
 
     @NonNull
@@ -158,11 +116,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ((DateHeaderViewHolder) holder).tvDate.setText(item.headerText);
         } else {
             MessageViewHolder vh = (MessageViewHolder) holder;
-
-            // Bind message text
             vh.tvText.setText(item.message.getText());
-
-            // Bind formatted time
             vh.tvTime.setText(timeFormat.format(new Date(item.message.getTimestamp())));
         }
     }
@@ -170,9 +124,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemCount() { return items.size(); }
 
-    /**
-     * ViewHolder for message items (sent/received).
-     */
     static class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvText, tvTime;
         MessageViewHolder(@NonNull View itemView) {
@@ -182,9 +133,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    /**
-     * ViewHolder for date header items.
-     */
     static class DateHeaderViewHolder extends RecyclerView.ViewHolder {
         TextView tvDate;
         DateHeaderViewHolder(@NonNull View itemView) {

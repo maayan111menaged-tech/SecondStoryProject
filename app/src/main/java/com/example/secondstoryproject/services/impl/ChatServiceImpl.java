@@ -102,6 +102,7 @@ public class ChatServiceImpl implements IChatService {
         DatabaseReference messagesRef = chatsRef.child(chatId).child("messages");
         String messageId = messagesRef.push().getKey();
         Message message = new Message(messageId, senderId, text, System.currentTimeMillis());
+        message.setAdminSender(senderIsAdmin);
 
         messagesRef.child(messageId).setValue(message)
                 .addOnSuccessListener(unused -> {
