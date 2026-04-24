@@ -26,6 +26,7 @@ public class AdminMainActivity extends BaseActivity {
 
     private Button btnAcceptDonations;
     private Button btnUsersList;
+    private Button btnDonationList;
     private TextView tvUsersCount;
     private TextView tvPendingDonations;
 
@@ -44,6 +45,7 @@ public class AdminMainActivity extends BaseActivity {
 
         btnAcceptDonations = findViewById(R.id.btn_accept_donations);
         btnUsersList = findViewById(R.id.btn_users_list);
+        btnDonationList = findViewById(R.id.btn_donation_list);
         tvUsersCount = findViewById(R.id.tv_users_count);
         tvPendingDonations = findViewById(R.id.tv_pending_donations);
 
@@ -53,6 +55,8 @@ public class AdminMainActivity extends BaseActivity {
                 startActivity(new Intent(this, AcceptDonationActivity.class)));
         btnUsersList.setOnClickListener(v ->
                 startActivity(new Intent(this, UsersListActivity.class)));
+        btnDonationList.setOnClickListener(v ->
+                startActivity(new Intent(this, DonationsListActivity.class)));
     }
 
     private void loadStats() {

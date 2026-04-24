@@ -120,8 +120,14 @@
             android:id="@+id/btn_users_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="View Users"/>
+            android:text="View Users"
+            android:layout_marginBottom="10dp"/>
 
+        <Button
+            android:id="@+id/btn_donation_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Donations"/>
     </LinearLayout>
 
 </ScrollView>
