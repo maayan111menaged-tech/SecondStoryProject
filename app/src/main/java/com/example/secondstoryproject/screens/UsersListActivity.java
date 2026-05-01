@@ -62,8 +62,8 @@ public class UsersListActivity extends BaseActivity {
         userAdapter = new UserAdapter(new UserAdapter.OnUserClickListener() {
             @Override
             public void onUserClick(User user) {
-                Intent intent = new Intent(UsersListActivity.this, updateDetailsActivity.class);
-                intent.putExtra("USER_UID", user.getId());
+                Intent intent = new Intent(UsersListActivity.this, UserProfileActivity.class);
+                intent.putExtra("USER_ID", user.getId());
                 startActivity(intent);
             }
 
@@ -72,9 +72,8 @@ public class UsersListActivity extends BaseActivity {
 
             @Override
             public void onInfoClick(User user) {
-                Intent intent = new Intent(UsersListActivity.this, updateDetailsActivity.class);
+                Intent intent = new Intent(UsersListActivity.this, UserProfileActivity.class);
                 intent.putExtra("USER_UID", user.getId());
-                intent.putExtra("VIEW_ONLY", true);
                 startActivity(intent);
             }
 

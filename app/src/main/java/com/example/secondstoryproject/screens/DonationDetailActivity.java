@@ -170,8 +170,17 @@ public class DonationDetailActivity extends BaseActivity {
                         if (avatar != null && !avatar.isEmpty()) {
                             ivGiverAvatar.setImageBitmap(ImageUtil.fromBase64(avatar));
                         }
+
+                        // ✅ ניווט לפרופיל התורם בלחיצה על השורה
+                        layoutGiverRow.setOnClickListener(v -> {
+                            Intent intent = new Intent(DonationDetailActivity.this,
+                                    UserProfileActivity.class);
+                            intent.putExtra("USER_ID", giver.getId());
+                            startActivity(intent);
+                        });
                     }
                 });
+
             }
 
             @Override
