@@ -1,8 +1,10 @@
 package com.example.secondstoryproject.adapters;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.Chat;
+import com.example.secondstoryproject.utils.ImageUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -84,13 +87,15 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     class ChatViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvName, tvLastMessage, tvTime, tvUnread;
-
+        ImageView ivPhoto;
         ChatViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tv_chat_name);
             tvLastMessage = itemView.findViewById(R.id.tv_last_message);
             tvTime = itemView.findViewById(R.id.tv_chat_time);
             tvUnread = itemView.findViewById(R.id.tv_unread_count);
+
+            ivPhoto = itemView.findViewById(R.id.iv_chat_avatar);
         }
 
         /**
@@ -125,6 +130,15 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
                 tvUnread.setText(String.valueOf(unread));
             } else {
                 tvUnread.setVisibility(View.GONE);
+            }
+
+            String base64 = chat.getOtherUserProfilePic();
+
+            if (base64 != null && !base64.isEmpty()) {
+                Bitmap bitmap = ImageUtil.fromBase64(base64);
+                ivPhoto.setImageBitmap(bitmap);
+            } else {
+                ivPhoto.setImageResource(R.drawable.ic_profile);
             }
 
             itemView.setOnClickListener(v -> listener.onChatClick(chat));

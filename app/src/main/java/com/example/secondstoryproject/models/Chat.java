@@ -22,6 +22,8 @@ public class Chat {
     private String otherUserName;   // שם המשתמש השני
     @Exclude
     private String otherUserId;     // ID של המשתמש השני
+    @Exclude
+    private String otherUserProfilePic;
 
     public Chat() {} // חובה ל-Firebase
 
@@ -67,6 +69,9 @@ public class Chat {
     public String getOtherUserId() { return otherUserId; }
     @Exclude
     public void setOtherUserId(String otherUserId) { this.otherUserId = otherUserId; }
-
+    @Exclude
+    public String getOtherUserProfilePic() { return otherUserProfilePic; }
+    @Exclude
+    public void setOtherUserProfilePic(String pic) { this.otherUserProfilePic = pic; }
 
 }

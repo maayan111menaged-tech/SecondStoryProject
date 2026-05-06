@@ -227,6 +227,7 @@ public class ChatServiceImpl implements IChatService {
         final int total = chats.size();
         for (Chat chat : chats) {
             String userId = chat.getReceiverId();
+            chat.setOtherUserId(userId);
             usersRef.child(userId).get()
                     .addOnCompleteListener(userTask -> {
                         if (userTask.isSuccessful() && userTask.getResult().exists()) {
@@ -234,6 +235,10 @@ public class ChatServiceImpl implements IChatService {
                                     .child("userName").getValue(String.class);
                             chat.setOtherUserName(
                                     userName != null ? userName.trim() : "משתמש שנמחק");
+                            String profilePic = userTask.getResult()
+                                    .child("profilePhoneUrl").getValue(String.class);
+
+                            chat.setOtherUserProfilePic(profilePic != null ? profilePic : "");
                         } else {
                             // node לא קיים = משתמש נמחק מה-DB
                             chat.setOtherUserName("משתמש שנמחק");
@@ -265,6 +270,11 @@ public class ChatServiceImpl implements IChatService {
                                     .child("userName").getValue(String.class);
                             currentChat.setOtherUserName(
                                     userName != null ? userName.trim() : "משתמש שנמחק");
+
+                            String profilePic = userTask.getResult()
+                                    .child("profilePhoneUrl").getValue(String.class);
+
+                            currentChat.setOtherUserProfilePic(profilePic != null ? profilePic : "");
                         } else {
                             currentChat.setOtherUserName("משתמש שנמחק");
                         }

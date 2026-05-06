@@ -159,6 +159,10 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             vh.btnRate.setOnClickListener(null);
 
             if (item.message.isRatingRequest()) {
+
+                android.util.Log.d("ChatDebug", "currentUserId=" + currentUserId
+                        + " donationGiverId=" + donationGiverId);
+
                 boolean isReceiver = donationGiverId == null
                         || !currentUserId.equals(donationGiverId);
 

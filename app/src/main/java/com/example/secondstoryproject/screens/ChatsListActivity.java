@@ -88,6 +88,8 @@ public class ChatsListActivity extends BaseActivity {
     }
 
     private void openChat(Chat chat) {
+        android.util.Log.d("ChatDebug", "chat.getOtherUserId()=" + chat.getOtherUserId());
+
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("CHAT_ID", chat.getId());
         intent.putExtra("OTHER_USER_NAME", chat.getOtherUserName());
