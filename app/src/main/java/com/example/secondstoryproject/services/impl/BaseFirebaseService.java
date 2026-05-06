@@ -202,4 +202,18 @@ public abstract class BaseFirebaseService<T extends Idable> {
     protected DatabaseReference getRootRef() {
         return databaseReference;
     }
+
+
+
+    protected void updateFields(@NonNull final String id,
+                                @NonNull final java.util.Map<String, Object> fields,
+                                @Nullable final DatabaseCallback<Void> callback) {
+        getRootRef().child(path).child(id).updateChildren(fields)
+                .addOnSuccessListener(unused -> {
+                    if (callback != null) callback.onCompleted(null);
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) callback.onFailed(e);
+                });
+    }
 }

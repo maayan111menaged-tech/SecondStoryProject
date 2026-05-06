@@ -6,6 +6,7 @@ public class Message {
     private String text;
     private long timestamp;
     private boolean adminSender;
+    private boolean isRatingRequest;// אוטומטי יוגדר כFALSE בDB
 
     public Message() {} // חובה ל-Firebase
 
@@ -27,4 +28,7 @@ public class Message {
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
     public boolean isAdminSender() { return adminSender; }
     public void setAdminSender(boolean adminSender) { this.adminSender = adminSender; }
+
+    public boolean isRatingRequest() { return isRatingRequest; }
+    public void setRatingRequest(boolean ratingRequest) { isRatingRequest = ratingRequest; }
 }

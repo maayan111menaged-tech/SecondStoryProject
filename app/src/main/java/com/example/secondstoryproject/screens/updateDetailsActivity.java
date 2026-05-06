@@ -32,6 +32,7 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 
@@ -201,27 +202,41 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         currentUser.setPassword(password);
 
         // עדכון במסד הנתונים
-        DatabaseService.getInstance().getUserService().update(
+        Map<String, Object> fields = new java.util.HashMap<>();
+        fields.put("fName", firstName);
+        fields.put("lName", lastName);
+        fields.put("email", email);
+        fields.put("phoneNumber", phone);
+        fields.put("dateOfBirth", birthDate);
+        fields.put("userName", userName);
+        fields.put("password", password);
+
+        DatabaseService.getInstance().getUserService().updateUserFields(
                 currentUser.getId(),
-                oldUser -> currentUser,
-                new IDatabaseService.DatabaseCallback<User>() {
+                fields,
+                new IDatabaseService.DatabaseCallback<Void>() {
                     @Override
-                    public void onCompleted(User result) {
+                    public void onCompleted(Void result) {
+                        // עדכון ה-SharedPreferences ידנית
+                        currentUser.setfName(firstName);
+                        currentUser.setlName(lastName);
+                        currentUser.setEmail(email);
+                        currentUser.setPhoneNumber(phone);
+                        currentUser.setDateOfBirth(birthDate);
+                        currentUser.setUserName(userName);
+                        currentUser.setPassword(password);
+                        SharedPreferencesUtil.saveUser(updateDetailsActivity.this, currentUser);
+
                         Toast.makeText(updateDetailsActivity.this,
-                                "פרטייך עודכנו בהצלחה!",
-                                Toast.LENGTH_LONG).show();
-                        showUserProfile();
+                                "פרטייך עודכנו בהצלחה!", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(updateDetailsActivity.this, UserProfileActivity.class);
                         startActivity(intent);
                         finish();
                     }
-
                     @Override
                     public void onFailed(Exception e) {
                         Toast.makeText(updateDetailsActivity.this,
-                                "שגיאה בעדכון הפרטים",
-                                Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Error updating user", e);
+                                "שגיאה בעדכון הפרטים", Toast.LENGTH_SHORT).show();
                     }
                 }
         );

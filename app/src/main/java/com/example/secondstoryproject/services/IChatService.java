@@ -82,4 +82,7 @@ public interface IChatService {
     void deleteAllUserChats(String userId, IDatabaseService.DatabaseCallback<Void> callback);
     void markUserAsDeleted(String userId, IDatabaseService.DatabaseCallback<Void> callback);
     void deleteChat(String chatId, String userId, IDatabaseService.DatabaseCallback<Void> callback);
+
+    void setMatch(String donationId, String matchedUserId,
+                  IDatabaseService.DatabaseCallback<Void> callback);
 }

@@ -22,7 +22,6 @@ public class User implements Idable {
     private boolean isAdmin;
     private boolean isActive = true; //ברירת מחדל פעיל
     private ArrayList<Donation> donationList;
-    private ArrayList<Rate> rateList;
 
     public enum NotificationType {
         PHONE_NUMBER,
@@ -50,7 +49,6 @@ public class User implements Idable {
         this.profilePhoneUrl = null;
 
         this.donationList = new ArrayList<>();
-        this.rateList = new ArrayList<>();
         this.notifications = NotificationType.EMAIL;
     }
 
@@ -75,7 +73,6 @@ public class User implements Idable {
         this.profilePhoneUrl = profilePhoneUrl;
 
         this.donationList = new ArrayList<>();
-        this.rateList = new ArrayList<>();
         this.notifications = NotificationType.EMAIL;
     }
 
@@ -86,7 +83,6 @@ public class User implements Idable {
         this.isActive = true;
 
         this.donationList = new ArrayList<>();
-        this.rateList = new ArrayList<>();
         this.notifications = NotificationType.EMAIL;
     }
 
@@ -119,8 +115,6 @@ public class User implements Idable {
 
     public ArrayList<Donation> getDonationList() { return donationList; }
     public void setDonationList(ArrayList<Donation> donationList) { this.donationList = donationList; }
-    public ArrayList<Rate> getRateList() { return rateList; }
-    public void setRateList(ArrayList<Rate> rateList) { this.rateList = rateList; }
     public NotificationType getNotifications() { return notifications; }
     public void setNotifications(NotificationType notifications) { this.notifications = notifications; }
 

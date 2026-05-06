@@ -35,6 +35,7 @@ import com.example.secondstoryproject.utils.Validator;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class UsersListActivity extends BaseActivity {
@@ -73,7 +74,7 @@ public class UsersListActivity extends BaseActivity {
             @Override
             public void onInfoClick(User user) {
                 Intent intent = new Intent(UsersListActivity.this, UserProfileActivity.class);
-                intent.putExtra("USER_UID", user.getId());
+                intent.putExtra("USER_ID", user.getId());
                 startActivity(intent);
             }
 
@@ -107,29 +108,36 @@ public class UsersListActivity extends BaseActivity {
                                                         userAdapter.resetMakeAdminButton(user);
                                                         return;
                                                     }
-                                                    user.setAdmin(true);
-                                                    DatabaseService.getInstance().getUserService().update(
-                                                            user.getId(), oldUser -> user,
-                                                            new IDatabaseService.DatabaseCallback<User>() {
-                                                                @Override
-                                                                public void onCompleted(User result) {
-                                                                    userAdapter.updateUserById(result);
-                                                                    DatabaseService.getInstance().getChatService()
-                                                                            .deleteAdminChat(user.getId(), new IDatabaseService.DatabaseCallback<Void>() {
-                                                                                @Override public void onCompleted(Void unused) {}
-                                                                                @Override public void onFailed(Exception e) { Log.e(TAG, "שגיאה במחיקת צאט", e); }
-                                                                            });
-                                                                    Toast.makeText(UsersListActivity.this, "המשתמש הפך לאדמין", Toast.LENGTH_SHORT).show();
-                                                                }
-                                                                @Override
-                                                                public void onFailed(Exception e) {
-                                                                    Toast.makeText(UsersListActivity.this, "שגיאה בעדכון", Toast.LENGTH_SHORT).show();
-                                                                }
-                                                            });
+                                                    // ✅ אין תרומות פעילות — מעדכן רק את השדה
+                                                    DatabaseService.getInstance().getUserService()
+                                                            .updateUserFields(user.getId(), Map.of("admin", true),
+                                                                    new IDatabaseService.DatabaseCallback<Void>() {
+                                                                        @Override
+                                                                        public void onCompleted(Void unused) {
+                                                                            user.setAdmin(true);
+                                                                            userAdapter.updateUserById(user);
+                                                                            DatabaseService.getInstance().getChatService()
+                                                                                    .deleteAdminChat(user.getId(),
+                                                                                            new IDatabaseService.DatabaseCallback<Void>() {
+                                                                                                @Override public void onCompleted(Void u) {}
+                                                                                                @Override public void onFailed(Exception e) {
+                                                                                                    Log.e(TAG, "שגיאה במחיקת צאט", e);
+                                                                                                }
+                                                                                            });
+                                                                            Toast.makeText(UsersListActivity.this,
+                                                                                    "המשתמש הפך לאדמין", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                        @Override
+                                                                        public void onFailed(Exception e) {
+                                                                            Toast.makeText(UsersListActivity.this,
+                                                                                    "שגיאה בעדכון", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
                                                 }
                                                 @Override
                                                 public void onFailed(Exception e) {
-                                                    Toast.makeText(UsersListActivity.this, "שגיאה בבדיקת תרומות", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(UsersListActivity.this,
+                                                            "שגיאה בבדיקת תרומות", Toast.LENGTH_SHORT).show();
                                                     userAdapter.resetMakeAdminButton(user);
                                                 }
                                             });
@@ -140,7 +148,6 @@ public class UsersListActivity extends BaseActivity {
                         })
                         .show();
             }
-
             @Override
             public void onToggleActiveClick(User user) {
                 if (!user.isActive()) {
@@ -166,6 +173,10 @@ public class UsersListActivity extends BaseActivity {
 
             @Override
             public void onChatClick(User user) {
+                String currentUserId = SharedPreferencesUtil.getUserId(UsersListActivity.this);
+                if (user.getId().equals(currentUserId)) return;
+
+
                 Intent intent = new Intent(UsersListActivity.this, ChatActivity.class);
                 intent.putExtra("CHAT_ID", "admin_" + user.getId());
                 intent.putExtra("OTHER_USER_NAME", user.getUserName());
@@ -358,24 +369,22 @@ public class UsersListActivity extends BaseActivity {
                                 "• ניתן לשחזר בכל עת ✅"
                 )
                 .setPositiveButton("השבת", (d, w) -> {
-                    user.setActive(false);
-                    DatabaseService.getInstance().getUserService().update(
-                            user.getId(), oldUser -> user,
-                            new IDatabaseService.DatabaseCallback<User>() {
-                                @Override
-                                public void onCompleted(User result) {
-                                    // ✅ updateUserById מפעיל notifyItemChanged → שקיפות מיידית
-                                    userAdapter.updateUserById(result);
-                                    Toast.makeText(UsersListActivity.this,
-                                            "המשתמש הושבת ⛔", Toast.LENGTH_SHORT).show();
-                                }
-                                @Override
-                                public void onFailed(Exception e) {
-                                    user.setActive(true);
-                                    Toast.makeText(UsersListActivity.this,
-                                            "שגיאה בהשבתת המשתמש", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                    DatabaseService.getInstance().getUserService()
+                            .updateUserFields(user.getId(), Map.of("active", false),
+                                    new IDatabaseService.DatabaseCallback<Void>() {
+                                        @Override
+                                        public void onCompleted(Void unused) {
+                                            user.setActive(false);
+                                            userAdapter.updateUserById(user);
+                                            Toast.makeText(UsersListActivity.this,
+                                                    "המשתמש הושבת ⛔", Toast.LENGTH_SHORT).show();
+                                        }
+                                        @Override
+                                        public void onFailed(Exception e) {
+                                            Toast.makeText(UsersListActivity.this,
+                                                    "שגיאה בהשבתת המשתמש", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                 })
                 .setNegativeButton("ביטול", null)
                 .show();
@@ -474,23 +483,22 @@ public class UsersListActivity extends BaseActivity {
     // הפעלה מחדש
     // ─────────────────────────────────────────────
     private void reactivateUser(User user) {
-        user.setActive(true);
-        DatabaseService.getInstance().getUserService().update(
-                user.getId(), oldUser -> user,
-                new IDatabaseService.DatabaseCallback<User>() {
-                    @Override
-                    public void onCompleted(User result) {
-                        userAdapter.updateUserById(result);
-                        Toast.makeText(UsersListActivity.this,
-                                "המשתמש הופעל מחדש ✅", Toast.LENGTH_SHORT).show();
-                    }
-                    @Override
-                    public void onFailed(Exception e) {
-                        user.setActive(false);
-                        Toast.makeText(UsersListActivity.this,
-                                "שגיאה בהפעלת המשתמש", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        DatabaseService.getInstance().getUserService()
+                .updateUserFields(user.getId(), Map.of("active", true),
+                        new IDatabaseService.DatabaseCallback<Void>() {
+                            @Override
+                            public void onCompleted(Void unused) {
+                                user.setActive(true);
+                                userAdapter.updateUserById(user);
+                                Toast.makeText(UsersListActivity.this,
+                                        "המשתמש הופעל מחדש ✅", Toast.LENGTH_SHORT).show();
+                            }
+                            @Override
+                            public void onFailed(Exception e) {
+                                Toast.makeText(UsersListActivity.this,
+                                        "שגיאה בהפעלת המשתמש", Toast.LENGTH_SHORT).show();
+                            }
+                        });
     }
 
     @Override

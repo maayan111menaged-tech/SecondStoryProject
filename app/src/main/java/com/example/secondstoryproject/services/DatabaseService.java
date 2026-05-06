@@ -3,6 +3,7 @@ package com.example.secondstoryproject.services;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.services.impl.ChatServiceImpl;
 import com.example.secondstoryproject.services.impl.DonationServiceImpl;
+import com.example.secondstoryproject.services.impl.RateServiceImpl;
 import com.example.secondstoryproject.services.impl.UserServiceImpl;
 
 /**
@@ -36,6 +37,7 @@ public class DatabaseService implements IDatabaseService {
     /** Service handling chat-related operations */
     private final IChatService chatService;
 
+    private final IRateService rateService;
     /**
      * Private constructor.
      * Initializes all service implementations.
@@ -45,6 +47,7 @@ public class DatabaseService implements IDatabaseService {
         userService = new UserServiceImpl();
         DonationService = new DonationServiceImpl();
         chatService = new ChatServiceImpl();
+        rateService = new RateServiceImpl();
     }
 
 
@@ -82,5 +85,8 @@ public class DatabaseService implements IDatabaseService {
      */
     @Override
     public IChatService getChatService() { return chatService; }
+
+    @Override
+    public IRateService getRateService(){return rateService;}
 
 }

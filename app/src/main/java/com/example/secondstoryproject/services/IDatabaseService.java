@@ -40,6 +40,8 @@ public interface IDatabaseService {
      */
     IChatService getChatService();
 
+
+    IRateService getRateService();
     /**
      * Generic callback interface for asynchronous database operations.
      * All database operations are asynchronous.

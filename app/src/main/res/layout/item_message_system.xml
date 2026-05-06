@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tv_system_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#E8F5E9"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:textColor="#2E7D32"
+        android:textSize="13sp"
+        android:textStyle="italic"
+        android:gravity="center" />
+
+    <!-- גלוי רק בהודעת בקשת דירוג -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="⭐ דרג את התורם"
+        android:backgroundTint="#FFA000"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/tv_already_rated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="⭐ דירגת את התורם"
+        android:textColor="#FFA000"
+        android:textSize="13sp"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+</LinearLayout>

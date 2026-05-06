@@ -7,6 +7,7 @@ import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 /// Service interface for user-related database operations.
@@ -103,4 +104,9 @@ public interface IUserService {
      */
     void isAdmin(@NonNull String userId,
                  @NonNull DatabaseCallback<Boolean> callback);
+
+    void incrementDonationCounter(String userId, DatabaseCallback<Void> callback);
+
+
+    void updateUserFields(String userId, Map<String, Object> fields, DatabaseCallback<Void> callback);
 }

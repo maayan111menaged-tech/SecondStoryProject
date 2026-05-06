@@ -11,6 +11,7 @@ import com.example.secondstoryproject.services.IDatabaseService.DatabaseCallback
 import com.example.secondstoryproject.services.IUserService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
@@ -185,5 +186,27 @@ public class UserServiceImpl extends BaseFirebaseService<User> implements IUserS
                 callback.onFailed(e);
             }
         });
+    }
+
+
+
+    @Override
+    public void updateUserFields(String userId, Map<String, Object> fields,
+                                 DatabaseCallback<Void> callback) {
+        updateFields(userId, fields, callback);
+    }
+
+    @Override
+    public void incrementDonationCounter(String userId, DatabaseCallback<Void> callback) {
+        getRootRef().child("users").child(userId).child("donationCounter").get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        if (callback != null) callback.onFailed(task.getException());
+                        return;
+                    }
+                    Integer current = task.getResult().getValue(Integer.class);
+                    int newCount = (current != null ? current : 0) + 1;
+                    updateUserFields(userId, Map.of("donationCounter", newCount), callback);
+                });
     }
 }

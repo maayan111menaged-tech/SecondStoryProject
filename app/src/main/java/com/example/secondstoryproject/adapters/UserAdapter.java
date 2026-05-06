@@ -127,13 +127,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
 
         }
 
-        // Show "Me" badge if this is the logged-in user
+        // Show "Me" badge and remove chat button if this is the logged-in user
         if (user.getId().equals(currentUserId)) {
             holder.tvMeBadge.setVisibility(View.VISIBLE);
+            holder.btnChatUser.setVisibility(View.GONE);
         } else {
             holder.tvMeBadge.setVisibility(View.GONE);
+            holder.btnChatUser.setVisibility(View.VISIBLE);
         }
-
         // Bind user data
         holder.tvUserName.setText(user.getUserName());
         holder.tvName.setText(user.getFullName());
@@ -161,6 +162,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             holder.btnMakeAdmin.setText("Make Admin");
             holder.btnMakeAdmin.setAlpha(1.0f);
         }
+
 
         // Click events
         holder.itemView.setOnClickListener(v -> {

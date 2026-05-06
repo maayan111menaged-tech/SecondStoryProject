@@ -1,6 +1,7 @@
 package com.example.secondstoryproject.services.impl;
 
 import com.example.secondstoryproject.models.Chat;
+import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.models.Message;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
@@ -10,6 +11,7 @@ import com.google.firebase.database.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ChatServiceImpl implements IChatService {
 
@@ -422,6 +424,21 @@ public class ChatServiceImpl implements IChatService {
                         usersRef.child(userId).child("chats").child(chatId).removeValue()
                                 .addOnSuccessListener(unused2 -> callback.onCompleted(null))
                                 .addOnFailureListener(callback::onFailed))
+                .addOnFailureListener(callback::onFailed);
+    }
+
+    @Override
+    public void setMatch(String donationId, String matchedUserId,
+                         IDatabaseService.DatabaseCallback<Void> callback) {
+        FirebaseDatabase.getInstance(
+                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("donations")
+                .child(donationId)
+                .updateChildren(Map.of(
+                        "receiverID", matchedUserId,
+                        "status", DonationStatus.MATCHED.name()
+                ))
+                .addOnSuccessListener(unused -> callback.onCompleted(null))
                 .addOnFailureListener(callback::onFailed);
     }
 }
