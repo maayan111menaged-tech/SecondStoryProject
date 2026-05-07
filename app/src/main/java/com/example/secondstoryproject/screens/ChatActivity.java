@@ -1,5 +1,6 @@
 package com.example.secondstoryproject.screens;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -99,6 +100,28 @@ public class ChatActivity extends BaseActivity {
 
         loadOtherUserAvatar(otherUserId);
         checkChatStatus(otherUserId);
+
+        // לחיצה על הבאנר העליון → פרופיל המשתמש
+        layoutChatHeader.setOnClickListener(v -> {
+            if (chatId != null && chatId.startsWith("admin_")) {
+                if (currentUserIsAdmin) {
+                    // אדמין → פרופיל המשתמש
+                    String userId = chatId.replace("admin_", "");
+                    Intent intent = new Intent(this, UserProfileActivity.class);
+                    intent.putExtra("USER_ID", userId);
+                    startActivity(intent);
+                } else {
+
+                }
+                return;
+            }
+
+            if (otherUserId != null) {
+                Intent intent = new Intent(this, UserProfileActivity.class);
+                intent.putExtra("USER_ID", otherUserId);
+                startActivity(intent);
+            }
+        });
     }
 
     // ─────────────────────────────────────────────────────────
