@@ -38,6 +38,7 @@
         private RecyclerView recyclerView;
         private DonationAdapter donationAdapter;
         private TextView tvDonationCount;
+        private MaterialButton btnStatus;
 
         private String searchQuery = "";
         private Set<DonationStatus> statusFilter = new HashSet<>(); // ריק = הכל
@@ -57,7 +58,7 @@
             });
 
             layoutEmpty = findViewById(R.id.layout_empty);
-
+            btnStatus        = findViewById(R.id.btn_filter_status);
             tvDonationCount = findViewById(R.id.tv_donation_count);
 
             recyclerView = findViewById(R.id.rv_donations_list);
@@ -80,6 +81,16 @@
             setupCategoryFilter();
             setupCityFilter();
             setupClearFilters();
+
+            String statusFromMain = getIntent().getStringExtra("FILTER_STATUS");
+            if (statusFromMain != null) {
+                DonationStatus status = DonationStatus.fromString(statusFromMain);
+                statusFilter.add(status);
+                btnStatus.setText("סטטוס: " + status.getHebrewName());
+                filtersVisible = true;
+                findViewById(R.id.layout_filters).setVisibility(View.VISIBLE);
+                ((MaterialButton) findViewById(R.id.btn_toggle_filters)).setText("🔍 Hide Filters");
+            }
         }
 
         private void setupToggleFilters() {
@@ -213,9 +224,9 @@
                     .getAll(new DatabaseService.DatabaseCallback<List<Donation>>() {
                         @Override
                         public void onCompleted(List<Donation> donations) {
-                            // כל הסטטוסים – ללא פילטר
-                            donationAdapter.setDonationList(donations);
-                            tvDonationCount.setText("Total: " + donations.size());
+                            runOnUiThread(() -> {
+                                donationAdapter.setDonationList(donations);
+                                donationAdapter.filterAdmin(searchQuery, statusFilter, categoryFilter, cityFilter);
 
                             if (donations.isEmpty()) {
                                 recyclerView.setVisibility(View.GONE);
@@ -224,6 +235,8 @@
                                 recyclerView.setVisibility(View.VISIBLE);
                                 layoutEmpty.setVisibility(View.GONE);
                             }
+                            });
+
                         }
 
                         @Override

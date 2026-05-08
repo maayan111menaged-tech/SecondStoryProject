@@ -63,10 +63,10 @@ public class AddDonationStep4Activity extends BaseActivity {
     /// add the food to the database
     /// @see Donation
     private void publishDonation() {
+        btnConfirm.setEnabled(false);
+        btnConfirm.setText("מפרסם...");
 
         String donationId = databaseService.getDonationService().generateId();
-
-        // שליפת המשתמש המחובר
         String currentUserId = SharedPreferencesUtil.getUserId(this);
 
         Donation donation = new Donation(
@@ -96,6 +96,10 @@ public class AddDonationStep4Activity extends BaseActivity {
 
             @Override
             public void onFailed(Exception e) {
+                runOnUiThread(() -> {
+                    btnConfirm.setEnabled(true);
+                    btnConfirm.setText("פרסם את התרומה");
+                });
                 Toast.makeText(AddDonationStep4Activity.this,
                         "שגיאה בפרסום התרומה", Toast.LENGTH_SHORT).show();
             }

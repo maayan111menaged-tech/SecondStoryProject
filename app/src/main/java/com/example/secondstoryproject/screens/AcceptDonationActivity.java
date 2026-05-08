@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -35,7 +36,7 @@ public class AcceptDonationActivity extends BaseActivity {
     private DonationAdapter adapter;
     private LinearLayout layoutEmpty;
     private TextView tvDonationCount;
-
+    private ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +53,8 @@ public class AcceptDonationActivity extends BaseActivity {
 
         layoutEmpty = findViewById(R.id.layout_empty);
         tvDonationCount = findViewById(R.id.tv_donation_to_accept_count);
+
+        progressBar = findViewById(R.id.progress_bar);
 
         // מעבר לפרטי התרומה
         adapter = new DonationAdapter(donation -> {
@@ -70,6 +73,10 @@ public class AcceptDonationActivity extends BaseActivity {
     }
 
     private void loadDonations() {
+        progressBar.setVisibility(View.VISIBLE);
+        rvDonations.setVisibility(View.GONE);
+        layoutEmpty.setVisibility(View.GONE);
+
         // שלב 1: טוענים את כל המשתמשים לבניית מפה uid → isActive
         DatabaseService.getInstance().getUserService().getAll(
                 new DatabaseService.DatabaseCallback<List<User>>() {
@@ -106,20 +113,25 @@ public class AcceptDonationActivity extends BaseActivity {
                                                     return dateA.compareTo(dateB);
                                                 });
 
-                                                tvDonationCount.setText("Total: " + filtered.size());
-                                                adapter.setDonations(filtered);
+                                                runOnUiThread(() -> {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    tvDonationCount.setText("Total: " + filtered.size());
+                                                    adapter.setDonations(filtered);
 
-                                                if (filtered.isEmpty()) {
+                                                    if (filtered.isEmpty()) {
                                                     rvDonations.setVisibility(View.GONE);
                                                     layoutEmpty.setVisibility(View.VISIBLE);
-                                                } else {
+                                                    } else {
                                                     rvDonations.setVisibility(View.VISIBLE);
                                                     layoutEmpty.setVisibility(View.GONE);
-                                                }
+                                                    }
+                                                });
+
                                             }
 
                                             @Override
                                             public void onFailed(Exception e) {
+                                                runOnUiThread(() -> progressBar.setVisibility(View.GONE));
                                                 Log.e(TAG, "Failed to load donations", e);
                                             }
                                         });

@@ -5,6 +5,7 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @IgnoreExtraProperties
 public class User implements Idable {
@@ -22,6 +23,7 @@ public class User implements Idable {
     private boolean isAdmin;
     private boolean isActive = true; //ברירת מחדל פעיל
     private ArrayList<Donation> donationList;
+    private Date createdAt;
 
     public enum NotificationType {
         PHONE_NUMBER,
@@ -50,6 +52,9 @@ public class User implements Idable {
 
         this.donationList = new ArrayList<>();
         this.notifications = NotificationType.EMAIL;
+
+        this.createdAt = new Date();
+
     }
 
     // בנאי מלא
@@ -117,6 +122,10 @@ public class User implements Idable {
     public void setDonationList(ArrayList<Donation> donationList) { this.donationList = donationList; }
     public NotificationType getNotifications() { return notifications; }
     public void setNotifications(NotificationType notifications) { this.notifications = notifications; }
+
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
 
     @Exclude
     public UserLevel getLevel() {
