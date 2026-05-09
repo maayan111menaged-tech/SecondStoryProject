@@ -14,4 +14,18 @@
 
     <color name="text_muted">#989eab</color>
 
+
+    <!-- ===== סטטוס תרומות ===== -->
+    <color name="status_pending">#F59E0B</color>
+    <color name="status_pending_bg">#FEF3C7</color>
+    <color name="status_available">#22C55E</color>
+    <color name="status_available_bg">#DCFCE7</color>
+    <color name="status_matched">#3B82F6</color>
+    <color name="status_matched_bg">#DBEAFE</color>
+    <color name="status_rejected">#EF4444</color>
+    <color name="status_rejected_bg">#FEE2E2</color>
+    <color name="status_cancelled">#6B7280</color>
+    <color name="status_cancelled_bg">#F3F4F6</color>
+    <color name="status_deleted">#795548</color>
+    <color name="status_deleted_bg">#EFEBE9</color>
 </resources>

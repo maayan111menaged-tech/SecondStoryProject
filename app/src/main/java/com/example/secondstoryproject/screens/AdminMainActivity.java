@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.secondstoryproject.R;
@@ -35,12 +36,10 @@ import java.util.ArrayList;
 
 public class AdminMainActivity extends BaseActivity {
 
-    private Button btnAcceptDonations;
-    private Button btnUsersList;
-    private Button btnDonationList;
     private TextView tvUsersCount;
     private TextView tvPendingDonations;
     private PieChart pieChart;
+    private LinearLayout legendContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,21 +54,21 @@ public class AdminMainActivity extends BaseActivity {
 
         bottomNav.setSelectedItemId(R.id.menu_home);
 
-        btnAcceptDonations = findViewById(R.id.btn_accept_donations);
-        btnUsersList = findViewById(R.id.btn_users_list);
-        btnDonationList = findViewById(R.id.btn_donation_list);
         tvUsersCount = findViewById(R.id.tv_users_count);
         tvPendingDonations = findViewById(R.id.tv_pending_donations);
         pieChart = findViewById(R.id.pie_chart);
+        legendContainer = findViewById(R.id.legendContainer);
 
         loadStats();
 
-        btnAcceptDonations.setOnClickListener(v ->
+        findViewById(R.id.btn_accept_donations).setOnClickListener(v ->
                 startActivity(new Intent(this, AcceptDonationActivity.class)));
-        btnUsersList.setOnClickListener(v ->
+        findViewById(R.id.btn_users_list).setOnClickListener(v ->
                 startActivity(new Intent(this, UsersListActivity.class)));
-        btnDonationList.setOnClickListener(v ->
+        findViewById(R.id.btn_donation_list).setOnClickListener(v ->
                 startActivity(new Intent(this, DonationsListActivity.class)));
+        findViewById(R.id.btn_chats).setOnClickListener(v ->
+                startActivity(new Intent(this, ChatsListActivity.class)));
     }
 
     private void loadStats() {
@@ -145,14 +144,20 @@ public class AdminMainActivity extends BaseActivity {
 
         ArrayList<PieEntry> entries = new ArrayList<>();
         ArrayList<Integer> colors = new ArrayList<>();
+        ArrayList<DonationStatus> orderedStatuses = new ArrayList<>();
 
-        // סדר קבוע וצבע לכל סטטוס
-        addPieEntry(entries, colors, statusCount, DonationStatus.PENDING_APPROVAL,   "#FFC107");
-        addPieEntry(entries, colors, statusCount, DonationStatus.APPROVED_AVAILABLE, "#4CAF50");
-        addPieEntry(entries, colors, statusCount, DonationStatus.MATCHED,            "#2196F3");
-        addPieEntry(entries, colors, statusCount, DonationStatus.REJECTED,           "#F44336");
-        addPieEntry(entries, colors, statusCount, DonationStatus.CANCELLED,          "#9E9E9E");
-        addPieEntry(entries, colors, statusCount, DonationStatus.DONOR_DELETED,      "#795548");
+        addPieEntry(entries, colors, orderedStatuses, statusCount,
+                DonationStatus.PENDING_APPROVAL,   getColor(R.color.status_pending));
+        addPieEntry(entries, colors, orderedStatuses, statusCount,
+                DonationStatus.APPROVED_AVAILABLE, getColor(R.color.status_available));
+        addPieEntry(entries, colors, orderedStatuses, statusCount,
+                DonationStatus.MATCHED,            getColor(R.color.status_matched));
+        addPieEntry(entries, colors, orderedStatuses, statusCount,
+                DonationStatus.REJECTED,           getColor(R.color.status_rejected));
+        addPieEntry(entries, colors, orderedStatuses, statusCount,
+                DonationStatus.CANCELLED,          getColor(R.color.status_cancelled));
+        addPieEntry(entries, colors, orderedStatuses, statusCount,
+                DonationStatus.DONOR_DELETED,      getColor(R.color.status_deleted));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(colors);
@@ -169,17 +174,17 @@ public class AdminMainActivity extends BaseActivity {
         pieChart.setHoleRadius(40f);
         pieChart.setTransparentCircleRadius(45f);
         pieChart.setRotationEnabled(true);
-        pieChart.getLegend().setEnabled(true);
-        pieChart.getLegend().setWordWrapEnabled(true);
+        pieChart.getLegend().setEnabled(false); // מכבים את ה-legend המובנה
         pieChart.animateY(800);
         pieChart.invalidate();
+
+        buildLegend(orderedStatuses, colors);
 
         pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 if (!(e instanceof PieEntry)) return;
                 String label = ((PieEntry) e).getLabel();
-
                 DonationStatus selectedStatus = null;
                 for (DonationStatus s : DonationStatus.values()) {
                     if (s.getHebrewName().equals(label)) {
@@ -187,28 +192,67 @@ public class AdminMainActivity extends BaseActivity {
                         break;
                     }
                 }
-
                 if (selectedStatus == null) return;
-
                 Intent intent = new Intent(AdminMainActivity.this, DonationsListActivity.class);
                 intent.putExtra("FILTER_STATUS", selectedStatus.name());
                 startActivity(intent);
             }
-
             @Override
             public void onNothingSelected() {}
         });
-
     }
-
     private void addPieEntry(ArrayList<PieEntry> entries,
                              ArrayList<Integer> colors,
+                             ArrayList<DonationStatus> statuses,
                              Map<DonationStatus, Integer> statusCount,
                              DonationStatus status,
-                             String hex) {
+                             int color) {
         if (statusCount.containsKey(status)) {
             entries.add(new PieEntry(statusCount.get(status), status.getHebrewName()));
-            colors.add(Color.parseColor(hex));
+            colors.add(color);
+            statuses.add(status);
+        }
+    }
+
+    private void buildLegend(List<DonationStatus> statuses, List<Integer> colors) {
+        legendContainer.removeAllViews();
+
+        for (int i = 0; i < statuses.size(); i++) {
+            DonationStatus status = statuses.get(i);
+            int color = colors.get(i);
+
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+
+            LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            rowParams.setMargins(0, 0, 0, 8);
+            row.setLayoutParams(rowParams);
+
+            // עיגול צבע
+            View colorDot = new View(this);
+            int dotSize = (int) (12 * getResources().getDisplayMetrics().density);
+            LinearLayout.LayoutParams dotParams = new LinearLayout.LayoutParams(dotSize, dotSize);
+            dotParams.setMarginEnd((int) (8 * getResources().getDisplayMetrics().density));
+            colorDot.setLayoutParams(dotParams);
+
+            android.graphics.drawable.GradientDrawable circle = new android.graphics.drawable.GradientDrawable();
+            circle.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+            circle.setColor(color);
+            colorDot.setBackground(circle);
+
+            // טקסט
+            TextView label = new TextView(this);
+            label.setText(status.getHebrewName());
+            label.setTextSize(13f);
+            label.setTextColor(getColor(R.color.dark_purple));
+
+            row.addView(colorDot);
+            row.addView(label);
+            legendContainer.addView(row);
         }
     }
 }

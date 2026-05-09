@@ -1,165 +1,384 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="#FFFFFF"
-    tools:context=".screens.AdminMainActivity">
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
 
-        <!-- כותרת -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- ===== ברכה ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Admin Dashboard"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginBottom="20dp"/>
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="4dp">
 
-        <!-- כרטיס סטטיסטיקות -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="שלום,"
+                android:textSize="17sp"
+                android:textColor="@color/text_muted"/>
+
+            <TextView
+                android:id="@+id/tvAdminGreeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="מנהל מערכת 👋"
+                android:textSize="25sp"
+                android:textColor="@color/dark_purple"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="מנהל"
+                android:textSize="13sp"
+                android:textColor="@color/dark_purple"
+                android:background="@drawable/badge_background"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+
+        <!-- ===== סטטיסטיקות ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="2">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                android:layout_marginEnd="6dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:padding="14dp">
 
                     <TextView
                         android:id="@+id/tv_pending_donations"
-                        android:text="0"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:text="..."
+                        android:textSize="30sp"
+                        android:textColor="@color/dark_purple"
+                        android:textStyle="bold"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pending Donations"
-                        android:textSize="14sp"/>
+                        android:text="תרומות ממתינות"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_muted"
+                        android:layout_marginTop="2dp"/>
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                android:layout_marginStart="6dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:padding="14dp">
 
                     <TextView
                         android:id="@+id/tv_users_count"
-                        android:text="0"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:text="..."
+                        android:textSize="30sp"
+                        android:textColor="@color/dark_purple"
+                        android:textStyle="bold"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Registered Users"
-                        android:textSize="14sp"/>
+                        android:text="משתמשים רשומים"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_muted"
+                        android:layout_marginTop="2dp"/>
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-        <androidx.cardview.widget.CardView
+        <!-- ===== גרף עוגה ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="תרומות לפי סטטוס"
+            android:textSize="15sp"
+            android:textColor="@color/text_muted"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="30dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:layout_marginStart="3dp"
-            android:layout_marginEnd="3dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/lavender"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="@color/white">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:orientation="horizontal"
+                android:layoutDirection="rtl"
+                android:padding="12dp"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="תרומות לפי סטטוס"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"/>
-
+                <!-- גרף עוגה בצד ימין -->
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/pie_chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="250dp"/>
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"/>
+
+                <!-- Legend בצד שמאל -->
+                <LinearLayout
+                    android:id="@+id/legendContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layoutDirection="rtl"
+                    android:paddingStart="8dp"
+                    android:gravity="center_vertical"/>
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
-
-        <!-- כפתורי פעולות -->
+        </com.google.android.material.card.MaterialCardView>
+        <!-- ===== פעולות מהירות ===== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quick Actions"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="10dp"/>
+            android:text="פעולות מהירות"
+            android:textSize="15sp"
+            android:textColor="@color/text_muted"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"/>
 
-
-        <Button
-            android:id="@+id/btn_accept_donations"
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Review Donations"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginHorizontal="16dp"
+            android:columnCount="2"
+            android:rowCount="2"
+            android:useDefaultMargins="false">
 
-        <Button
-            android:id="@+id/btn_users_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View Users"
-            android:layout_marginBottom="10dp"/>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_accept_donations"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
 
-        <Button
-            android:id="@+id/btn_donation_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View Donations"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp"
+                    android:gravity="start">
+
+                    <ImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/baseline_playlist_add_check_circle_24"
+                        android:background="@drawable/badge_background"
+                        android:padding="8dp"
+                        android:tint="@color/dark_purple"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="אישור תרומות"
+                        android:textSize="12sp"
+                        android:textColor="@color/dark_purple"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_users_list"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp"
+                    android:gravity="start">
+
+                    <ImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_profile"
+                        android:background="@drawable/badge_background"
+                        android:padding="8dp"
+                        android:tint="@color/dark_purple"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="רשימת משתמשים"
+                        android:textSize="12sp"
+                        android:textColor="@color/dark_purple"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_donation_list"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp"
+                    android:gravity="start">
+
+                    <ImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_giving_heart"
+                        android:background="@drawable/badge_background"
+                        android:padding="8dp"
+                        android:tint="@color/dark_purple"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="רשימת תרומות"
+                        android:textSize="12sp"
+                        android:textColor="@color/dark_purple"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_chats"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp"
+                    android:gravity="start">
+
+                    <ImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_chat"
+                        android:background="@drawable/badge_background"
+                        android:padding="8dp"
+                        android:tint="@color/dark_purple"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="צ'אטים"
+                        android:textSize="12sp"
+                        android:textColor="@color/dark_purple"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </GridLayout>
+
     </LinearLayout>
 
 </ScrollView>
