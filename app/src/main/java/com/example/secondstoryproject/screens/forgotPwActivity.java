@@ -72,7 +72,7 @@ public class forgotPwActivity extends BaseActivity {
                             /// שלב 2: בדיקת התאמה של האימייל
                             if (!email.equals(user.getEmail())) {
                                 Log.e(TAG, "Email does not match for user: " + username);
-                                etEmail.setError("האימייל לא תואם לחשבון הזה");
+                                etEmail.setError("האימייל לא תואם לחשבון זה");
                                 etEmail.requestFocus();
                                 return;
                             }
@@ -106,6 +106,8 @@ public class forgotPwActivity extends BaseActivity {
                 }
             }
         });
+
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
     /// Check if the input is valid

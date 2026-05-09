@@ -1,201 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    tools:context=".screens.forgotPwActivity">
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <FrameLayout
+        <!-- ===== Header סגול ===== -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:orientation="vertical"
+            android:background="@color/dark_purple"
+            android:gravity="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="28dp"
+            android:paddingHorizontal="24dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_arrow_right"
+                android:tint="@color/lavender"
+                android:layout_gravity="left"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="חזור"/>
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/logonobackground"
+                android:background="@drawable/circle_background"
+                android:layout_marginBottom="12dp"/>
 
             <TextView
-                android:id="@+id/bigTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/noot"
-                android:text="עידכון"
-                android:textColor="#36b3b8"
-                android:textSize="23pt"
-                android:textStyle="bold" />
+                android:text="עדכון סיסמה"
+                android:textSize="30sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
 
             <TextView
-                android:id="@+id/bigTitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="-5dp"
-                android:layout_marginTop="-5dp"
-                android:fontFamily="@font/noot"
-                android:text="עידכון"
-                android:textColor="@color/black"
-                android:textSize="23pt"
-                android:textStyle="bold" />
-        </FrameLayout>
+                android:text="נאמת את זהותך ונאפס את הסיסמה"
+                android:textSize="17sp"
+                android:textColor="@color/lavender"
+                android:layout_marginTop="4dp"
+                android:alpha="0.85"/>
 
-        <FrameLayout
+        </LinearLayout>
+
+        <!-- ===== גוף הטופס ===== -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-40dp"
-            android:layout_marginBottom="40dp">
+            android:orientation="vertical"
+            android:padding="20dp">
 
+            <!-- כותרת שלב 1 -->
             <TextView
-                android:id="@+id/littleTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/akitrg__"
-                android:text="סיסמה"
-                android:textColor="@color/black"
-                android:textSize="23pt"
-                android:textStyle="bold" />
+                android:text="אימות זהות"
+                android:textSize="16sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="10dp"/>
 
-            <TextView
-                android:id="@+id/littleTitle2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="-3dp"
-                android:layout_marginTop="-3dp"
-                android:fontFamily="@font/akitrg__"
-                android:text="סיסמה"
-                android:textColor="#36b3b8"
-                android:textSize="23pt"
-                android:textStyle="bold" />
-        </FrameLayout>
-
-
-
-
-        <!-- כרטיס מידע -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp"
-            android:layout_margin="16dp">
-
-            <LinearLayout
+            <!-- שם משתמש -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/usernameInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <!-- שדה שם משתמש -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/usernameInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:hint="שם משתמש"
+                android:layout_marginBottom="12dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/usernameInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="שם משתמש"
-                    android:maxWidth="488dp"
-                    android:layout_gravity="center"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/usernameInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPersonName"
-                        android:textColor="@android:color/black"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:inputType="textPersonName"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- שדה אימייל -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/emailInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <!-- אימייל -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="אימייל"
+                android:layout_marginBottom="20dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/emailInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="אימייל"
-                    android:maxWidth="488dp"
-                    android:layout_gravity="center"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/emailInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        android:textColor="@android:color/black"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- שדה סיסמה -->
-                <View
-                    android:id="@+id/view"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
+            <!-- קו הפרדה -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/lavender"
+                android:layout_marginBottom="20dp"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/passwordInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="סיסמה"
-                    android:maxWidth="488dp"
-                    android:layout_gravity="center"
-                    app:endIconMode="password_toggle"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/passwordInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:textColor="@android:color/black"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
+            <!-- כותרת שלב 2 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="סיסמה חדשה"
+                android:textSize="16sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="10dp"/>
 
-                <!-- שדה אימות סיסמה -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/confirmPasswordInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <!-- סיסמה חדשה -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="סיסמה חדשה"
+                android:layout_marginBottom="12dp"
+                app:endIconMode="password_toggle"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="אימות סיסמה"
-                    android:maxWidth="488dp"
-                    app:endIconMode="password_toggle"
-                    android:layout_gravity="center"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/confirmPasswordInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:textColor="@android:color/black"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
-                <!-- כפתור למטה -->
-                <Button
-                    android:id="@+id/btn_changePw"
-                    android:layout_width="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- אימות סיסמה -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/confirmPasswordInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="אימות סיסמה"
+                android:layout_marginBottom="24dp"
+                app:endIconMode="password_toggle"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/confirmPasswordInput"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:backgroundTint="#36b3b8"
-                    android:fontFamily="@font/akitrg__"
-                    android:text="עידכון סיסמה"
-                    android:textColor="@color/black"
-                    android:textSize="15pt"/>
-                <!--app:icon="@android:drawable/ic_menu_save"-->
+                    android:inputType="textPassword"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- כפתור עדכון -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_changePw"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="עדכון סיסמה"
+                android:textSize="18sp"
+                android:backgroundTint="@color/dark_purple"
+                android:textColor="@color/light_lavender"
+                app:cornerRadius="12dp"/>
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
+        </LinearLayout>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

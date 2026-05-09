@@ -81,6 +81,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         // set the click listeners
         btnLogin.setOnClickListener(this);
+
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
     @Override

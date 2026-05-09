@@ -99,6 +99,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         });
 
         btnRegister.setOnClickListener(this);
+
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
     }
 
     @Override
