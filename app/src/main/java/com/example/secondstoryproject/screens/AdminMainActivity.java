@@ -164,10 +164,14 @@ public class AdminMainActivity extends BaseActivity {
         dataSet.setValueTextSize(12f);
         dataSet.setValueTextColor(Color.WHITE);
         dataSet.setSliceSpace(2f);
-
+        dataSet.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value);
+            }
+        });
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
-        pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
         pieChart.setCenterText("תרומות");
         pieChart.setCenterTextSize(14f);
