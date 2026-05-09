@@ -3,15 +3,17 @@ package com.example.secondstoryproject.screens;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.core.view.GravityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.secondstoryproject.R;
+import com.example.secondstoryproject.adapters.CarouselDonationAdapter;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.models.IsraelCity;
@@ -28,126 +30,154 @@ import org.osmdroid.views.overlay.Marker;
 
 import androidx.preference.PreferenceManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends BaseActivity {
 
     @Override
-    protected int getSelectedBottomNavItem() {
-        return R.id.menu_home;
-    }
-    private static final String TAG = "MainActivity";
-    ProgressBar rateProgressBar;
-    ImageView currentRateIcon, nextRateIcon ,maxLevelIcon;;
+    protected int getSelectedBottomNavItem() { return R.id.menu_home; }
+
+    private ProgressBar rateProgressBar;
+    private ImageView currentRateIcon, maxLevelIcon;
     private MapView miniMap;
-    TextView progressText, remainingText, totalDonationsText;
-    TextView currentLevelName, nextLevelName, maxLevelTitle, maxLevelSub;
-    LinearLayout normalLevelLayout, maxLevelLayout;
+    private TextView progressText, remainingText, totalDonationsText;
+    private TextView currentLevelName, nextLevelName, maxLevelTitle, maxLevelSub;
+    private LinearLayout normalLevelLayout, maxLevelLayout;
+    private RecyclerView rvCarousel;
+    private CarouselDonationAdapter carouselAdapter;
+    private final List<Donation> carouselDonations = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        rateProgressBar = findViewById(R.id.rateProgressBar);
-        currentRateIcon = findViewById(R.id.currentRateIcon);
-        nextRateIcon = findViewById(R.id.nextRateIcon);
-        progressText = findViewById(R.id.progressText);
-        remainingText = findViewById(R.id.remainingText);
-        totalDonationsText = findViewById(R.id.totalDonationsText);
-        currentLevelName = findViewById(R.id.currentLevelName);
-        nextLevelName = findViewById(R.id.nextLevelName);
-        maxLevelLayout = findViewById(R.id.maxLevelLayout);
-        normalLevelLayout = findViewById(R.id.normalLevelLayout);
-        maxLevelIcon = findViewById(R.id.maxLevelIcon);
-        maxLevelTitle = findViewById(R.id.maxLevelTitle);
-        maxLevelSub = findViewById(R.id.maxLevelSub);
+        bindViews();
 
         User currentUser = SharedPreferencesUtil.getUser(this);
+
+        // ברכה
+        TextView tvGreeting = findViewById(R.id.tvGreetingName);
+        tvGreeting.setText(currentUser.getFullName() + " 👋");
+
+        // רמה
         updateUserLevelUI(currentUser);
 
-        // ── מפה קטנה ──
-        Configuration.getInstance().load(
-                getApplicationContext(),
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-        );
+        // קרוסלה
+        setupCarousel();
+        loadCarouselDonations();
 
-        miniMap = findViewById(R.id.miniMap);
-        miniMap.setTileSource(TileSourceFactory.MAPNIK); //סוג מפה
-        miniMap.setMultiTouchControls(false); // לא גוללים במפה הקטנה
-        miniMap.getController().setZoom(7.5); // זום
-        miniMap.getController().setCenter(new GeoPoint(31.5, 34.8)); // מרכז ישראל
+        // מפה
+        setupMap();
 
-        AddAllMarkers();
-
-        // לחיצה על המפה -> פתיחת מסך מלא
-        findViewById(R.id.mapClickOverlay).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, FullMapActivity.class);
-            startActivity(intent);
-        });
-
-        // ── כפתורים ──
-        Button buttoToAddDonation = findViewById(R.id.btn_addDonation);
-        Button buttonToSearchDonation = findViewById(R.id.btn_searchDonation);
-
-        buttoToAddDonation.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, PickCatergoryActivity.class);
-            startActivity(intent);
-        });
-
-        buttonToSearchDonation.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SearchDonationsActivity.class);
-            startActivity(intent);
-        });
+        // כפתורים
+        findViewById(R.id.btn_addDonation).setOnClickListener(v ->
+                startActivity(new Intent(this, PickCatergoryActivity.class)));
+        findViewById(R.id.btn_searchDonation).setOnClickListener(v ->
+                startActivity(new Intent(this, SearchDonationsActivity.class)));
+        findViewById(R.id.mapClickOverlay).setOnClickListener(v ->
+                startActivity(new Intent(this, FullMapActivity.class)));
     }
 
-    public void AddAllMarkers(){
+    private void bindViews() {
+        rateProgressBar   = findViewById(R.id.rateProgressBar);
+        currentRateIcon   = findViewById(R.id.currentRateIcon);
+        progressText      = findViewById(R.id.progressText);
+        remainingText     = findViewById(R.id.remainingText);
+        totalDonationsText= findViewById(R.id.totalDonationsText);
+        currentLevelName  = findViewById(R.id.currentLevelName);
+        nextLevelName     = findViewById(R.id.nextLevelName);
+        maxLevelLayout    = findViewById(R.id.maxLevelLayout);
+        normalLevelLayout = findViewById(R.id.normalLevelLayout);
+        maxLevelIcon      = findViewById(R.id.maxLevelIcon);
+        maxLevelTitle     = findViewById(R.id.maxLevelTitle);
+        maxLevelSub       = findViewById(R.id.maxLevelSub);
+        rvCarousel        = findViewById(R.id.rvDonationsCarousel);
+    }
 
+    private void setupCarousel() {
+        carouselAdapter = new CarouselDonationAdapter(this, carouselDonations);
+        rvCarousel.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvCarousel.setAdapter(carouselAdapter);
+
+        rvCarousel.setVisibility(View.GONE);
+        findViewById(R.id.layout_empty).setVisibility(View.GONE);
+        findViewById(R.id.carouselLoading).setVisibility(View.VISIBLE);
+    }
+
+    private void loadCarouselDonations() {
+        User currentUser = SharedPreferencesUtil.getUser(this);
+
+        DatabaseService.getInstance().getDonationService()
+                .getDonationsByStatus(DonationStatus.APPROVED_AVAILABLE,
+                        new DatabaseService.DatabaseCallback<List<Donation>>() {
+                            @Override
+                            public void onCompleted(List<Donation> donations) {
+                                List<Donation> others = new ArrayList<>();
+                                for (Donation d : donations) {
+                                    if (!d.getGiverID().equals(currentUser.getId())) {
+                                        others.add(d);
+                                    }
+                                }
+                                runOnUiThread(() -> {
+                                    carouselDonations.clear();
+                                    carouselDonations.addAll(others);
+                                    carouselAdapter.notifyDataSetChanged();
+                                    updateCarouselState(others.isEmpty());
+                                });
+                            }
+                            @Override
+                            public void onFailed(Exception e) {
+                                runOnUiThread(() -> updateCarouselState(false));
+                            }
+                        });
+    }
+
+    private void updateCarouselState(boolean isEmpty) {
+        rvCarousel.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        findViewById(R.id.layout_empty).setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        findViewById(R.id.carouselLoading).setVisibility(View.GONE);
+    }
+
+    private void setupMap() {
+        Configuration.getInstance().load(
+                getApplicationContext(),
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        miniMap = findViewById(R.id.miniMap);
+        miniMap.setTileSource(TileSourceFactory.MAPNIK);
+        miniMap.setMultiTouchControls(false);
+        miniMap.getController().setZoom(7.5);
+        miniMap.getController().setCenter(new GeoPoint(31.5, 34.8));
+        AddAllMarkers();
+    }
+
+    public void AddAllMarkers() {
         miniMap.getOverlays().clear();
-
         DatabaseService.getInstance().getDonationService()
                 .getDonationsCountByCities(DonationStatus.APPROVED_AVAILABLE,
                         new DatabaseService.DatabaseCallback<java.util.HashMap<String, Integer>>() {
-
-                    @Override
-                    public void onCompleted(java.util.HashMap<String, Integer> cityCountMap) {
-
-                        IsraelCity[] citys = IsraelCity.values();
-
-                        for(int i = 0; i < citys.length; i++){
-                            String cityName = citys[i].getHebrewName();
-                            double lat = citys[i].getLatitude();
-                            double lon = citys[i].getLongitude();
-
-                            int count = cityCountMap.containsKey(cityName) ? cityCountMap.get(cityName) : 0;
-
-                            addCityMarker(cityName, lat, lon, count);
-                        }
-                    }
-
-                    @Override
-                    public void onFailed(Exception e) {
-
-                    }
-                });
+                            @Override
+                            public void onCompleted(java.util.HashMap<String, Integer> cityCountMap) {
+                                for (IsraelCity city : IsraelCity.values()) {
+                                    int count = cityCountMap.containsKey(city.getHebrewName())
+                                            ? cityCountMap.get(city.getHebrewName()) : 0;
+                                    addCityMarker(city.getHebrewName(),
+                                            city.getLatitude(), city.getLongitude(), count);
+                                }
+                            }
+                            @Override
+                            public void onFailed(Exception e) {}
+                        });
     }
+
     private void addCityMarker(String city, double lat, double lon, int count) {
-        Marker marker = new Marker(miniMap); //יצירת מרקר
-        marker.setPosition(new GeoPoint(lat, lon)); // מיקום
-        marker.setTitle(city + ": " + count + " תרומות"); // כיתוב
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM); // מרכוז וקביעה שהלמטה יגע במפה
-        miniMap.getOverlays().add(marker); // הוספה למפה עצמה (לפי שכבות)
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (miniMap != null) miniMap.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (miniMap != null) miniMap.onPause();
+        Marker marker = new Marker(miniMap);
+        marker.setPosition(new GeoPoint(lat, lon));
+        marker.setTitle(city + ": " + count + " תרומות");
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        miniMap.getOverlays().add(marker);
     }
 
     private void updateUserLevelUI(User user) {
@@ -160,15 +190,12 @@ public class MainActivity extends BaseActivity {
         if (isMaxLevel) {
             normalLevelLayout.setVisibility(View.GONE);
             maxLevelLayout.setVisibility(View.VISIBLE);
-
             maxLevelIcon.setImageResource(currentLevel.getIconRes());
             maxLevelTitle.setText(currentLevel.getLabel());
             maxLevelSub.setText("הגעת לרמה הגבוהה ביותר עם " + donations + " תרומות!");
-
         } else {
             normalLevelLayout.setVisibility(View.VISIBLE);
             maxLevelLayout.setVisibility(View.GONE);
-
             UserLevel nextLevel = levels[nextIndex];
             int min = currentLevel.getMinDonations();
             int nextMin = nextLevel.getMinDonations();
@@ -176,16 +203,26 @@ public class MainActivity extends BaseActivity {
             int totalInLevel = nextMin - min;
             int remaining = nextMin - donations;
             int progress = doneInLevel * 100 / totalInLevel;
-
             rateProgressBar.setProgress(progress);
             currentRateIcon.setImageResource(currentLevel.getIconRes());
-            nextRateIcon.setImageResource(nextLevel.getIconRes());
             currentLevelName.setText(currentLevel.getLabel());
             nextLevelName.setText(nextLevel.getLabel());
             progressText.setText(doneInLevel + " מתוך " + totalInLevel);
             remainingText.setText("עוד " + remaining + " לרמה הבאה");
             totalDonationsText.setText("סה\"כ תרומות: " + donations);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (miniMap != null) miniMap.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (miniMap != null) miniMap.onPause();
     }
 
     @Override
