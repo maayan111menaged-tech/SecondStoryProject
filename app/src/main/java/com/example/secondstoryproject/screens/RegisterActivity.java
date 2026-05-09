@@ -79,7 +79,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         etDate.setOnClickListener(v -> {
             CalendarConstraints constraints = new CalendarConstraints.Builder()
                     .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
-                    .setValidator(DateValidatorPointBackward.now()) // ← זה החסימה האמיתית!
+                    .setValidator(DateValidatorPointBackward.now())
                     .build();
 
             MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
@@ -125,43 +125,43 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     private boolean checkInput(String uName, String fName, String lName, String email, String phone, String date, String password) {
         if (!Validator.isUNameValid(uName)) {
-            etUName.setError("User name can include letters, numbers, dot and underscore");
+            etUName.setError("שם משתמש יכול להכיל אותיות, מספרים, נקודה וקו תחתון");
             etEmail.requestFocus();
             return false;
         }
 
         if (!Validator.isNameValid(fName)) {
-            etFName.setError("First name must be at least 3 characters long");
+            etFName.setError("שם פרטי חייב להכיל לפחות 3 תווים");
             etFName.requestFocus();
             return false;
         }
 
         if (!Validator.isNameValid(lName)) {
-            etLName.setError("Last name must be at least 3 characters long");
+            etLName.setError("שם משפחה חייב להכיל לפחות 3 תווים");
             etLName.requestFocus();
             return false;
         }
 
         if (!Validator.isEmailValid(email)) {
-            etEmail.setError("Invalid email address");
+            etEmail.setError("כתובת אימייל לא תקינה");
             etEmail.requestFocus();
             return false;
         }
 
         if (!Validator.isBirthDateValid(date)) {
-            etDate.setError("Please select a valid birth date");
+            etDate.setError("נא לבחור תאריך לידה תקין");
             etDate.requestFocus();
             return false;
         }
 
         if (!Validator.isPhoneValid(phone)) {
-            etPhoneNumber.setError("Phone number must be at least 10 characters long");
+            etPhoneNumber.setError("מספר טלפון חייב להכיל לפחות 10 ספרות");
             etPhoneNumber.requestFocus();
             return false;
         }
 
         if (!Validator.isPasswordValid(password)) {
-            etPassword.setError("Password must be at least 6 characters long");
+            etPassword.setError("סיסמה חייבת להכיל לפחות 6 תווים");
             etPassword.requestFocus();
             return false;
         }
@@ -188,7 +188,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onCompleted(Boolean exists) {
                 if (exists) {
-                    Toast.makeText(RegisterActivity.this, "User name already exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "שם המשתמש קיים במערכת, בחרו שם משתמש אחר", Toast.LENGTH_SHORT).show();
                 } else {
                     createUserInDatabase(user);
                 }
@@ -197,7 +197,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onFailed(Exception e) {
                 Log.e(TAG, "Failed to check username", e);
-                Toast.makeText(RegisterActivity.this, "Failed to register user", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, "שגיאה ברישום המשתמש", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -232,7 +232,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onFailed(Exception e) {
                 Log.e(TAG, "createUserInDatabase: Failed to create user", e);
-                Toast.makeText(RegisterActivity.this, "Failed to register user", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, "שגיאה ברישום המשתמש", Toast.LENGTH_SHORT).show();
                 SharedPreferencesUtil.signOutUser(RegisterActivity.this);
             }
         });

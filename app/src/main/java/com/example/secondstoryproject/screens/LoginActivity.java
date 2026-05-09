@@ -107,14 +107,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private boolean checkInput(String uname, String password) {
         if (!Validator.isUNameValid(uname)) {
             Log.e(TAG, "checkInput: Invalid user name address");
-            etUName.setError("Invalid user name address");
+            etUName.setError("שם משתמש לא תקין");
             etUName.requestFocus();
             return false;
         }
 
         if (!Validator.isPasswordValid(password)) {
             Log.e(TAG, "checkInput: Invalid password");
-            etPassword.setError("Password must be at least 6 characters long");
+            etPassword.setError("סיסמה חייבת להכיל לפחות 6 תווים");
             etPassword.requestFocus();
             return false;
         }
