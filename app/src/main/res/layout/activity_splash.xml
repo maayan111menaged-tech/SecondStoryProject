@@ -1,42 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".screens.SplashActivity">
+    android:background="@color/dark_purple">
 
+    <!-- עיגול עליון -->
+    <View
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="-70dp"
+        android:layout_marginStart="-70dp"
+        android:background="@drawable/circle_bg_top"/>
 
+    <!-- עיגול תחתון -->
+    <View
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="-100dp"
+        android:layout_marginEnd="-100dp"
+        android:background="@drawable/circle_bg_bottom"/>
 
+    <!-- לוגו + טעינה במרכז -->
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_centerInParent="true">
 
         <ProgressBar
             android:layout_width="280dp"
             android:layout_height="280dp"
-            android:layout_gravity="center"/>
-        <ImageView
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:src="@drawable/logonobackground"
-            android:background="@android:color/transparent"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/lavender"/>
 
+        <ImageView
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_gravity="center"
+            android:src="@drawable/logonobackground" />
 
     </FrameLayout>
 
+    <!-- קרדיט -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="פותח על ידי מעיין מנגד"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:layout_marginBottom="20dp"/>
-
+        android:layout_marginBottom="24dp"
+        android:text="פותח על ידי מעיין מנגד"
+        android:textSize="12sp"
+        android:textColor="@color/lavender"
+        android:alpha="0.7"
+        android:gravity="center"/>
 
 </RelativeLayout>
