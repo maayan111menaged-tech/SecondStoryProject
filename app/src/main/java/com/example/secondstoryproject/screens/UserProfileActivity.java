@@ -42,6 +42,18 @@ import java.util.stream.Collectors;
  */
 public class UserProfileActivity extends BaseActivity {
 
+    @Override
+    protected int getSelectedBottomNavItem() {
+        String targetUserId = getIntent().getStringExtra("USER_ID");
+        User currentUser = SharedPreferencesUtil.getUser(this);
+
+        boolean viewingSelf = targetUserId == null
+                || (currentUser != null && targetUserId.equals(currentUser.getId()));
+
+        return viewingSelf ? R.id.menu_profile : -1;
+    }
+
+
     private enum ProfileMode { SELF, SELF_ADMIN, OTHER_USER, OTHER_ADMIN, ADMIN_ADMIN }
     private ProfileMode mode;
 
@@ -61,11 +73,7 @@ public class UserProfileActivity extends BaseActivity {
     private ProfileDonationAdapter donationAdapter;
     private final List<Donation> shownDonations = new ArrayList<>();
 
-    @Override
-    protected int getSelectedBottomNavItem() {
-        return (mode == ProfileMode.SELF || mode == ProfileMode.SELF_ADMIN)
-                ? R.id.menu_profile : -1;
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -443,6 +451,33 @@ public class UserProfileActivity extends BaseActivity {
                 btnLeft.setVisibility(View.VISIBLE);
                 btnRight.setVisibility(View.VISIBLE);
             }
+        }
+    }
+
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent); // מחליף את ה-Intent הישן בחדש
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        currentUser = SharedPreferencesUtil.getUser(this);
+        String targetUserId = getIntent().getStringExtra("USER_ID");
+
+        boolean viewingSelf = targetUserId == null
+                || (currentUser != null && targetUserId.equals(currentUser.getId()));
+
+        if (viewingSelf) {
+            profileUser = currentUser;
+            mode = (currentUser != null && currentUser.isAdmin())
+                    ? ProfileMode.SELF_ADMIN : ProfileMode.SELF;
+            renderProfile();
+        } else {
+            loadUserFromDb(targetUserId);
         }
     }
 }

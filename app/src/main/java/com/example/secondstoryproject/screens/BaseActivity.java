@@ -1,15 +1,18 @@
 package com.example.secondstoryproject.screens;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -18,8 +21,10 @@ import com.example.secondstoryproject.models.Chat;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
+import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
@@ -58,6 +63,23 @@ public abstract class BaseActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // עדכון Header של Drawer
+        View headerView = navigationView.getHeaderView(0);
+        TextView navHeaderName = headerView.findViewById(R.id.navHeaderName);
+        TextView navHeaderUsername = headerView.findViewById(R.id.navHeaderUsername);
+        ShapeableImageView navHeaderAvatar = headerView.findViewById(R.id.navHeaderAvatar);
+
+        User currentUser = SharedPreferencesUtil.getUser(this);
+        if (currentUser != null) {
+            navHeaderName.setText(currentUser.getFullName());
+            navHeaderUsername.setText("@" + currentUser.getUserName());
+
+            String photo = currentUser.getProfilePhoneUrl();
+            if (photo != null && !photo.isEmpty()) {
+                navHeaderAvatar.setImageBitmap(ImageUtil.fromBase64(photo));
+            }
+        }
+
         bottomNav = findViewById(R.id.bottom_nav);
 
         // בודק סוג משתמש
@@ -73,18 +95,19 @@ public abstract class BaseActivity extends AppCompatActivity
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
                 getSupportActionBar().setTitle("");
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.baseline_menu_24);
+                Drawable menuIcon = ContextCompat.getDrawable(this, R.drawable.baseline_menu_24);
+                menuIcon.setTint(ContextCompat.getColor(this, R.color.light_lavender));
+                getSupportActionBar().setHomeAsUpIndicator(menuIcon);
             }
 
-            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                    this,
-                    drawerLayout,
-                    toolbar,
-                    R.string.open_drawer,
-                    R.string.close_drawer
-            );
-            drawerLayout.addDrawerListener(toggle);
-            toggle.syncState();
+            toolbar.setNavigationOnClickListener(v -> {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            });
+
         } else{
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             navigationView.setVisibility(View.GONE);
@@ -111,6 +134,7 @@ public abstract class BaseActivity extends AppCompatActivity
                     }
                     if (item.getItemId() == R.id.menu_profile) {
                         navigateTo(UserProfileActivity.class);
+
                     }
                     return true;
                 }
@@ -143,17 +167,18 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     protected void navigateTo(Class<?> targetActivity) {
-
         if (!this.getClass().equals(targetActivity)) {
             Intent intent = new Intent(this, targetActivity);
             startActivity(intent);
             finish();
+        } else if (targetActivity.equals(UserProfileActivity.class)) {
+            Intent intent = new Intent(this, targetActivity);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
     }
-
-
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

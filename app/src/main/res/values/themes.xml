@@ -1,16 +1,81 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.SecondStoryProject" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!--background color-->
+        <item name="android:colorBackground">@color/light_lavender</item>
+        <item name="colorSurface">@color/light_lavender</item>
+        <item name="android:windowBackground">@color/light_lavender</item>
+
+        <!--shapes-->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeSmall</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeMedium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeLarge</item>
+
+        <!--bottom navigation-->
+        <item name="bottomNavigationStyle">@style/BottomNavStyle</item>
+
+
     </style>
 
     <style name="Theme.SecondStoryProject" parent="Base.Theme.SecondStoryProject" />
 
+    <!-- ===== Shapes ===== -->
+    <style name="ShapeSmall" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+    <style name="ShapeMedium" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+    <style name="ShapeLarge" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
     <style name="CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <!-- ===== botton nav ===== -->
+    <style name="BottomNavStyle" parent="Widget.Material3.BottomNavigationView">
+        <item name="backgroundTint">@color/dark_purple</item>
+        <item name="itemIconTint">@color/bottom_nav_tint</item>
+        <item name="itemTextColor">@color/bottom_nav_text_tint</item>
+        <item name="itemActiveIndicatorStyle">@style/BottomNavIndicator</item>
+        <item name="elevation">8dp</item>
+    </style>
+    <style name="BottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/light_lavender</item>
+    </style>
+
+
+    <!-- ===== Navigation Drawer ===== -->
+    <style name="NavDrawerStyle" parent="Widget.Material3.NavigationView">
+        <item name="android:background">@color/light_lavender</item>
+        <item name="itemIconTint">@color/nav_drawer_tint</item>
+        <item name="itemTextColor">@color/nav_drawer_tint</item>
+    </style>
+
+
+    <!-- ===== Dialogs ===== -->
+    <style name="DialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/dark_purple</item>
+        <item name="colorOnSurface">@color/dark_purple</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeMedium</item>
+        <item name="buttonBarPositiveButtonStyle">@style/DialogPositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogNegativeButton</item>
+    </style>
+    <style name="DialogPositiveButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/dark_purple</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="DialogNegativeButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/dark_purple</item>
+        <item name="android:textColor">@color/dark_purple</item>
+    </style>
+
+
 </resources>
 
 

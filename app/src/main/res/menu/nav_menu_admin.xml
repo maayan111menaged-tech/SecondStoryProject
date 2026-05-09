@@ -10,27 +10,27 @@
         <item
             android:id="@+id/nav_home_admin"
             android:icon="@drawable/ic_home"
-            android:title="Home"
+            android:title="בית"
             />
         <item
             android:id="@+id/nav_admin_profile"
             android:icon="@drawable/ic_profile"
-            android:title="User Admin Profile"
+            android:title="פרופיל אישי"
             />
         <item
             android:id="@+id/nav_accept_donation"
             android:icon="@drawable/baseline_playlist_add_check_circle_24"
-            android:title="accept Donation"
+            android:title="אישור תרומות חדשות"
             />
         <item
             android:id="@+id/nav_donation_list"
             android:icon="@drawable/ic_search"
-            android:title="Donation List"
+            android:title="רשימת תרומות"
             />
         <item
             android:id="@+id/nav_users_list"
             android:icon="@drawable/baseline_menu_24"
-            android:title="Users List"
+            android:title="רשימת משתמשים"
             />
 
     </group>
@@ -42,7 +42,7 @@
             <item
                 android:id="@+id/nav_signOut"
                 android:icon="@drawable/ic_exit"
-                android:title="Sign Out"
+                android:title="התנתקות"
                 />
         </menu>
     </item>
