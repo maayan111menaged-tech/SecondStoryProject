@@ -217,7 +217,6 @@ public class AdminMainActivity extends BaseActivity {
             statuses.add(status);
         }
     }
-
     private void buildLegend(List<DonationStatus> statuses, List<Integer> colors) {
         legendContainer.removeAllViews();
 
