@@ -72,6 +72,8 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
         /// get the views
         addDonationButton = findViewById(R.id.add_donation_button);
         DonationImageView = findViewById(R.id.donation_image);
+        View layoutEmpty = findViewById(R.id.layoutUploadEmpty);
+        View layoutFilled = findViewById(R.id.layoutUploadFilled);
 
         /// set the tag for the image view
         /// to check if the image was changed from app:srcCompat="@drawable/image"
@@ -81,6 +83,9 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
         DonationImageView.setOnClickListener(this);
         addDonationButton.setOnClickListener(this);
 
+        layoutEmpty.setOnClickListener(v -> showImageSourceDialog());
+        findViewById(R.id.btnChangeImage).setOnClickListener(v -> showImageSourceDialog());
+
         /// register the activity result launcher for selecting image from gallery
         selectImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -88,6 +93,9 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri selectedImage = result.getData().getData();
                         DonationImageView.setImageURI(selectedImage);
+
+                        layoutEmpty.setVisibility(View.GONE);
+                        layoutFilled.setVisibility(View.VISIBLE);
                         /// set the tag for the image view to null
                         DonationImageView.setTag(null);
                     }
@@ -100,6 +108,8 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Bitmap bitmap = (Bitmap) result.getData().getExtras().get("data");
                         DonationImageView.setImageBitmap(bitmap);
+                        layoutEmpty.setVisibility(View.GONE);
+                        layoutFilled.setVisibility(View.VISIBLE);
                         /// set the tag for the image view to null
                         DonationImageView.setTag(null);
                     }

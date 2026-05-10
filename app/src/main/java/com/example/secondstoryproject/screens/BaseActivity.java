@@ -27,6 +27,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseActivity extends AppCompatActivity
@@ -36,6 +37,8 @@ public abstract class BaseActivity extends AppCompatActivity
     protected DrawerLayout drawerLayout;
     BottomNavigationView bottomNav;
 
+    private final List<com.google.firebase.database.ValueEventListener> unreadListeners = new ArrayList<>();
+    private final List<com.google.firebase.database.DatabaseReference> unreadRefs = new ArrayList<>();
 
     protected boolean isAdmin() {
         User currentUser = SharedPreferencesUtil.getUser(this);
@@ -238,10 +241,20 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     private void listenToTotalUnread() {
+        // ניקוי ליסנרים קודמים
+        for (int i = 0; i < unreadListeners.size(); i++) {
+            unreadRefs.get(i).removeEventListener(unreadListeners.get(i));
+        }
+        unreadListeners.clear();
+        unreadRefs.clear();
+
         User currentUser = SharedPreferencesUtil.getUser(this);
         if (currentUser == null) return;
 
-        if(!isAdmin()){
+        com.google.firebase.database.DatabaseReference chatsRef =
+                DatabaseService.getInstance().getChatService().getChatsRef();
+
+        if (!isAdmin()) {
             DatabaseService.getInstance().getChatService()
                     .getUserChats(currentUser.getId(),
                             new IDatabaseService.DatabaseCallback<List<Chat>>() {
@@ -250,66 +263,91 @@ public abstract class BaseActivity extends AppCompatActivity
                                     if (chats.isEmpty()) return;
                                     final int[] total = {0};
                                     final int[] count = {0};
+                                    String userId = currentUser.getId();
 
-                                    String id = currentUser.getId();
                                     for (Chat chat : chats) {
+                                        com.google.firebase.database.DatabaseReference ref =
+                                                chatsRef.child(chat.getId())
+                                                        .child("metadata")
+                                                        .child("unread_" + userId);
 
-                                        DatabaseService.getInstance().getChatService()
-                                                .listenToUnreadCount(chat.getId(),
-                                                        id,
-                                                        new IDatabaseService.DatabaseCallback<Integer>() {
-                                                            @Override
-                                                            public void onCompleted(Integer unread) {
-                                                                total[0] += unread;
-                                                                count[0]++;
-                                                                if (count[0] == chats.size()) {
-                                                                    updateChatBadge(total[0]);
-                                                                }
-                                                            }
-                                                            @Override
-                                                            public void onFailed(Exception e) {}
-                                                        });
+                                        com.google.firebase.database.ValueEventListener listener =
+                                                new com.google.firebase.database.ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                                                        Integer unread = snapshot.getValue(Integer.class);
+                                                        total[0] += (unread != null ? unread : 0);
+                                                        count[0]++;
+                                                        if (count[0] == chats.size()) {
+                                                            updateChatBadge(total[0]);
+                                                            total[0] = 0;
+                                                            count[0] = 0;
+                                                        }
+                                                    }
+                                                    @Override
+                                                    public void onCancelled(com.google.firebase.database.DatabaseError error) {}
+                                                };
+
+                                        ref.addValueEventListener(listener);
+                                        unreadListeners.add(listener);
+                                        unreadRefs.add(ref);
                                     }
                                 }
                                 @Override
                                 public void onFailed(Exception e) {}
                             });
         } else {
-
             DatabaseService.getInstance().getChatService()
                     .getAllAdminChats(new IDatabaseService.DatabaseCallback<List<Chat>>() {
-                                @Override
-                                public void onCompleted(List<Chat> chats) {
-                                    if (chats.isEmpty()) return;
-                                    final int[] total = {0};
-                                    final int[] count = {0};
+                        @Override
+                        public void onCompleted(List<Chat> chats) {
+                            if (chats.isEmpty()) return;
+                            final int[] total = {0};
+                            final int[] count = {0};
 
-                                    for (Chat chat : chats) {
+                            for (Chat chat : chats) {
+                                com.google.firebase.database.DatabaseReference ref =
+                                        chatsRef.child(chat.getId())
+                                                .child("metadata")
+                                                .child("unread_admin");
 
-                                        DatabaseService.getInstance().getChatService()
-                                                .listenToUnreadCount(chat.getId(),
-                                                        "admin",
-                                                        new IDatabaseService.DatabaseCallback<Integer>() {
-                                                            @Override
-                                                            public void onCompleted(Integer unread) {
-                                                                total[0] += unread;
-                                                                count[0]++;
-                                                                if (count[0] == chats.size()) {
-                                                                    updateChatBadge(total[0]);
-                                                                }
-                                                            }
-                                                            @Override
-                                                            public void onFailed(Exception e) {}
-                                                        });
-                                    }
-                                }
-                                @Override
-                                public void onFailed(Exception e) {}
-                            });
+                                com.google.firebase.database.ValueEventListener listener =
+                                        new com.google.firebase.database.ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                                                Integer unread = snapshot.getValue(Integer.class);
+                                                total[0] += (unread != null ? unread : 0);
+                                                count[0]++;
+                                                if (count[0] == chats.size()) {
+                                                    updateChatBadge(total[0]);
+                                                    total[0] = 0;
+                                                    count[0] = 0;
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(com.google.firebase.database.DatabaseError error) {}
+                                        };
+
+                                ref.addValueEventListener(listener);
+                                unreadListeners.add(listener);
+                                unreadRefs.add(ref);
+                            }
+                        }
+                        @Override
+                        public void onFailed(Exception e) {}
+                    });
         }
-
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (int i = 0; i < unreadListeners.size(); i++) {
+            unreadRefs.get(i).removeEventListener(unreadListeners.get(i));
+        }
+        unreadListeners.clear();
+        unreadRefs.clear();
+    }
     private void updateChatBadge(int count) {
         runOnUiThread(() -> {
             com.google.android.material.badge.BadgeDrawable badge =
@@ -321,5 +359,31 @@ public abstract class BaseActivity extends AppCompatActivity
                 badge.setVisible(false);
             }
         });
+    }
+
+    protected void sendAutoAdminMessage(String userId, String text) {
+        DatabaseService.getInstance().getChatService()
+                .getOrCreateAdminChat(userId, new IDatabaseService.DatabaseCallback<String>() {
+                    @Override
+                    public void onCompleted(String chatId) {
+                        DatabaseService.getInstance().getChatService()
+                                .sendMessage(chatId, "admin", text, true, new IDatabaseService.DatabaseCallback<Void>() {
+                                    @Override
+                                    public void onCompleted(Void unused) {}
+                                    @Override
+                                    public void onFailed(Exception e) {}
+                                });
+                    }
+                    @Override
+                    public void onFailed(Exception e) {}
+                });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (hasBottomMenu()) {
+            listenToTotalUnread();
+        }
     }
 }

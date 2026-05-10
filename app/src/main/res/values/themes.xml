@@ -76,6 +76,33 @@
     </style>
 
 
+    <style name="CategoryChipStyle" parent="Widget.Material3.Chip.Assist">
+
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/dark_purple</item>
+
+        <item name="chipBackgroundColor">@color/light_lavender</item>
+
+        <item name="chipStrokeColor">@color/medium_purple</item>
+        <item name="chipStrokeWidth">1dp</item>
+
+        <item name="chipCornerRadius">14dp</item>
+
+        <item name="chipIconSize">35dp</item>
+
+        <item name="ensureMinTouchTargetSize">false</item>
+
+    </style>
+
+    <!-- steps in adding new donation-->
+    <style name="StepText">
+        <item name="android:layout_width">35dp</item>
+        <item name="android:layout_height">35dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>
 
 

@@ -1,154 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".screens.AddDonationStep3Activity">
+    android:orientation="vertical"
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl">
 
+    <!-- ===== Header ===== -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:background="@color/dark_purple"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:paddingHorizontal="16dp">
 
-        <!--steps-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="הוספת תרומה"
+            android:textSize="22sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_marginBottom="12dp"/>
+
         <LinearLayout
-            android:id="@+id/stepIndicator"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:gravity="center_vertical">
 
-            <!-- צעד 1 -->
-            <TextView
-                android:id="@+id/step1"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_outline"
-                android:gravity="center"
-                android:text="1"
-                android:textColor="#AAAAAA"
-                android:textStyle="bold" />
+            <TextView style="@style/StepText"
+                android:background="@drawable/step_indicator_done"
+                android:text="✓" android:textColor="@color/white"/>
+            <View android:layout_width="24dp" android:layout_height="1dp"
+                android:background="@color/lavender" android:alpha="0.4"/>
+            <TextView style="@style/StepText"
+                android:background="@drawable/step_indicator_done"
+                android:text="✓" android:textColor="@color/white"/>
+            <View android:layout_width="24dp" android:layout_height="1dp"
+                android:background="@color/lavender" android:alpha="0.4"/>
+            <TextView style="@style/StepText"
+                android:background="@drawable/step_indicator_active"
+                android:text="3" android:textColor="@color/dark_purple"/>
+            <View android:layout_width="24dp" android:layout_height="1dp"
+                android:background="@color/lavender" android:alpha="0.4"/>
+            <TextView style="@style/StepText"
+                android:background="@drawable/step_indicator_idle"
+                android:text="4" android:textColor="@color/lavender"
+                android:alpha="0.5"/>
 
-            <!-- צעד 2 -->
-            <TextView
-                android:id="@+id/step2"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_outline"
-                android:gravity="center"
-                android:text="2"
-                android:textColor="#AAAAAA"
-                android:textStyle="bold" />
-
-            <!-- צעד 3 -->
-            <TextView
-                android:id="@+id/step3"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_filled"
-                android:gravity="center"
-                android:text="3"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-
-            <!-- צעד 4 -->
-            <TextView
-                android:id="@+id/step4"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:gravity="center"
-                android:text="4"
-                android:textColor="#AAAAAA"
-                android:background="@drawable/circle_outline"
-                android:textStyle="bold"
-                android:layout_margin="4dp"/>
         </LinearLayout>
+    </LinearLayout>
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
+    <!-- ===== תוכן ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="24dp">
+            android:text="הוסיפו תמונה לתרומה"
+            android:textSize="17sp"
+            android:textColor="@color/text_muted"
+            android:layout_marginBottom="16dp"/>
 
+        <!-- אזור תמונה -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginBottom="20dp">
+
+            <!-- לפני בחירה — מסגרת מקווקוות -->
             <LinearLayout
+                android:id="@+id/layoutUploadEmpty"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/dashed_border_bg"
+                android:clickable="true"
+                android:focusable="true"
+                tools:visibility="visible">
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp">
+                <ImageView
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@drawable/rounded_photo_camera_24"
+                    android:alpha="0.5"
+                    android:layout_marginBottom="8dp"/>
 
-                    <ImageView
-                        android:id="@+id/donation_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/colorSurfaceVariant"
-                        android:contentDescription="Donation Image"
-                        android:scaleType="centerCrop"
-                        app:srcCompat="@drawable/image" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="לחצו להוספת תמונה"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_muted"/>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        app:cardBackgroundColor="?attr/colorSurface"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="גלריה או מצלמה"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_muted"
+                    android:alpha="0.7" />
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:src="@drawable/rounded_photo_camera_24"
-                                app:tint="?attr/colorOnSurface" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tap to add photo"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="14sp"
-                                android:layout_marginTop="8dp" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-                </FrameLayout>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+
+            <!-- אחרי בחירה — תמונה + כפתור החלפה -->
+            <FrameLayout
+                android:id="@+id/layoutUploadFilled"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/donation_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/rounded_image_bg"/>
+
+                <!-- כפתור החלפה -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnChangeImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|start"
+                    android:layout_margin="10dp"
+                    android:text="החלף תמונה"
+                    android:textSize="14sp"
+                    android:backgroundTint="@color/dark_purple"
+                    android:textColor="@color/light_lavender"
+                    app:cornerRadius="99dp"
+                    app:icon="@drawable/rounded_photo_camera_24"
+                    app:iconSize="19dp"
+                    app:iconTint="@color/light_lavender"/>
+
+            </FrameLayout>
+
+        </FrameLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_donation_button"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="Add Donation"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            app:cornerRadius="30dp"
-            app:icon="@android:drawable/ic_input_add"
-            app:iconGravity="textStart"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
+            android:layout_height="52dp"
+            android:text="המשך לאישור"
+            android:textSize="17sp"
+            android:backgroundTint="@color/dark_purple"
+            android:textColor="@color/light_lavender"
+            app:cornerRadius="12dp"/>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

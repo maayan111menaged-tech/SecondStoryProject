@@ -1,179 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".screens.AddDonationStep2Activity">
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:orientation="vertical">
 
-        <!--steps-->
-        <LinearLayout
-            android:id="@+id/stepIndicator"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <!-- צעד 1 -->
-            <TextView
-                android:id="@+id/step1"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_outline"
-                android:gravity="center"
-                android:text="1"
-                android:textColor="#AAAAAA"
-                android:textStyle="bold" />
-
-            <!-- צעד 2 -->
-            <TextView
-                android:id="@+id/step2"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_filled"
-                android:gravity="center"
-                android:text="2"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-
-            <!-- צעד 3 -->
-            <TextView
-                android:id="@+id/step3"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_outline"
-                android:gravity="center"
-                android:text="3"
-                android:textColor="#AAAAAA"
-                android:textStyle="bold" />
-
-            <!-- צעד 4 -->
-            <TextView
-                android:id="@+id/step4"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:gravity="center"
-                android:text="4"
-                android:textColor="#AAAAAA"
-                android:background="@drawable/circle_outline"
-                android:textStyle="bold"
-                android:layout_margin="4dp"/>
-        </LinearLayout>
-
-        <!-- קטגוריה שנבחרה -->
+        <!-- ===== Header ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="vertical"
-            android:layout_marginBottom="24dp">
-
-            <ImageView
-                android:id="@+id/imgCategory"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginBottom="8dp"/>
+            android:background="@color/dark_purple"
+            android:paddingTop="22dp"
+            android:paddingBottom="16dp"
+            android:paddingHorizontal="16dp">
 
             <TextView
-                android:id="@+id/tvCategoryName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="הוספת תרומה"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/StepText"
+                    android:background="@drawable/step_indicator_done"
+                    android:text="✓"
+                    android:textColor="@color/white"/>
+
+                <View android:layout_width="24dp" android:layout_height="1dp"
+                    android:background="@color/lavender" android:alpha="0.4"/>
+
+                <TextView
+                    style="@style/StepText"
+                    android:background="@drawable/step_indicator_active"
+                    android:text="2"
+                    android:textColor="@color/dark_purple"/>
+
+                <View android:layout_width="24dp" android:layout_height="1dp"
+                    android:background="@color/lavender" android:alpha="0.4"/>
+
+                <TextView
+                    style="@style/StepText"
+                    android:background="@drawable/step_indicator_idle"
+                    android:text="3"
+                    android:textColor="@color/lavender"
+                    android:alpha="0.5"/>
+
+                <View android:layout_width="24dp" android:layout_height="1dp"
+                    android:background="@color/lavender" android:alpha="0.4"/>
+
+                <TextView
+                    style="@style/StepText"
+                    android:background="@drawable/step_indicator_idle"
+                    android:text="4"
+                    android:textColor="@color/lavender"
+                    android:alpha="0.5"/>
+
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- שם תרומה -->
-        <TextView
+        <!-- ===== תוכן ===== -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="שם התרומה"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="נא לתאר את התרומה בקצרה"
-            android:textSize="13sp"
-            android:textColor="#777777"
-            android:layout_marginBottom="8dp"/>
+            <!-- קטגוריה שנבחרה -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/white"
+                android:padding="12dp"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
 
-        <EditText
-            android:id="@+id/etDonationName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="כתבו כאן את שם התרומה..."
-            android:inputType="textCapWords"
-            android:layout_marginBottom="16dp"/>
+                <ImageView
+                    android:id="@+id/imgCategory"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"/>
 
-        <!-- תיאור -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="תיאור התרומה"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+                <TextView
+                    android:id="@+id/tvCategoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/dark_purple"
+                    android:layout_marginStart="20dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="נא לפרט: צבע, מצב, מתי נקנה, שימוש קודם, תאריך תפוגה (אם רלוונטי) וכל פרט חשוב נוסף."
-            android:textSize="13sp"
-            android:textColor="#777777"
-            android:layout_marginBottom="8dp"/>
+            </LinearLayout>
 
-        <EditText
-            android:id="@+id/etDescription"
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:background="@drawable/bg_rounded_input"
-            android:hint="כתבו כאן את תיאור התרומה..."
-            android:gravity="top|start"
-            android:inputType="textMultiLine"
-            android:maxLines="6"
-            android:padding="12dp"
-            android:layout_marginBottom="20dp"/>
+            <!-- שם תרומה -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="שם התרומה"
+                android:textSize="15sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="6dp"/>
 
-        <!-- עיר -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="עיר"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/etDonationName_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="כתבו את שם התרומה..."
+                android:layout_marginBottom="14dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDonationName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <AutoCompleteTextView
-            android:id="@+id/actCity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_rounded_input"
-            android:hint="בחרו עיר"
-            android:padding="12dp"
-            android:completionThreshold="1"
-            android:layout_marginBottom="30dp"/>
+            <!-- תיאור -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="תיאור התרומה"
+                android:textSize="15sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="4dp"/>
 
-        <!-- כפתור המשך -->
-        <Button
-            android:id="@+id/btnNextToUploadPic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="המשך להוספת תמונה"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="פרטו: צבע, מצב, שימוש קודם וכל פרט אחר רלוונטי"
+                android:textSize="13sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="6dp"/>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/etDescription_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="כתבו תיאור מפורט..."
+                android:layout_marginBottom="14dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:inputType="textMultiLine"
+                    android:gravity="top|start"
+                    android:maxLines="6"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- עיר -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="עיר"
+                android:textSize="15sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="6dp"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/actCity_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="בחרי עיר"
+                android:layout_marginBottom="20dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <AutoCompleteTextView
+                    android:padding="12dp"
+                    android:id="@+id/actCity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:completionThreshold="1"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNextToUploadPic"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="המשך להוספת תמונה"
+                android:textSize="17sp"
+                android:backgroundTint="@color/dark_purple"
+                android:textColor="@color/light_lavender"
+                app:cornerRadius="12dp"/>
+
+        </LinearLayout>
     </LinearLayout>
-
 </ScrollView>

@@ -5,286 +5,414 @@
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".screens.UserProfileActivity">
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingBottom="24dp">
 
-        <!-- ── כותרת דינמית ── -->
+        <!-- ===== כותרת + שם ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="8dp">
 
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="הפרופיל שלי"
-                android:textColor="#36b3b8"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textSize="17sp"
+                android:textColor="@color/text_muted"/>
+
+            <!-- ===== תמונת פרופיל ===== -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="12dp"
+                android:padding="2dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_profile"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                app:strokeColor="@color/medium_purple"
+                app:strokeWidth="2.5dp"/>
+
+            <TextView
+                android:id="@+id/tvFullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="שם מלא"
+                android:textSize="25sp"
+                android:textColor="@color/dark_purple"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/tvUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="username"
-                android:textColor="#36b3b8"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textSize="19sp"
+                android:textColor="@color/text_muted"/>
+
+            <!-- תג אדמין -->
+            <TextView
+                android:id="@+id/tvAdminState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="מנהל"
+                android:textSize="15sp"
+                android:textColor="@color/dark_purple"
+                android:background="@drawable/badge_background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
         </LinearLayout>
 
-        <!-- ── תמונת פרופיל ── -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imgProfile"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:padding="2dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_profile"
-            app:shapeAppearanceOverlay="@style/CircleImageView"
-            app:strokeColor="#36b3b8"
-            app:strokeWidth="2dp" />
-
-        <!-- ── שם מלא ── -->
-        <TextView
-            android:id="@+id/tvFullName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
-            android:text="שם מלא"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <!-- ── פרטים ציבוריים (רמה/אדמין + מספר תרומות) ── -->
+        <!-- ===== סטטיסטיקות ===== -->
         <LinearLayout
             android:id="@+id/layoutPublicInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:background="@drawable/rounded_background"
-                android:padding="10dp"
-                android:layout_marginEnd="6dp">
+                android:layout_marginEnd="6dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
 
-                <!-- רמה + מדליה – מוצג רק למשתמשים רגילים -->
                 <LinearLayout
-                    android:id="@+id/layoutLevelRow"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    tools:visibility="visible">
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
 
                     <TextView
-                        android:id="@+id/tvLevel"
+                        android:id="@+id/tvDonationCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:text="רמה"
-                        android:textColor="#36b3b8" />
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textColor="@color/dark_purple"
+                        android:textStyle="bold"/>
 
-                    <ImageView
-                        android:id="@+id/imgMedal"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_bronze" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="תרומות"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_muted"/>
                 </LinearLayout>
 
-                <!-- סוג המשתמש – אדמין – מוצג רק לאדמין -->
-                <TextView
-                    android:id="@+id/tvAdminState"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ADMIN"
-                    android:textColor="#36b3b8"
-                    android:textStyle="bold"
-                    android:visibility="gone"
-                    tools:visibility="visible"/>
+            </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
-
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardLevel"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:background="@drawable/rounded_background"
-                android:padding="10dp"
-                android:layout_marginStart="6dp">
+                android:layout_marginStart="6dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/white">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="תרומות"
-                    android:textSize="11sp"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
 
-                <TextView
-                    android:id="@+id/tvDonationCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0 תרומות"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="#36b3b8" />
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imgMedal"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_bronze"/>
+
+                        <TextView
+                            android:id="@+id/tvLevel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ארד"
+                            android:textSize="20sp"
+                            android:textColor="@color/dark_purple"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="רמה"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_muted"/>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <!-- ── כפתור צ'אט (OTHER_USER בלבד) ── -->
+        <!-- ===== דירוג ===== -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardRating"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/lavender"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="@color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp">
+
+                <!-- כוכבים -->
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:isIndicator="true"
+                    android:numStars="5"
+                    android:stepSize="0.1"
+                    style="@style/Widget.AppCompat.RatingBar.Small"
+                    app:tint="@color/medium_purple"/>
+
+                <!-- ממוצע -->
+                <TextView
+                    android:id="@+id/tvRatingAvg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="15sp"
+                    android:textColor="@color/dark_purple"
+                    android:textStyle="bold"/>
+
+                <!-- כמות -->
+                <TextView
+                    android:id="@+id/tvRatingCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_muted"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- טרם דורג -->
+        <TextView
+            android:id="@+id/tvNoRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:text="טרם דורג"
+            android:textSize="13sp"
+            android:textColor="@color/text_muted"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+        <!-- ===== כפתור צ'אט ===== -->
         <LinearLayout
             android:id="@+id/layoutChatRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="10dp"
             android:visibility="gone"
             tools:visibility="visible">
 
             <Button
                 android:id="@+id/btnChat"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="המשך שיחה"
-                android:backgroundTint="#36b3b8"
-                android:textColor="@android:color/white" />
+                android:backgroundTint="@color/lavender"
+                android:textColor="@color/dark_purple"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- ── פרטי קשר מלאים (SELF / SELF_ADMIN / OTHER_ADMIN / ADMIN_ADMIN) ── -->
-        <LinearLayout
+        <!-- ===== פרטי קשר ===== -->
+        <TextView
+            android:id="@+id/tvContactTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="פרטי קשר"
+            android:textSize="17sp"
+            android:textColor="@color/text_muted"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="6dp"/>
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/layoutContactInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/lavender"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="@color/white">
 
-            <!-- טלפון -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:background="@drawable/rounded_background"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_phone"
-                    app:tint="#36b3b8" />
-
-                <TextView
-                    android:id="@+id/tvPhone"
-                    android:layout_width="wrap_content"
+                <!-- טלפון -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="טלפון" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/ic_phone"
+                        android:layout_marginEnd="10dp"
+                        app:tint="@color/medium_purple"/>
+
+                    <TextView
+                        android:id="@+id/tvPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="טלפון"
+                        android:textSize="17sp"
+                        android:textColor="@color/dark_purple"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/lavender"
+                    android:layout_marginHorizontal="14dp"/>
+
+                <!-- מייל -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/ic_email"
+                        android:layout_marginEnd="10dp"
+                        app:tint="@color/medium_purple"/>
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="מייל"
+                        android:textSize="17sp"
+                        android:textColor="@color/dark_purple"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/lavender"
+                    android:layout_marginHorizontal="14dp"/>
+
+                <!-- תאריך לידה -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/ic_calendar"
+                        android:layout_marginEnd="10dp"
+                        app:tint="@color/medium_purple"/>
+
+                    <TextView
+                        android:id="@+id/tvBirthday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="תאריך לידה"
+                        android:textSize="17sp"
+                        android:textColor="@color/dark_purple"/>
+                </LinearLayout>
+
             </LinearLayout>
 
-            <!-- מייל -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:background="@drawable/rounded_background"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
+        </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_email"
-                    app:tint="#36b3b8" />
-
-                <TextView
-                    android:id="@+id/tvEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="מייל" />
-            </LinearLayout>
-
-            <!-- תאריך לידה -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:background="@drawable/rounded_background"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_calendar"
-                    app:tint="#36b3b8" />
-
-                <TextView
-                    android:id="@+id/tvBirthday"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="תאריך לידה" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- ── כפתורי פעולה ── -->
-        <LinearLayout
+        <!-- ===== כפתור עריכה ===== -->
+        <Button
+            android:id="@+id/btnEditProfile"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:weightSum="2">
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:text="עריכת פרטים"
+            android:backgroundTint="@color/dark_purple"
+            android:textColor="@color/light_lavender"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:cornerRadius="12dp"/>
 
-            <Button
-                android:id="@+id/btnEditProfile"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:text="עריכת פרטים"
-                android:backgroundTint="#36b3b8"
-                android:textColor="@android:color/white"
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <!-- ── סקציית תרומות ── -->
+        <!-- =====  תרומות ===== -->
         <LinearLayout
             android:id="@+id/layoutDonationsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_marginTop="20dp"
-            android:orientation="vertical">
+            android:paddingHorizontal="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_marginBottom="8dp">
 
                 <TextView
@@ -292,84 +420,84 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="תרומות"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="17sp"
+                    android:textColor="@color/text_muted"/>
 
                 <Button
                     android:id="@+id/btnViewAllDonations"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="הצג הכל"
-                    android:textSize="12sp"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:textColor="#36b3b8" />
+                    android:textSize="15sp"
+                    android:textColor="@color/medium_purple"
+                    style="@style/Widget.Material3.Button.TextButton"/>
             </LinearLayout>
 
-            <!-- קרוסלה -->
-            <RelativeLayout
-                android:id="@+id/layoutDonationsCarousel"
-                android:layout_width="match_parent"
-                android:layout_height="180dp">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvUserDonations"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingStart="32dp"
-                    android:paddingEnd="32dp" />
-
-                <ImageButton
-                    android:id="@+id/btnLeft"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/rounded_background"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:src="@drawable/ic_arrow_left"
-                    app:tint="@android:color/black" />
-
-                <ImageButton
-                    android:id="@+id/btnRight"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/rounded_background"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:src="@drawable/ic_arrow_right"
-                    app:tint="@android:color/black" />
-
-                <!-- Empty state -->
-                <LinearLayout
-                    android:id="@+id/emptyDonationsView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:alpha="0.3"
-                        android:contentDescription="אין תרומות"
-                        android:src="@drawable/ic_giving_heart" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:gravity="center"
-                        android:text="אין תרומות להצגה"
-                        android:textColor="#888888"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </RelativeLayout>
         </LinearLayout>
 
+        <!-- קרוסלת תרומות (מחוץ ל-padding כדי לאפשר scroll מקצה לקצה) -->
+        <RelativeLayout
+            android:id="@+id/layoutDonationsCarousel"
+            android:layout_width="match_parent"
+            android:layout_height="190dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvUserDonations"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                tools:visibility="invisible"/>
+
+            <ImageButton
+                android:id="@+id/btnLeft"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/badge_background"
+                android:src="@drawable/ic_arrow_left"
+                app:tint="@color/dark_purple"/>
+
+            <ImageButton
+                android:id="@+id/btnRight"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/badge_background"
+                android:src="@drawable/ic_arrow_right"
+                app:tint="@color/dark_purple"/>
+
+            <LinearLayout
+                android:id="@+id/emptyDonationsView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:alpha="0.25"
+                    android:src="@drawable/ic_giving_heart"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="אין תרומות להצגה"
+                    android:textColor="@color/text_muted"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+
     </LinearLayout>
+
 </ScrollView>

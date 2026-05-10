@@ -85,4 +85,6 @@ public interface IChatService {
 
     void setMatch(String donationId, String matchedUserId,
                   IDatabaseService.DatabaseCallback<Void> callback);
+
+    com.google.firebase.database.DatabaseReference getChatsRef();
 }

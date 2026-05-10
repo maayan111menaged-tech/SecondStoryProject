@@ -211,13 +211,14 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             public void onCompleted(Void object) {
                 SharedPreferencesUtil.saveUser(RegisterActivity.this, user);
 
-                // יצירת צאט אדמין אוטומטי ← חדש!
                 DatabaseService.getInstance().getChatService()
                         .getOrCreateAdminChat(user.getId(),
                                 new DatabaseService.DatabaseCallback<String>() {
                                     @Override
                                     public void onCompleted(String chatId) {
                                         // עוברים הלאה בכל מקרה
+                                        sendAutoAdminMessage(user.getId(),
+                                                "ברוכ/ה הבא/ה לסיפור שני! 🌸\nשמחים שהצטרפת לקהילה שלנו.\nאם יש שאלות או צורך בעזרה — אנחנו כאן!");
                                         Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
                                         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(mainIntent);
@@ -225,6 +226,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                                     @Override
                                     public void onFailed(Exception e) {
                                         // לא קריטי — עוברים בכל מקרה
+                                        sendAutoAdminMessage(user.getId(),
+                                                "ברוכ/ה הבא/ה לסיפור שני! 🌸\nשמחים שהצטרפת לקהילה שלנו.\nאם יש שאלות או צורך בעזרה — אנחנו כאן!");
                                         Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
                                         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(mainIntent);

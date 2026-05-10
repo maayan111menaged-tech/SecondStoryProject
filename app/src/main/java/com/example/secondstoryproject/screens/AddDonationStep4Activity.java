@@ -87,7 +87,12 @@ public class AddDonationStep4Activity extends BaseActivity {
             public void onCompleted(Void object) {
                 Toast.makeText(AddDonationStep4Activity.this,
                         "התרומה פורסמה בהצלחה!", Toast.LENGTH_SHORT).show();
-
+                sendAutoAdminMessage(currentUserId,
+                        "תרומה חדשה נשלחה לאישור ✨\n\n" +
+                                "שם: " + donationName + "\n" +
+                                "קטגוריה: " + categoryName + "\n" +
+                                "עיר: " + city + "\n\n" +
+                                "נעדכן אותך ברגע שהתרומה תאושר ותפורסם לציבור 🌸");
                 Intent intent = new Intent(AddDonationStep4Activity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

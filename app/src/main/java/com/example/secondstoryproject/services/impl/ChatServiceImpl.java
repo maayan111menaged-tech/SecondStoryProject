@@ -451,4 +451,9 @@ public class ChatServiceImpl implements IChatService {
                 .addOnSuccessListener(unused -> callback.onCompleted(null))
                 .addOnFailureListener(callback::onFailed);
     }
+
+    @Override
+    public DatabaseReference getChatsRef() {
+        return chatsRef;
+    }
 }

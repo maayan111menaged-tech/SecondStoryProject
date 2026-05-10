@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import com.example.secondstoryproject.adapters.ProfileDonationAdapter;
 import com.example.secondstoryproject.models.Chat;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationStatus;
+import com.example.secondstoryproject.models.Rate;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.models.UserLevel;
 import com.example.secondstoryproject.services.DatabaseService;
@@ -46,34 +48,32 @@ public class UserProfileActivity extends BaseActivity {
     protected int getSelectedBottomNavItem() {
         String targetUserId = getIntent().getStringExtra("USER_ID");
         User currentUser = SharedPreferencesUtil.getUser(this);
-
         boolean viewingSelf = targetUserId == null
                 || (currentUser != null && targetUserId.equals(currentUser.getId()));
-
         return viewingSelf ? R.id.menu_profile : -1;
     }
-
 
     private enum ProfileMode { SELF, SELF_ADMIN, OTHER_USER, OTHER_ADMIN, ADMIN_ADMIN }
     private ProfileMode mode;
 
     // Views
-    private TextView   tvPageTitle, tvUserName, tvFullName, tvLevel;
+    private TextView   tvPageTitle, tvUserName, tvFullName, tvLevel, tvContactTitle;
     private TextView   tvPhone, tvEmail, tvBirthday, tvDonationCount, tvAdminState;
     private ImageView  ivProfile, ivLevel;
     private Button     btnEdit, btnChat, btnViewAllDonations;
-    private LinearLayout layoutContactInfo, layoutChatRow,
-            layoutDonationsSection, layoutPublicInfo, layoutLevelRow;
+    private LinearLayout layoutChatRow, layoutDonationsSection, layoutPublicInfo;
     private RecyclerView rvUserDonations;
     private android.widget.ImageButton btnLeft, btnRight;
+    private com.google.android.material.card.MaterialCardView layoutContactInfo, cardLevel;
+    private com.google.android.material.card.MaterialCardView cardRating;
+    private RatingBar ratingBar;
+    private TextView tvRatingAvg, tvRatingCount, tvNoRating;
 
     // Data
     private User profileUser;
     private User currentUser;
     private ProfileDonationAdapter donationAdapter;
     private final List<Donation> shownDonations = new ArrayList<>();
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +92,6 @@ public class UserProfileActivity extends BaseActivity {
 
         currentUser = SharedPreferencesUtil.getUser(this);
         String targetUserId = getIntent().getStringExtra("USER_ID");
-
         boolean viewingSelf = targetUserId == null
                 || (currentUser != null && targetUserId.equals(currentUser.getId()));
 
@@ -122,13 +121,19 @@ public class UserProfileActivity extends BaseActivity {
         btnChat             = findViewById(R.id.btnChat);
         btnViewAllDonations = findViewById(R.id.btnViewAllDonations);
         layoutContactInfo   = findViewById(R.id.layoutContactInfo);
+        tvContactTitle      = findViewById(R.id.tvContactTitle);
         layoutChatRow       = findViewById(R.id.layoutChatRow);
         layoutDonationsSection = findViewById(R.id.layoutDonationsSection);
         layoutPublicInfo    = findViewById(R.id.layoutPublicInfo);
-        layoutLevelRow      = findViewById(R.id.layoutLevelRow);
+        cardLevel           = findViewById(R.id.cardLevel);
         rvUserDonations     = findViewById(R.id.rvUserDonations);
         btnLeft             = findViewById(R.id.btnLeft);
         btnRight            = findViewById(R.id.btnRight);
+        cardRating          = findViewById(R.id.cardRating);
+        ratingBar           = findViewById(R.id.ratingBar);
+        tvRatingAvg         = findViewById(R.id.tvRatingAvg);
+        tvRatingCount       = findViewById(R.id.tvRatingCount);
+        tvNoRating          = findViewById(R.id.tvNoRating);
 
         btnLeft.setOnClickListener(v  -> rvUserDonations.smoothScrollBy(300, 0));
         btnRight.setOnClickListener(v -> rvUserDonations.smoothScrollBy(-300, 0));
@@ -183,7 +188,6 @@ public class UserProfileActivity extends BaseActivity {
     private void renderProfile() {
         if (profileUser == null) return;
 
-        // ── פרטים משותפים לכל המצבים ──
         tvUserName.setText(profileUser.getUserName());
         tvFullName.setText(profileUser.getFullName());
         tvDonationCount.setText(profileUser.getDonationCounter() + " תרומות");
@@ -198,13 +202,12 @@ public class UserProfileActivity extends BaseActivity {
         switch (mode) {
 
             case SELF:
-                // משתמש רגיל רואה את עצמו – מציג רמה, מסתיר אדמין
                 showLevelRow(level);
                 tvAdminState.setVisibility(View.GONE);
-
                 tvPageTitle.setText("הפרופיל שלי");
-                layoutContactInfo.setVisibility(View.VISIBLE);
                 layoutPublicInfo.setVisibility(View.VISIBLE);
+                layoutContactInfo.setVisibility(View.VISIBLE);
+                tvContactTitle.setVisibility(View.VISIBLE);
                 layoutChatRow.setVisibility(View.GONE);
                 btnEdit.setVisibility(View.VISIBLE);
                 layoutDonationsSection.setVisibility(View.VISIBLE);
@@ -215,13 +218,12 @@ public class UserProfileActivity extends BaseActivity {
                 break;
 
             case SELF_ADMIN:
-                // אדמין רואה את עצמו – מציג ADMIN, מסתיר רמה
                 hideLevelRow();
                 tvAdminState.setVisibility(View.VISIBLE);
-
+                layoutPublicInfo.setVisibility(View.GONE);
                 tvPageTitle.setText("הפרופיל שלי");
                 layoutContactInfo.setVisibility(View.VISIBLE);
-                layoutPublicInfo.setVisibility(View.VISIBLE);
+                tvContactTitle.setVisibility(View.VISIBLE);
                 layoutChatRow.setVisibility(View.GONE);
                 btnEdit.setVisibility(View.VISIBLE);
                 layoutDonationsSection.setVisibility(View.VISIBLE);
@@ -232,51 +234,49 @@ public class UserProfileActivity extends BaseActivity {
                 break;
 
             case OTHER_USER:
-                // משתמש רגיל רואה אחר – מציג רמה, מסתיר אדמין
                 showLevelRow(level);
                 tvAdminState.setVisibility(View.GONE);
-
                 tvPageTitle.setText("פרופיל תורם");
-                layoutContactInfo.setVisibility(View.GONE);
                 layoutPublicInfo.setVisibility(View.VISIBLE);
+                layoutContactInfo.setVisibility(View.GONE);
+                tvContactTitle.setVisibility(View.GONE);
                 btnEdit.setVisibility(View.GONE);
                 layoutDonationsSection.setVisibility(View.VISIBLE);
                 setupChatButton();
-                loadDonations(true); // רק זמינות
+                loadDonations(true);
                 break;
 
             case OTHER_ADMIN:
-                // אדמין רואה משתמש רגיל – מציג רמה, מסתיר אדמין
                 showLevelRow(level);
                 tvAdminState.setVisibility(View.GONE);
-
                 tvPageTitle.setText("פרופיל משתמש");
-                layoutContactInfo.setVisibility(View.VISIBLE);
                 layoutPublicInfo.setVisibility(View.VISIBLE);
+                layoutContactInfo.setVisibility(View.VISIBLE);
+                tvContactTitle.setVisibility(View.VISIBLE);
                 btnEdit.setVisibility(View.GONE);
                 layoutDonationsSection.setVisibility(View.VISIBLE);
                 fillContactInfo();
                 setupAdminChatButton();
-                loadDonations(false); // כל הסטטוסים
+                loadDonations(false);
                 break;
 
             case ADMIN_ADMIN:
-                // אדמין רואה אדמין אחר – מציג ADMIN, מסתיר רמה
                 hideLevelRow();
                 tvAdminState.setVisibility(View.VISIBLE);
-
+                layoutPublicInfo.setVisibility(View.GONE);
                 tvPageTitle.setText("פרופיל מנהל");
                 layoutContactInfo.setVisibility(View.VISIBLE);
-                layoutPublicInfo.setVisibility(View.VISIBLE);
+                tvContactTitle.setVisibility(View.VISIBLE);
                 layoutChatRow.setVisibility(View.GONE);
                 btnEdit.setVisibility(View.GONE);
                 layoutDonationsSection.setVisibility(View.VISIBLE);
                 fillContactInfo();
-                loadDonations(false); // כל הסטטוסים
+                loadDonations(false);
                 break;
         }
 
-        // כפתור "כל התרומות" – נראה תמיד
+        loadRating();
+
         btnViewAllDonations.setVisibility(View.VISIBLE);
         btnViewAllDonations.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserDonationsActivity.class);
@@ -291,16 +291,15 @@ public class UserProfileActivity extends BaseActivity {
         });
     }
 
-    /** מציג את שורת הרמה + מדליה עם הערכים הנכונים */
     private void showLevelRow(UserLevel level) {
-        layoutLevelRow.setVisibility(View.VISIBLE);
+        layoutPublicInfo.setVisibility(View.VISIBLE);
+        cardLevel.setVisibility(View.VISIBLE);
         ivLevel.setImageResource(level.getIconRes());
         tvLevel.setText(level.getLabel());
     }
 
-    /** מסתיר את שורת הרמה + מדליה */
     private void hideLevelRow() {
-        layoutLevelRow.setVisibility(View.GONE);
+        cardLevel.setVisibility(View.GONE);
     }
 
     private void fillContactInfo() {
@@ -309,12 +308,6 @@ public class UserProfileActivity extends BaseActivity {
         tvBirthday.setText(profileUser.getDateOfBirth());
     }
 
-    /**
-     * מחפש צ'אטים קיימים עם profileUser.
-     * 0 צ'אטים  → מסתיר את layoutChatRow לגמרי
-     * 1 צ'אט    → פותח ישירות
-     * 2+ צ'אטים → מציג דיאלוג בחירה
-     */
     private void setupChatButton() {
         if (currentUser == null) {
             layoutChatRow.setVisibility(View.GONE);
@@ -326,25 +319,19 @@ public class UserProfileActivity extends BaseActivity {
                         new IDatabaseService.DatabaseCallback<List<Chat>>() {
                             @Override
                             public void onCompleted(List<Chat> chats) {
-                                // מסננים רק צ'אטים עם המשתמש הנצפה
                                 List<Chat> relevantChats = chats.stream()
                                         .filter(c -> profileUser.getId().equals(c.getOtherUserId()))
                                         .collect(Collectors.toList());
 
                                 runOnUiThread(() -> {
                                     if (relevantChats.isEmpty()) {
-                                        // אין צ'אט פתוח – מסתירים לגמרי
                                         layoutChatRow.setVisibility(View.GONE);
-
                                     } else if (relevantChats.size() == 1) {
-                                        // צ'אט אחד – פותחים ישירות
                                         layoutChatRow.setVisibility(View.VISIBLE);
                                         btnChat.setText("המשך שיחה");
                                         btnChat.setOnClickListener(v ->
                                                 openChat(relevantChats.get(0)));
-
                                     } else {
-                                        // כמה צ'אטים – דיאלוג בחירה
                                         layoutChatRow.setVisibility(View.VISIBLE);
                                         btnChat.setText("המשך שיחה");
                                         btnChat.setOnClickListener(v ->
@@ -352,7 +339,6 @@ public class UserProfileActivity extends BaseActivity {
                                     }
                                 });
                             }
-
                             @Override
                             public void onFailed(Exception e) {
                                 runOnUiThread(() -> layoutChatRow.setVisibility(View.GONE));
@@ -373,7 +359,6 @@ public class UserProfileActivity extends BaseActivity {
         });
     }
 
-
     private void openChat(Chat chat) {
         Intent i = new Intent(UserProfileActivity.this, ChatActivity.class);
         i.putExtra("CHAT_ID", chat.getId());
@@ -382,11 +367,6 @@ public class UserProfileActivity extends BaseActivity {
         startActivity(i);
     }
 
-
-    /**
-     * דיאלוג בחירה כאשר יש יותר מצ'אט אחד עם אותו משתמש.
-     * כל שורה מציגה את שם התרומה המשויכת לצ'אט.
-     */
     private void showChatPickerDialog(List<Chat> chats) {
         String[] labels = chats.stream()
                 .map(c -> {
@@ -397,17 +377,13 @@ public class UserProfileActivity extends BaseActivity {
                 })
                 .toArray(String[]::new);
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
+        new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
                 .setTitle("בחר שיחה")
                 .setItems(labels, (dialog, which) -> openChat(chats.get(which)))
                 .setNegativeButton("ביטול", null)
                 .show();
     }
 
-    /**
-     * @param availableOnly true  = רק APPROVED_AVAILABLE (OTHER_USER)
-     *                      false = כל הסטטוסים
-     */
     private void loadDonations(boolean availableOnly) {
         databaseService.getDonationService().getByGiverId(
                 profileUser.getId(),
@@ -454,12 +430,58 @@ public class UserProfileActivity extends BaseActivity {
         }
     }
 
+    private void loadRating() {
+        if (mode == ProfileMode.SELF_ADMIN || mode == ProfileMode.ADMIN_ADMIN) {
+            cardRating.setVisibility(View.GONE);
+            tvNoRating.setVisibility(View.GONE);
+            return;
+        }
+        android.util.Log.d("RATING_DEBUG", "loadRating called, mode: " + mode
+                + ", userId: " + profileUser.getId());
 
+        DatabaseService.getInstance().getRateService()
+                .getRatesForUser(profileUser.getId(),
+                        new IDatabaseService.DatabaseCallback<List<Rate>>() {
+                            @Override
+                            public void onCompleted(List<Rate> rates) {
+                                android.util.Log.d("RATING_DEBUG", "rates count: "
+                                        + (rates == null ? "null" : rates.size()));
+                                runOnUiThread(() -> {
+                                    if (rates == null || rates.isEmpty()) {
+                                        cardRating.setVisibility(View.GONE);
+                                        tvNoRating.setVisibility(View.VISIBLE);
+                                        return;
+                                    }
+                                    double avg = rates.stream()
+                                            .mapToInt(Rate::getStarAmount)
+                                            .average()
+                                            .orElse(0);
+                                    int count = rates.size();
+                                    // מעגל לחצי כוכב הכי קרוב
+                                    float roundedAvg = Math.round(avg * 2) / 2.0f;
+
+                                    ratingBar.setRating(roundedAvg);
+                                    tvRatingAvg.setText(String.format("%.1f", avg));
+                                    tvRatingCount.setText(count + " דירגו");
+                                    cardRating.setVisibility(View.VISIBLE);
+                                    tvNoRating.setVisibility(View.GONE);
+                                });
+                            }
+                            @Override
+                            public void onFailed(Exception e) {
+                                android.util.Log.e("RATING_DEBUG", "failed: " + e.getMessage());
+                                runOnUiThread(() -> {
+                                    cardRating.setVisibility(View.GONE);
+                                    tvNoRating.setVisibility(View.GONE);
+                                });
+                            }
+                        });
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        setIntent(intent); // מחליף את ה-Intent הישן בחדש
+        setIntent(intent);
     }
 
     @Override
@@ -467,7 +489,6 @@ public class UserProfileActivity extends BaseActivity {
         super.onResume();
         currentUser = SharedPreferencesUtil.getUser(this);
         String targetUserId = getIntent().getStringExtra("USER_ID");
-
         boolean viewingSelf = targetUserId == null
                 || (currentUser != null && targetUserId.equals(currentUser.getId()));
 
