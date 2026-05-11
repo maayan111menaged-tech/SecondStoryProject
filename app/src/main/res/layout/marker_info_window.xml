@@ -1,38 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="180dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@android:color/white"
+    android:background="@drawable/marker_info_window_bg"
     android:padding="12dp"
+    android:layoutDirection="rtl"
     android:elevation="8dp">
 
     <TextView
         android:id="@+id/tv_city_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:textSize="17sp"
         android:textStyle="bold"
-        android:textColor="#000000"
-        android:layoutDirection="rtl"
-        tools:text="@tools:sample/cities"/>
+        android:textColor="@color/dark_purple"
+        tools:text="תל אביב"/>
 
     <TextView
         android:id="@+id/tv_donation_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#555555"
-        android:layout_marginTop="4dp"
-        tools:text="@tools:sample/full_names"/>
+        android:textSize="15sp"
+        android:textColor="@color/text_muted"
+        android:layout_marginTop="2dp"
+        tools:text="5 תרומות זמינות"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="חיפוש תרומות"
-        android:textSize="5pt"
-        android:layout_marginTop="8dp"/>
+        android:layout_height="36dp"
+        android:text="חיפוש"
+        android:textSize="14sp"
+        android:backgroundTint="@color/dark_purple"
+        android:textColor="@color/light_lavender"
+        android:layout_marginTop="10dp"
+        app:cornerRadius="8dp"/>
 
 </LinearLayout>

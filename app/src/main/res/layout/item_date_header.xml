@@ -9,10 +9,10 @@
         android:id="@+id/tv_date_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="12dp"
+        android:paddingHorizontal="14dp"
         android:paddingVertical="4dp"
         android:textSize="12sp"
-        android:textColor="#888888"
-        android:background="@drawable/bg_date_header" />
+        android:textColor="@color/text_muted"
+        android:background="@drawable/bg_date_header"/>
 
 </LinearLayout>

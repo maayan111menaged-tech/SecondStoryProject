@@ -1,150 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".screens.ProfilePicActivity">
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <FrameLayout
-            android:layout_width="wrap_content"
+        <!-- ===== Header ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp">
+            android:orientation="vertical"
+            android:background="@color/dark_purple"
+            android:gravity="center"
+            android:paddingTop="48dp"
+            android:paddingBottom="28dp"
+            android:paddingHorizontal="24dp">
 
+            <!-- תמונת פרופיל נוכחית -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgProfile"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:padding="2dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_profile"
                 app:shapeAppearanceOverlay="@style/CircleImageView"
-                app:strokeColor="#36b3b8"
-                app:strokeWidth="2dp"/>
-        </FrameLayout>
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="2dp"
+                android:layout_marginBottom="10dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="make sure to press submit\nafter choosing a profile picture"/>
-
-        <TableLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp">
-
-            <TableRow
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:text="בחרו תמונת פרופיל"
+                android:textSize="22sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="בחרו תמונה מוכנה או העלו תמונה משלכם"
+                android:textSize="17sp"
+                android:textColor="@color/lavender"
+                android:layout_marginTop="4dp"
+                android:alpha="0.85"/>
+
+        </LinearLayout>
+
+        <!-- ===== גריד תמונות ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="תמונות מוכנות"
+                android:textSize="17sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- שורה 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="12dp">
 
                 <ImageButton
                     android:id="@+id/pic1"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginLeft="3dp"
                     android:src="@drawable/profilepic1"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/circle_border"
+                    android:background="@drawable/profile_unselected"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"/>
+
                 <ImageButton
                     android:id="@+id/pic2"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginRight="3dp"
                     android:src="@drawable/profilepic2"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/circle_border"
+                    android:background="@drawable/profile_unselected"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"/>
+
                 <ImageButton
                     android:id="@+id/pic3"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginRight="3dp"
                     android:src="@drawable/profilepic3"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/circle_border"
+                    android:background="@drawable/profile_unselected"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"/>
 
+            </LinearLayout>
 
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+            <!-- שורה 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="20dp">
 
                 <ImageButton
                     android:id="@+id/pic4"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginLeft="3dp"
                     android:src="@drawable/profilepic4"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/circle_border"
+                    android:background="@drawable/profile_unselected"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"/>
+
                 <ImageButton
                     android:id="@+id/pic5"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginRight="3dp"
                     android:src="@drawable/profilepic5"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/circle_border"
+                    android:background="@drawable/profile_unselected"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"/>
+
                 <ImageButton
                     android:id="@+id/pic6"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginRight="3dp"
                     android:src="@drawable/profilepic6"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/circle_border"
+                    android:background="@drawable/profile_unselected"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"/>
 
-            </TableRow>
+            </LinearLayout>
 
-            <TableRow
+            <!-- קו הפרדה -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/lavender"
+                android:layout_marginBottom="20dp"/>
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
-                <View
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
-                <ImageButton
-                    android:id="@+id/btnAddImage"
+                android:text="העלו תמונה משלכם"
+                android:textSize="17sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- כפתור העלאה -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/dashed_border_bg"
+                android:id="@+id/btnAddImage"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:src="@drawable/baseline_add_circle_24"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"
+                    android:layout_marginStart="8dp"
+                    app:tint="@color/medium_purple"/>
 
-                    android:background="@drawable/circle_border"
-                    android:scaleType="centerCrop"
-                    android:adjustViewBounds="true"/>
-                <View
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="10dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="בחרו מהגלריה או צלמו תמונה"
+                    android:textSize="15sp"
+                    android:textColor="@color/medium_purple"
+                    android:layout_marginStart="8dp"/>
 
-            </TableRow>
+            </LinearLayout>
 
-        </TableLayout>
+            <!-- כפתור שמירה -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSubmit"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="שמירה"
+                android:textSize="18sp"
+                android:backgroundTint="@color/dark_purple"
+                android:textColor="@color/light_lavender"
+                android:layout_marginTop="20dp"
+                app:cornerRadius="12dp"/>
 
-        <Button
-            android:id="@+id/btnSubmit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Submit"/>
+        </LinearLayout>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

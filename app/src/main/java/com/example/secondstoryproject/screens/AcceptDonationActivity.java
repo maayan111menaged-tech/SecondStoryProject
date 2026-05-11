@@ -2,8 +2,11 @@ package com.example.secondstoryproject.screens;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -37,6 +40,8 @@ public class AcceptDonationActivity extends BaseActivity {
     private LinearLayout layoutEmpty;
     private TextView tvDonationCount;
     private ProgressBar progressBar;
+    private EditText etSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +61,8 @@ public class AcceptDonationActivity extends BaseActivity {
 
         progressBar = findViewById(R.id.progress_bar);
 
+        etSearch = findViewById(R.id.et_search);
+
         // מעבר לפרטי התרומה
         adapter = new DonationAdapter(donation -> {
             Intent intent = new Intent(AcceptDonationActivity.this, DonationDetailActivity.class);
@@ -64,6 +71,16 @@ public class AcceptDonationActivity extends BaseActivity {
         });
 
         rvDonations.setAdapter(adapter);
+
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.filter(s.toString(), null, null);  }    });
+        // עדכון מונה אחרי פילטר
+        adapter.setOnFilterListener(count ->
+                tvDonationCount.setText("ממתינות לאישור: " + count)  );
+
     }
 
     @Override
@@ -73,11 +90,8 @@ public class AcceptDonationActivity extends BaseActivity {
     }
 
     private void loadDonations() {
-        progressBar.setVisibility(View.VISIBLE);
-        rvDonations.setVisibility(View.GONE);
-        layoutEmpty.setVisibility(View.GONE);
+        showLoading();
 
-        // שלב 1: טוענים את כל המשתמשים לבניית מפה uid → isActive
         DatabaseService.getInstance().getUserService().getAll(
                 new DatabaseService.DatabaseCallback<List<User>>() {
                     @Override
@@ -87,24 +101,20 @@ public class AcceptDonationActivity extends BaseActivity {
                             activeMap.put(u.getId(), u.isActive());
                         }
 
-                        // שלב 2: טוענים תרומות לפי סטטוס
                         DatabaseService.getInstance()
                                 .getDonationService()
                                 .getDonationsByStatus(DonationStatus.PENDING_APPROVAL,
                                         new DatabaseService.DatabaseCallback<List<Donation>>() {
                                             @Override
                                             public void onCompleted(List<Donation> donations) {
-                                                // ✅ פילטור תרומות של תורמים לא פעילים
                                                 List<Donation> filtered = new ArrayList<>();
                                                 for (Donation d : donations) {
                                                     Boolean donorActive = activeMap.get(d.getGiverID());
-                                                    boolean isDonorActive = donorActive == null || donorActive;
-                                                    if (isDonorActive) {
+                                                    if (donorActive == null || donorActive) {
                                                         filtered.add(d);
                                                     }
                                                 }
 
-                                                // מיון לפי תאריך – הישן ביותר ראשון
                                                 filtered.sort((a, b) -> {
                                                     Date dateA = getFirstStatusDate(a);
                                                     Date dateB = getFirstStatusDate(b);
@@ -114,24 +124,16 @@ public class AcceptDonationActivity extends BaseActivity {
                                                 });
 
                                                 runOnUiThread(() -> {
-                                                    progressBar.setVisibility(View.GONE);
-                                                    tvDonationCount.setText("Total: " + filtered.size());
+                                                    tvDonationCount.setText("ממתינות לאישור: " + filtered.size());
                                                     adapter.setDonations(filtered);
-
-                                                    if (filtered.isEmpty()) {
-                                                    rvDonations.setVisibility(View.GONE);
-                                                    layoutEmpty.setVisibility(View.VISIBLE);
-                                                    } else {
-                                                    rvDonations.setVisibility(View.VISIBLE);
-                                                    layoutEmpty.setVisibility(View.GONE);
-                                                    }
+                                                    if (filtered.isEmpty()) showEmpty();
+                                                    else showList();
                                                 });
-
                                             }
 
                                             @Override
                                             public void onFailed(Exception e) {
-                                                runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                                                runOnUiThread(() -> showEmpty());
                                                 Log.e(TAG, "Failed to load donations", e);
                                             }
                                         });
@@ -139,6 +141,7 @@ public class AcceptDonationActivity extends BaseActivity {
 
                     @Override
                     public void onFailed(Exception e) {
+                        runOnUiThread(() -> showEmpty());
                         Log.e(TAG, "Failed to load users", e);
                     }
                 });
@@ -149,5 +152,23 @@ public class AcceptDonationActivity extends BaseActivity {
             return null;
         }
         return donation.getStatusHistory().get(0).getTimestamp();
+    }
+
+    private void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+        rvDonations.setVisibility(View.GONE);
+        layoutEmpty.setVisibility(View.GONE);
+    }
+
+    private void showEmpty() {
+        progressBar.setVisibility(View.GONE);
+        rvDonations.setVisibility(View.GONE);
+        layoutEmpty.setVisibility(View.VISIBLE);
+    }
+
+    private void showList() {
+        progressBar.setVisibility(View.GONE);
+        rvDonations.setVisibility(View.VISIBLE);
+        layoutEmpty.setVisibility(View.GONE);
     }
 }

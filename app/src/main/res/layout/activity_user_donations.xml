@@ -5,17 +5,26 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="@color/light_lavender"
     android:orientation="vertical"
+    android:layoutDirection="rtl"
     tools:context=".screens.UserDonationsActivity">
 
-    <!-- ── כותרת + מספר תרומות ── -->
+    <!-- ===== כותרת ===== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@color/white">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="פרופיל"
+            android:textSize="13sp"
+            android:textColor="@color/text_muted"/>
 
         <TextView
             android:id="@+id/tvTitle"
@@ -24,25 +33,52 @@
             android:text="תרומות"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="?attr/colorOnBackground" />
+            android:textColor="@color/dark_purple"
+            android:layout_marginTop="2dp"/>
 
-        <TextView
-            android:id="@+id/tvDonationCount"
+        <!-- תג ספירה -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 תרומות"
-            android:textSize="13sp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginTop="2dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/badge_background"
+            android:backgroundTint="@color/lavender"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_giving_heart"
+                android:layout_marginEnd="6dp"
+                app:tint="@color/medium_purple"/>
+
+            <TextView
+                android:id="@+id/tvDonationCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 תרומות"
+                android:textSize="13sp"
+                android:textColor="@color/medium_purple"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
-    <!-- ── אזור פילטרים ── -->
+    <!-- ===== אזור פילטרים ===== -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="0dp">
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/lavender"
+        app:strokeWidth="1dp"
+        app:cardBackgroundColor="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -50,44 +86,83 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- חיפוש חופשי -->
-            <com.google.android.material.textfield.TextInputLayout
+            <!-- חיפוש -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="חיפוש לפי שם תרומה"
+                android:layout_height="44dp"
                 android:layout_marginBottom="8dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/lavender"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/light_lavender">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etSearch"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_search"
+                        android:layout_marginEnd="8dp"
+                        app:tint="@color/text_muted"/>
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:hint="חיפוש לפי שם תרומה"
+                        android:textColorHint="@color/text_muted"
+                        android:textSize="14sp"
+                        android:textColor="@color/dark_purple"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- שורת קטגוריה + סטטוס -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
 
                 <!-- קטגוריה -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:hint="קטגוריה"
                     android:layout_marginEnd="6dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    app:boxCornerRadiusTopStart="20dp"
+                    app:boxCornerRadiusTopEnd="20dp"
+                    app:boxCornerRadiusBottomStart="20dp"
+                    app:boxCornerRadiusBottomEnd="20dp"
+                    app:boxStrokeColor="@color/lavender"
+                    app:hintEnabled="false"
+                    app:errorEnabled="false"
+                    app:counterEnabled="false">
 
                     <AutoCompleteTextView
                         android:id="@+id/spinnerCategory"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:focusable="false"
+                        android:focusableInTouchMode="false"
                         android:inputType="none"
-                        android:text="כל הקטגוריות" />
+                        android:textSize="13sp"
+                        android:textColor="@color/medium_purple"
+                        android:hint="קטגוריה"
+                        android:paddingVertical="10dp"/>
+
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- סטטוס -->
@@ -95,34 +170,60 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:hint="סטטוס"
                     android:layout_marginStart="6dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    app:boxCornerRadiusTopStart="20dp"
+                    app:boxCornerRadiusTopEnd="20dp"
+                    app:boxCornerRadiusBottomStart="20dp"
+                    app:boxCornerRadiusBottomEnd="20dp"
+                    app:boxStrokeColor="@color/lavender"
+                    app:hintEnabled="false"
+                    app:errorEnabled="false"
+                    app:counterEnabled="false">
 
                     <AutoCompleteTextView
                         android:id="@+id/spinnerStatus"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:focusable="false"
+                        android:focusableInTouchMode="false"
                         android:inputType="none"
-                        android:text="כל הסטטוסים" />
+                        android:textSize="13sp"
+                        android:textColor="@color/medium_purple"
+                        android:hint="סטטוס"
+                        android:paddingVertical="10dp"/>
+
                 </com.google.android.material.textfield.TextInputLayout>
+
             </LinearLayout>
 
-            <!-- כפתור ניקוי -->
-            <Button
+            <!-- נקה סינונים -->
+            <TextView
                 android:id="@+id/btnClearFilters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="נקה סינונים"
-                android:textSize="12sp"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:textColor="#36b3b8" />
+                android:layout_marginTop="2dp"
+                android:text="נקה סינונים ✕"
+                android:textSize="13sp"
+                android:textColor="@color/medium_purple"
+                android:clickable="true"
+                android:focusable="true"/>
+
         </LinearLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- ── רשימת תרומות ── -->
+    <!-- ===== כותרת רשימה ===== -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="תוצאות"
+        android:textSize="13sp"
+        android:textColor="@color/text_muted"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="6dp"/>
+
+    <!-- ===== תוכן ===== -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -132,10 +233,11 @@
             android:id="@+id/rvDonations"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
-            android:clipToPadding="false" />
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false"/>
 
-        <!-- Empty state -->
         <LinearLayout
             android:id="@+id/layoutEmpty"
             android:layout_width="match_parent"
@@ -145,19 +247,21 @@
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:alpha="0.35"
-                android:src="@drawable/ic_giving_heart" />
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:alpha="0.4"
+                android:src="@drawable/ic_giving_heart"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:text="אין תרומות להצגה"
-                android:textColor="#AAAAAA"
-                android:textSize="16sp" />
+                android:textColor="@color/text_muted"
+                android:textSize="18sp"/>
+
         </LinearLayout>
+
     </FrameLayout>
 
 </LinearLayout>

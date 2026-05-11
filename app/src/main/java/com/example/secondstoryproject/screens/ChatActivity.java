@@ -34,10 +34,11 @@ import java.util.List;
 public class ChatActivity extends BaseActivity {
 
     // ── צבעי באנר ──
-    private static final String COLOR_DEFAULT  = "#075E54";
-    private static final String COLOR_INACTIVE = "#B71C1C";
-    private static final String COLOR_TAKEN    = "#E65100";
-    private static final String COLOR_MATCH    = "#F57F17";
+    private static final String COLOR_DEFAULT  = "#33083f"; // dark_purple
+    private static final String COLOR_INACTIVE = "#B71C1C"; // אדום — נשמר
+    private static final String COLOR_TAKEN    = "#E65100"; // כתום — נשמר
+    private static final String COLOR_MATCH    = "#F57F17"; // צהוב — נשמר
+
 
     public enum HeaderState { DEFAULT, INACTIVE, DELETED, TAKEN, MATCH }
 
@@ -48,6 +49,7 @@ public class ChatActivity extends BaseActivity {
     private ImageButton    btnBack;
     private ImageView      ivChatAvatar;
     private TextView       tvChatTitle;
+    private TextView tvHeaderDonationName;
     private TextView       tvStatusIcon;
     private TextView       tvChatStatus;
     private TextView       tvMatchSubtitle;
@@ -134,6 +136,7 @@ public class ChatActivity extends BaseActivity {
         btnBack           = findViewById(R.id.btn_back);
         ivChatAvatar      = findViewById(R.id.iv_chat_avatar);
         tvChatTitle       = findViewById(R.id.tv_chat_title);
+        tvHeaderDonationName = findViewById(R.id.tv_header_donation_name);
         tvStatusIcon      = findViewById(R.id.tv_status_icon);
         tvChatStatus      = findViewById(R.id.tv_chat_status);
         tvMatchSubtitle   = findViewById(R.id.tv_match_subtitle);
@@ -266,6 +269,32 @@ public class ChatActivity extends BaseActivity {
                     messageAdapter.setDonationId(donationId);
 
                     Boolean isDeleted = meta.child("donorDeleted").getValue(Boolean.class);
+                    if (donationId != null && !"admin".equals(type)) {
+                        FirebaseDatabase.getInstance(
+                                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
+                                .getReference("donations")
+                                .child(donationId)
+                                .child("name")
+                                .get()
+                                .addOnCompleteListener(donTask -> {
+                                    if (donTask.isSuccessful() && donTask.getResult().exists()) {
+                                        String donName = donTask.getResult().getValue(String.class);
+                                        runOnUiThread(() -> {
+                                            if (donName != null && !donName.isEmpty()) {
+                                                tvHeaderDonationName.setText("📦 " + donName);
+                                                tvHeaderDonationName.setVisibility(View.VISIBLE);
+                                                tvHeaderDonationName.setOnClickListener(v -> {
+                                                    Intent intent = new Intent(ChatActivity.this,
+                                                            DonationDetailActivity.class);
+                                                    intent.putExtra("DONATION_ID", donationId);
+                                                    startActivity(intent);
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+
                     if (Boolean.TRUE.equals(isDeleted)) {
                         runOnUiThread(this::showDeletedUserHeader);
                         listenToMessages(); // ← donationGiverId כבר מוגדר

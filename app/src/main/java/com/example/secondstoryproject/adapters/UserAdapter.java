@@ -98,23 +98,27 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         User user = userList.get(position);
         if (user == null) return;
 
-        // טיפול בפעיל לא פעיל
+        // במקום setText("+") / setText("-") — נחליף לאייקון
         if (!user.isActive()) {
             holder.itemView.setAlpha(0.7f);
             holder.tvStatus.setVisibility(View.VISIBLE);
-            holder.tvStatus.setText("⛔ לא פעיל");
-            holder.tvStatus.setTextColor(Color.parseColor("#E53935"));
-
-            holder.btnToggleActive.setText("+");
+            holder.btnToggleActive.setIconResource(R.drawable.baseline_add_circle_24);
+            holder.btnToggleActive.setIconTint(
+                    android.content.res.ColorStateList.valueOf(
+                            android.graphics.Color.parseColor("#43A047")));
             holder.btnToggleActive.setBackgroundTintList(
-                    android.content.res.ColorStateList.valueOf(Color.parseColor("#43A047")));
+                    android.content.res.ColorStateList.valueOf(
+                            android.graphics.Color.parseColor("#E8F5E9")));
         } else {
             holder.itemView.setAlpha(1.0f);
             holder.tvStatus.setVisibility(View.GONE);
-
-            holder.btnToggleActive.setText("-");
+            holder.btnToggleActive.setIconResource(R.drawable.baseline_block_24);
+            holder.btnToggleActive.setIconTint(
+                    android.content.res.ColorStateList.valueOf(
+                            android.graphics.Color.parseColor("#E53935")));
             holder.btnToggleActive.setBackgroundTintList(
-                    android.content.res.ColorStateList.valueOf(Color.parseColor("#E53935")));
+                    android.content.res.ColorStateList.valueOf(
+                            android.graphics.Color.parseColor("#FDECEA")));
         }
 
         //איפוס וטיפול בהשבתה עצמית או השבתת אדמין אחר
@@ -151,15 +155,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         // כפתור Make Admin – disabled אם כבר אדמין או אם לא פעיל
         if (user.isAdmin()) {
             holder.btnMakeAdmin.setEnabled(false);
-            holder.btnMakeAdmin.setText("Already Admin");
+            holder.btnMakeAdmin.setText("כבר אדמין");
             holder.btnMakeAdmin.setAlpha(0.5f);
         } else if (!user.isActive()) {
             holder.btnMakeAdmin.setEnabled(false);
-            holder.btnMakeAdmin.setText("Make Admin");
+            holder.btnMakeAdmin.setText("הפוך לאדמין");
             holder.btnMakeAdmin.setAlpha(0.5f);
         } else {
             holder.btnMakeAdmin.setEnabled(true);
-            holder.btnMakeAdmin.setText("Make Admin");
+            holder.btnMakeAdmin.setText("הפוך לאדמין");
             holder.btnMakeAdmin.setAlpha(1.0f);
         }
 
@@ -177,10 +181,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             return true;
         });
         holder.btnMakeAdmin.setOnClickListener(v -> {
-            // Set temporary loading state
             holder.btnMakeAdmin.setEnabled(false);
-            holder.btnMakeAdmin.setText("Loading...");
-
+            holder.btnMakeAdmin.setAlpha(0.5f);
+            holder.btnMakeAdmin.setText("...");
             if (onUserClickListener != null) {
                 onUserClickListener.onMakeAdminClick(user);
             }
@@ -297,7 +300,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
     public void resetMakeAdminButton(User user) {
         for (int i = 0; i < userList.size(); i++) {
             if (userList.get(i).getId().equals(user.getId())) {
-
                 userList.get(i).setAdmin(false);
                 notifyItemChanged(i);
                 return;
@@ -317,18 +319,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         notifyItemRemoved(index);
     }
 
-    /**
-     * Sets loading state for a button.
-     */
-    public void setLoadingState(Button button, boolean isLoading) {
-        if (isLoading) {
-            button.setEnabled(false);
-            button.setText("Loading...");
-        } else {
-            button.setEnabled(true);
-            button.setText("Make Admin");
-        }
-    }
 
     /**
      * ViewHolder for user item.
@@ -336,7 +326,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvUserName, tvName, tvEmail, tvPhone, tvMeBadge , tvStatus;
         ImageView ivProfilePic;
-        Button btnMakeAdmin, btnToggleActive, btnInfoUser, btnChatUser;
+        com.google.android.material.button.MaterialButton btnMakeAdmin,
+                btnToggleActive, btnInfoUser, btnChatUser;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,7 +40,8 @@ public class ProfilePicActivity extends BaseActivity {
 
     private ImageView ivProfile;
 
-    private ImageButton pic1, pic2, pic3, pic4, pic5, pic6, btnAddImage;
+    private ImageButton pic1, pic2, pic3, pic4, pic5, pic6;
+    private LinearLayout btnAddImage;
     private Button btnSubmit;
 
     private ActivityResultLauncher<Intent> selectImageLauncher;
@@ -140,22 +142,15 @@ public class ProfilePicActivity extends BaseActivity {
 
                     @Override
                     public void onCompleted(User result) {
-
                         SharedPreferencesUtil.saveUser(ProfilePicActivity.this, currentUser);
-
-                        Toast.makeText(ProfilePicActivity.this,
-                                "Profile updated!",
-                                Toast.LENGTH_SHORT).show();
-
-                        startActivity(new Intent(ProfilePicActivity.this, UserProfileActivity.class));
+                        Toast.makeText(ProfilePicActivity.this, "הפרופיל עודכן בהצלחה!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(ProfilePicActivity.this, updateDetailsActivity.class));
                         finish();
                     }
 
                     @Override
                     public void onFailed(Exception e) {
-                        Toast.makeText(ProfilePicActivity.this,
-                                "Update failed",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfilePicActivity.this, "עדכון נכשל, נסי שוב", Toast.LENGTH_SHORT).show();
                     }
                 }
         );

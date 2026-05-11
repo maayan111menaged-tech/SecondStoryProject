@@ -65,6 +65,19 @@
         <item name="shapeAppearanceMediumComponent">@style/ShapeMedium</item>
         <item name="buttonBarPositiveButtonStyle">@style/DialogPositiveButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/DialogNegativeButton</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/DialogTitleStyle</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/DialogBodyStyle</item>
+    </style>
+
+    <style name="DialogTitleStyle" parent="MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textAlignment">viewEnd</item>
+        <item name="android:textColor">@color/dark_purple</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DialogBodyStyle" parent="MaterialAlertDialog.Material3.Body.Text">
+        <item name="android:textAlignment">viewEnd</item>
+        <item name="android:textColor">@color/dark_purple</item>
     </style>
     <style name="DialogPositiveButton" parent="Widget.Material3.Button">
         <item name="backgroundTint">@color/dark_purple</item>

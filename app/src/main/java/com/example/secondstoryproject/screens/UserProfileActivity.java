@@ -282,11 +282,22 @@ public class UserProfileActivity extends BaseActivity {
             Intent intent = new Intent(this, UserDonationsActivity.class);
             intent.putExtra("USER_ID", profileUser.getId());
             intent.putExtra("USER_NAME", profileUser.getFullName());
-            boolean fullAccess = mode == ProfileMode.SELF
-                    || mode == ProfileMode.OTHER_ADMIN
-                    || mode == ProfileMode.ADMIN_ADMIN
-                    || mode == ProfileMode.SELF_ADMIN;
-            intent.putExtra("FULL_ACCESS", fullAccess);
+
+            String viewMode;
+            switch (mode) {
+                case SELF:
+                case SELF_ADMIN:
+                    viewMode = "SELF";
+                    break;
+                case OTHER_ADMIN:
+                case ADMIN_ADMIN:
+                    viewMode = "ADMIN";
+                    break;
+                default: // OTHER_USER
+                    viewMode = "OTHER";
+                    break;
+            }
+            intent.putExtra("VIEW_MODE", viewMode);
             startActivity(intent);
         });
     }

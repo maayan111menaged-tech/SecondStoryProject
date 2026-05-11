@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:gravity="center"
     android:padding="8dp">
@@ -16,17 +18,17 @@
         android:textColor="#2E7D32"
         android:textSize="13sp"
         android:textStyle="italic"
-        android:gravity="center" />
+        android:gravity="center"/>
 
-    <!-- גלוי רק בהודעת בקשת דירוג -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:text="⭐ דרג את התורם"
-        android:backgroundTint="#FFA000"
-        android:textColor="@android:color/white"
+        android:backgroundTint="@color/medium_purple"
+        android:textColor="@color/white"
+        app:cornerRadius="12dp"
         android:visibility="gone"
         tools:visibility="visible"/>
 
@@ -36,8 +38,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:text="⭐ דירגת את התורם"
-        android:textColor="#FFA000"
+        android:textColor="@color/medium_purple"
         android:textSize="13sp"
         android:visibility="gone"
         tools:visibility="visible"/>
+
 </LinearLayout>

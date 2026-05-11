@@ -87,8 +87,6 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         });
 
 
-
-
         // אתחול הכפתור והגדרת OnClickListener
         btnUpdateProfile = findViewById(R.id.btn_updateDetails_toHome);
         btnUpdateProfile.setOnClickListener(this);
@@ -188,9 +186,50 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         String password = etPassword.getText().toString().trim();
 
         // בדיקה שהקלט תקין
-        if (!isValid(firstName, lastName, phone, email,birthDate, userName, password)) {
+        if (!isValid(firstName, lastName, phone, email, birthDate, userName, password)) {
             return;
         }
+
+        // אם המשתמש שינה username -> לבדוק אם כבר קיים
+        if (!userName.equals(currentUser.getUserName())) {
+
+            DatabaseService.getInstance().getUserService()
+                    .checkIfUserNameExists(userName,
+                            new DatabaseService.DatabaseCallback<Boolean>() {
+
+                                @Override
+                                public void onCompleted(Boolean exists) {
+
+                                    if (exists) {
+                                        Toast.makeText(updateDetailsActivity.this,
+                                                "שם המשתמש כבר קיים במערכת",
+                                                Toast.LENGTH_SHORT).show();
+
+                                    } else {
+                                        saveUpdatedUser(firstName, lastName, email,
+                                                phone, birthDate, userName, password);
+                                    }
+                                }
+
+                                @Override
+                                public void onFailed(Exception e) {
+                                    Toast.makeText(updateDetailsActivity.this,
+                                            "שגיאה בבדיקת שם המשתמש",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+        } else {
+            // המשתמש לא שינה username
+            saveUpdatedUser(firstName, lastName, email,
+                    phone, birthDate, userName, password);
+        }
+    }
+
+    private void saveUpdatedUser(String firstName, String lastName,
+                                 String email, String phone,
+                                 String birthDate, String userName,
+                                 String password) {
 
         // עדכון האובייקט
         currentUser.setfName(firstName);
@@ -215,58 +254,62 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
                 currentUser.getId(),
                 fields,
                 new IDatabaseService.DatabaseCallback<Void>() {
+
                     @Override
                     public void onCompleted(Void result) {
-                        // עדכון ה-SharedPreferences ידנית
-                        currentUser.setfName(firstName);
-                        currentUser.setlName(lastName);
-                        currentUser.setEmail(email);
-                        currentUser.setPhoneNumber(phone);
-                        currentUser.setDateOfBirth(birthDate);
-                        currentUser.setUserName(userName);
-                        currentUser.setPassword(password);
-                        SharedPreferencesUtil.saveUser(updateDetailsActivity.this, currentUser);
+
+                        SharedPreferencesUtil.saveUser(
+                                updateDetailsActivity.this,
+                                currentUser
+                        );
 
                         Toast.makeText(updateDetailsActivity.this,
-                                "פרטייך עודכנו בהצלחה!", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(updateDetailsActivity.this, UserProfileActivity.class);
+                                "פרטייך עודכנו בהצלחה!",
+                                Toast.LENGTH_LONG).show();
+
+                        Intent intent = new Intent(
+                                updateDetailsActivity.this,
+                                UserProfileActivity.class
+                        );
+
                         startActivity(intent);
                         finish();
                     }
+
                     @Override
                     public void onFailed(Exception e) {
                         Toast.makeText(updateDetailsActivity.this,
-                                "שגיאה בעדכון הפרטים", Toast.LENGTH_SHORT).show();
+                                "שגיאה בעדכון הפרטים",
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
         );
-    } // סוגר הסופי של updateUserProfile
-
+    }
     private boolean isValid(String firstName, String lastName, String phone, String email,
                             String birthDate, String userName, String password) {
         if (!Validator.isNameValid(firstName)) {
-            etFirstName.setError("First name is required");
+            etFirstName.setError("שם פרטי חייב להכיל לפחות 3 תווים");
             etFirstName.requestFocus();
             return false;
         }
         if (!Validator.isNameValid(lastName)) {
-            etLastName.setError("Last name is required");
+            etLastName.setError("שם משפחה חייב להכיל לפחות 3 תווים");
             etLastName.requestFocus();
             return false;
         }
         if (!Validator.isPhoneValid(phone)) {
-            etPhoneNumber.setError("Phone number is required");
+            etPhoneNumber.setError("מספר טלפון לא תקין");
             etPhoneNumber.requestFocus();
             return false;
         }
         if (!Validator.isEmailValid(email)) {
-            etEmail.setError("Email is required");
+            etEmail.setError("כתובת אימייל לא תקינה");
             etEmail.requestFocus();
             return false;
         }
         if (!Validator.isBirthDateValid(birthDate)) {
             Log.e(TAG, "checkInput: Date cannot be empty");
-            etDate.setError("Please select a date");
+            etDate.setError("נא לבחור תאריך לידה");
             etDate.requestFocus();
             return false;
         }
@@ -275,12 +318,12 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         }
 
         if (!Validator.isUNameValid(userName)) {
-            etUserName.setError("User Name is required");
+            etUserName.setError("שם משתמש לא תקין");
             etUserName.requestFocus();
             return false;
         }
         if (!Validator.isPasswordValid(password)) {
-            etPassword.setError("Password is required");
+            etPassword.setError("סיסמה חייבת להכיל לפחות 6 תווים");
             etPassword.requestFocus();
             return false;
         }

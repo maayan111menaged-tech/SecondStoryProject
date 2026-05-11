@@ -1,55 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    android:layout_marginVertical="5dp"
     android:clickable="true"
     android:focusable="true"
-    android:background="@android:color/white"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/lavender"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="12dp"
         android:gravity="center_vertical">
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+        <!-- אווטאר -->
+        <ImageView
+            android:id="@+id/iv_user_profile_pic"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_profile"
+            android:background="@drawable/rounded_image_background"
+            android:clipToOutline="true"/>
 
-            <ImageView
-                android:id="@+id/iv_user_profile_pic"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:src="@drawable/ic_profile" />
-
-        </com.google.android.material.card.MaterialCardView>
-
+        <!-- פרטים -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp">
+            android:orientation="vertical">
 
+            <!-- שם + תגיות -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="5dp">
+                android:layout_marginBottom="3dp">
 
                 <TextView
                     android:id="@+id/tv_item_user_name"
@@ -57,20 +54,21 @@
                     android:layout_height="wrap_content"
                     android:textSize="17sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    tools:text="@tools:sample/first_names" />
+                    android:textColor="@color/dark_purple"
+                    tools:text="sarah_k"/>
 
                 <TextView
                     android:id="@+id/tv_me_badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="ME"
-                    android:textSize="11sp"
-                    android:textColor="@android:color/white"
+                    android:layout_marginStart="6dp"
+                    android:text="אני"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
                     android:textStyle="bold"
-                    android:background="@drawable/bg_me_badge"
-                    android:paddingHorizontal="6dp"
+                    android:background="@drawable/badge_background"
+                    android:backgroundTint="@color/medium_purple"
+                    android:paddingHorizontal="7dp"
                     android:paddingVertical="2dp"
                     android:visibility="gone"
                     tools:visibility="visible"/>
@@ -79,22 +77,31 @@
                     android:id="@+id/tv_user_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="6dp"
                     android:text="לא פעיל ⛔"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textColor="#E53935"
                     android:textStyle="bold"
+                    android:background="@drawable/badge_background"
+                    android:backgroundTint="#fdecea"
+                    android:paddingHorizontal="7dp"
+                    android:paddingVertical="2dp"
                     android:visibility="gone"
                     tools:visibility="visible"/>
+
             </LinearLayout>
+
+            <!-- שם מלא -->
             <TextView
                 android:id="@+id/tv_item_user_fullname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="?attr/colorOnSurface"
-                tools:text="@tools:sample/full_names" />
+                android:textSize="14sp"
+                android:textColor="@color/dark_purple"
+                android:layout_marginBottom="2dp"
+                tools:text="שרה כהן"/>
 
+            <!-- אימייל -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,22 +110,23 @@
                 android:layout_marginBottom="2dp">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:src="@android:drawable/ic_dialog_email"
-                    app:tint="#666666"
-                    android:layout_marginEnd="6dp" />
+                    android:layout_marginEnd="4dp"
+                    app:tint="@color/text_muted"/>
 
                 <TextView
                     android:id="@+id/tv_item_user_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="user@example.com" />
+                    android:textSize="13sp"
+                    android:textColor="@color/text_muted"
+                    tools:text="sarah@example.com"/>
 
             </LinearLayout>
 
+            <!-- טלפון -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -126,82 +134,104 @@
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:src="@android:drawable/sym_action_call"
-                    app:tint="#666666"
-                    android:layout_marginEnd="6dp" />
+                    android:layout_marginEnd="4dp"
+                    app:tint="@color/text_muted"/>
 
                 <TextView
                     android:id="@+id/tv_item_user_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="@tools:sample/us_phones" />
+                    android:textSize="13sp"
+                    android:textColor="@color/text_muted"
+                    tools:text="050-1234567"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/btn_make_admin"
+        <!-- כפתורי פעולה -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Make Admin"
-            android:textSize="11sp" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="8dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp">
+            <!-- הפוך לאדמין -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_make_admin"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="הפוך לאדמין"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/medium_purple"
+                android:backgroundTint="@color/lavender"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:layout_marginBottom="6dp"
+                app:cornerRadius="8dp"/>
 
-            <Button
-                android:id="@+id/btn_delete_user"
-                android:layout_width="0dp"
-                android:layout_height="32dp"
-                android:layout_weight="1"
-                android:text="−"
-                android:textSize="18sp"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#E53935"
-                android:padding="0dp"
-                style="@style/Widget.Material3.Button.IconButton"/>
+            <!-- שורת אייקונים -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete_user"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/baseline_block_24"
+                    app:iconSize="16dp"
+                    app:iconTint="#E53935"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    android:backgroundTint="#fdecea"
+                    app:cornerRadius="8dp"
+                    android:layout_marginEnd="4dp"/>
 
-            <Button
-                android:id="@+id/btn_Info_user"
-                android:layout_width="0dp"
-                android:layout_height="32dp"
-                android:layout_weight="1"
-                android:text="!"
-                android:textSize="18sp"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#1E88E5"
-                android:padding="0dp"
-                style="@style/Widget.Material3.Button.IconButton"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_Info_user"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/baseline_info_outline_24"
+                    app:iconSize="16dp"
+                    app:iconTint="@color/medium_purple"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    android:backgroundTint="@color/lavender"
+                    app:cornerRadius="8dp"
+                    android:layout_marginEnd="4dp"/>
 
-            <Button
-                android:id="@+id/btn_chat_user"
-                android:layout_width="0dp"
-                android:layout_height="32dp"
-                android:layout_weight="1"
-                android:backgroundTint="#36b3b8"
-                android:padding="0dp"
-                app:icon="@drawable/ic_chat"
-                app:iconTint="@android:color/white"
-                app:iconSize="18dp"
-                app:iconGravity="textStart"
-                style="@style/Widget.Material3.Button.IconButton"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_chat_user"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_chat"
+                    app:iconSize="16dp"
+                    app:iconTint="@color/dark_purple"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    android:backgroundTint="@color/light_purple"
+                    app:cornerRadius="8dp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
-    </LinearLayout>
 
     </LinearLayout>
 

@@ -86,15 +86,17 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
      */
     class ChatViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvName, tvLastMessage, tvTime, tvUnread;
+        TextView tvName, tvLastMessage, tvTime, tvUnread, tvDonationNameTag;
         ImageView ivPhoto;
+
+
         ChatViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tv_chat_name);
             tvLastMessage = itemView.findViewById(R.id.tv_last_message);
             tvTime = itemView.findViewById(R.id.tv_chat_time);
             tvUnread = itemView.findViewById(R.id.tv_unread_count);
-
+            tvDonationNameTag = itemView.findViewById(R.id.tv_donation_name_tag);
             ivPhoto = itemView.findViewById(R.id.iv_chat_avatar);
         }
 
@@ -111,8 +113,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
                 String name = chat.getOtherUserName();
                 // ✅ fallback אם השם ריק/null (משתמש שנמחק לפני שה-enrich רץ)
                 tvName.setText((name != null && !name.isEmpty()) ? name : "משתמש שנמחק");
-                String donation = chat.getDonationName() != null ? chat.getDonationName() : "";
-                tvLastMessage.setText(!donation.isEmpty() ? "📦 " + donation : "");
+
+            }
+
+            String donationName = chat.getDonationName();
+            if (!"admin".equals(chat.getType())
+                    && donationName != null && !donationName.isEmpty()) {
+                tvDonationNameTag.setText("📦 " + donationName);
+                tvDonationNameTag.setVisibility(View.VISIBLE);
+            } else {
+                tvDonationNameTag.setVisibility(View.GONE);
             }
 
             String last = chat.getLastMessage();

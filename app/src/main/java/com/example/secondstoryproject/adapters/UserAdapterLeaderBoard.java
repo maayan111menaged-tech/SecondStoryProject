@@ -59,8 +59,8 @@ public class UserAdapterLeaderBoard extends RecyclerView.Adapter<UserAdapterLead
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User user = userList.get(position);
 
-        // Display ranking position (starting from 1)
-        holder.tvPlace.setText(String.valueOf(position + 1));
+        // Display ranking position (starting from 4)
+        holder.tvPlace.setText(String.valueOf(position + 4));
 
         // Display user full name
         holder.tvName.setText(user.getFullName());
@@ -70,7 +70,7 @@ public class UserAdapterLeaderBoard extends RecyclerView.Adapter<UserAdapterLead
         holder.ivLevelIcon.setImageResource(user.getLevel().getIconRes());
 
         // Display donation count
-        holder.tvDonationCount.setText(user.getDonationCounter() + " תרומות");
+        holder.tvDonationCount.setText(String.valueOf(user.getDonationCounter()));
 
         // Display user profile picture
         if (user.getProfilePhoneUrl() != null && !user.getProfilePhoneUrl().isEmpty()) {

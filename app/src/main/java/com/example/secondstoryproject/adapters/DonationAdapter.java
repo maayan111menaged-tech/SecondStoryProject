@@ -3,12 +3,16 @@ package com.example.secondstoryproject.adapters;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationCategory;
 
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
+
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -166,9 +170,9 @@ public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHo
         // Set donation name
         holder.tvName.setText(donation.getName());
 
-        // Set category name and icon
+        // Set category name and city
         holder.tvCategory.setText(donation.getCategory().getHebrewName());
-        holder.imgCategory.setImageResource(donation.getCategory().getIconResId());
+        holder.tvCity.setText(donation.getCity());
 
         // Load donation image if exists
         if (donation.getPhotoUrl() != null && !donation.getPhotoUrl().isEmpty()) {
@@ -201,16 +205,16 @@ public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHo
      * ViewHolder for donation item.
      */
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvCategory , tvMineBadge;
-        ImageView imgDonation, imgCategory;
-        Button btnMoreInfo;
+        TextView tvName, tvCategory , tvCity,tvMineBadge;
+        ImageView imgDonation;
+        LinearLayout btnMoreInfo;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tv_donation_name);
             tvCategory = itemView.findViewById(R.id.tv_donation_category2);
+            tvCity = itemView.findViewById(R.id.tv_donation_city);
             imgDonation = itemView.findViewById(R.id.img_donation);
-            imgCategory = itemView.findViewById(R.id.img_category);
             btnMoreInfo = itemView.findViewById(R.id.btn_more_info);
             tvMineBadge = itemView.findViewById(R.id.tv_mine_badge);
         }

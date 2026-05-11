@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl"
     tools:context=".screens.AcceptDonationActivity">
 
     <LinearLayout
@@ -12,73 +15,173 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- כותרת -->
+        <!-- ===== כותרת ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="4dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accept Donations"
-                android:textSize="24sp"
+                android:text="ניהול"
+                android:textSize="17sp"
+                android:textColor="@color/text_muted"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="אישור תרומות"
+                android:textSize="26sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorOnBackground"
-                android:layout_marginBottom="4dp" />
+                android:textColor="@color/dark_purple"
+                android:layout_marginTop="2dp"/>
 
-            <TextView
-                android:id="@+id/tv_donation_to_accept_count"
+            <!-- תג ספירה -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total: 0"
-                android:textSize="14sp"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/badge_background"
+                android:backgroundTint="@color/lavender"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
+                    android:src="@drawable/ic_clock"
+                    android:layout_marginEnd="6dp"
+                    app:tint="@color/medium_purple"/>
+
+                <TextView
+                    android:id="@+id/tv_donation_to_accept_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ממתינות לאישור: 0"
+                    android:textSize="14sp"
+                    android:textColor="@color/medium_purple"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/rv_donations"
+        <!-- ===== שדה חיפוש ===== -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="12dp"/>
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/lavender"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="@color/white">
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    android:layout_marginEnd="8dp"
+                    app:tint="@color/text_muted"/>
+
+                <EditText
+                    android:id="@+id/et_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:hint="חיפוש לפי שם..."
+                    android:textColorHint="@color/text_muted"
+                    android:textSize="16sp"
+                    android:textColor="@color/dark_purple"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:singleLine="true"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ===== כותרת רשימה ===== -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="visible"/>
+            android:text="ממתינות לאישור"
+            android:textSize="16sp"
+            android:textColor="@color/text_muted"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="6dp"/>
 
-        <LinearLayout
-            android:id="@+id/layout_empty"
+        <!-- ===== תוכן ===== -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/ic_giving_heart"
-                android:alpha="0.4"/>
-
-            <TextView
+            <!-- לודינג -->
+            <ProgressBar
+                android:id="@+id/progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="אין תרומות לאישור"
-                android:textSize="18sp"
-                android:textColor="#AAAAAA"
-                android:layout_marginTop="16dp"/>
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/dark_purple"
+                android:visibility="gone"
+                tools:visibility="visible"/>
 
-        </LinearLayout>
+            <!-- ריק -->
+            <LinearLayout
+                android:id="@+id/layout_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible">
 
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ic_giving_heart"
+                    android:alpha="0.4"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="אין תרומות לאישור"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginTop="16dp"/>
+
+            </LinearLayout>
+
+            <!-- רשימה -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_donations"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="16dp"
+                android:clipToPadding="false"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+        </FrameLayout>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

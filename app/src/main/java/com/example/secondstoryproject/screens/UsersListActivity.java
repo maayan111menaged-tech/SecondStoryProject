@@ -80,8 +80,8 @@ public class UsersListActivity extends BaseActivity {
 
             @Override
             public void onMakeAdminClick(User user) {
-                new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
-                        .setTitle("Make Admin")
+                new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this, R.style.DialogTheme)
+                        .setTitle("הפיכה לאדמין")
                         .setMessage("האם תרצה להפוך את " + user.getUserName() + " לאדמין?")
                         .setPositiveButton("כן", (dialog, which) -> {
                             DatabaseService.getInstance().getDonationService()
@@ -100,7 +100,7 @@ public class UsersListActivity extends BaseActivity {
                                                         }
                                                     }
                                                     if (hasActiveDonations) {
-                                                        new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
+                                                        new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this, R.style.DialogTheme)
                                                                 .setTitle("לא ניתן להפוך לאדמין")
                                                                 .setMessage("למשתמש יש תרומות פעילות.\nיש לסגור אותן לפני הפיכתו לאדמין.")
                                                                 .setPositiveButton("הבנתי", null)
@@ -152,7 +152,7 @@ public class UsersListActivity extends BaseActivity {
             public void onToggleActiveClick(User user) {
                 if (!user.isActive()) {
                     // משתמש מושבת – הפעל מחדש בלבד
-                    new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
+                    new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this, R.style.DialogTheme)
                             .setTitle("הפעל משתמש")
                             .setMessage("האם להפעיל מחדש את " + user.getUserName() + "?")
                             .setPositiveButton("הפעל", (d, w) -> reactivateUser(user))
@@ -162,7 +162,7 @@ public class UsersListActivity extends BaseActivity {
                 }
 
                 // משתמש פעיל – דיאלוג בחירה
-                new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this)
+                new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this, R.style.DialogTheme)
                         .setTitle("פעולה על משתמש")
                         .setMessage("מה ברצונך לעשות עם " + user.getUserName() + "?")
                         .setPositiveButton("⛔ השבת", (dialog, which) -> showDeactivateConfirmDialog(user))
@@ -209,7 +209,7 @@ public class UsersListActivity extends BaseActivity {
         });
 
         userAdapter.setOnFilterListener(count ->
-                tvUserCount.setText("Total users: " + count));
+                tvUserCount.setText("סה״כ: " + count));
     }
 
     private void showAddUserDialog() {
@@ -249,8 +249,8 @@ public class UsersListActivity extends BaseActivity {
             datePicker.show(getSupportFragmentManager(), "ADD_USER_DATE_PICKER");
         });
 
-        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("➕ הוספת משתמש חדש")
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
+                .setTitle("הוספת משתמש חדש")
                 .setView(dialogView)
                 .setPositiveButton("הוסף", null) // null – נטפל ידנית
                 .setNegativeButton("ביטול", null)
@@ -331,7 +331,7 @@ public class UsersListActivity extends BaseActivity {
                                                             @Override public void onFailed(Exception e) {}
                                                         });
                                                 userAdapter.addUser(newUser);
-                                                tvUserCount.setText("Total users: " + userAdapter.getItemCount());
+                                                tvUserCount.setText("סה״כ: " + userAdapter.getItemCount());
                                                 dialog.dismiss();
                                                 Toast.makeText(UsersListActivity.this,
                                                         "המשתמש נוסף בהצלחה ✅", Toast.LENGTH_SHORT).show();
@@ -359,8 +359,8 @@ public class UsersListActivity extends BaseActivity {
     // השבתה לוגית
     // ─────────────────────────────────────────────
     private void showDeactivateConfirmDialog(User user) {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("⛔ השבתת משתמש")
+        new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
+                .setTitle("השבתת משתמש")
                 .setMessage(
                         "האם אתה בטוח שברצונך להשבית את " + user.getUserName() + "?\n\n" +
                                 "• המשתמש לא יוכל להתחבר למערכת\n" +
@@ -394,8 +394,8 @@ public class UsersListActivity extends BaseActivity {
     // מחיקה פיזית – צ'אטים + תרומות + משתמש
     // ─────────────────────────────────────────────
     private void showDeleteConfirmDialog(User user) {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("🗑 מחיקה לצמיתות")
+        new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
+                .setTitle("מחיקה לצמיתות")
                 .setMessage(
                         "האם אתה בטוח שברצונך למחוק לצמיתות את " + user.getUserName() + "?\n\n" +
                                 "• הצ'אטים שלו יוצגו כ\"משתמש נמחק\" לצד השני\n" +
@@ -510,7 +510,7 @@ public class UsersListActivity extends BaseActivity {
                     public void onCompleted(List<User> users) {
                         String currentUserId = SharedPreferencesUtil.getUserId(UsersListActivity.this);
                         userAdapter.setUserList(users, currentUserId);
-                        tvUserCount.setText("Total users: " + users.size());
+                        tvUserCount.setText("סה״כ: " + users.size());
                         if (users.isEmpty()) {
                             usersList.setVisibility(View.GONE);
                             layoutEmpty.setVisibility(View.VISIBLE);

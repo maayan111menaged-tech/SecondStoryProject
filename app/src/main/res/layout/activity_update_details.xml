@@ -1,314 +1,252 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    tools:context=".screens.updateDetailsActivity">
+    android:background="@color/light_lavender"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
-        <!-- כותרת גדולה -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/bigTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/noot"
-                android:text="ניהול"
-                android:textColor="#36b3b8"
-                android:textSize="23pt"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/bigTitle2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="-5dp"
-                android:layout_marginTop="-5dp"
-                android:fontFamily="@font/noot"
-                android:text="ניהול"
-                android:textColor="@color/black"
-                android:textSize="23pt"
-                android:textStyle="bold" />
-        </FrameLayout>
-
-        <!-- תת־כותרת -->
-        <FrameLayout
+        <!-- ===== Header סגול ===== -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-30dp">
+            android:orientation="vertical"
+            android:background="@color/dark_purple"
+            android:gravity="center"
+            android:paddingTop="40dp"
+            android:paddingBottom="28dp"
+            android:paddingHorizontal="24dp">
 
-            <TextView
-                android:id="@+id/littleTitle"
+            <!-- תמונת פרופיל + כפתור עריכה -->
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/akitrg__"
-                android:text="חשבון"
-                android:textColor="@color/black"
-                android:textSize="23pt"
-                android:textStyle="bold" />
+                android:layout_marginBottom="14dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imgProfile"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ic_profile"
+                    android:scaleType="centerCrop"
+                    android:padding="2dp"
+                    app:shapeAppearanceOverlay="@style/CircleImageView"
+                    app:strokeColor="@color/lavender"
+                    app:strokeWidth="2dp"/>
+
+                <ImageButton
+                    android:id="@+id/btnEditProfilePic"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="bottom|end"
+                    android:src="@drawable/ic_edit"
+                    android:backgroundTint="@color/lavender"
+                    app:tint="@color/dark_purple"
+                    android:layout_margin="2dp"/>
+
+            </FrameLayout>
 
             <TextView
-                android:id="@+id/littleTitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="-3dp"
-                android:layout_marginTop="-3dp"
-                android:fontFamily="@font/akitrg__"
-                android:text="חשבון"
-                android:textColor="#36b3b8"
-                android:textSize="23pt"
-                android:textStyle="bold" />
-        </FrameLayout>
+                android:text="עדכון פרטים"
+                android:textSize="25sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="עדכנו את פרטי החשבון שלכם"
+                android:textSize="17sp"
+                android:textColor="@color/lavender"
+                android:layout_marginTop="4dp"
+                android:alpha="0.85"/>
 
-        <!-- Profile Picture -->
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ואל תשכחו ללחוץ על כפתור העדכון"
+                android:textSize="15sp"
+                android:textColor="@color/lavender"
+                android:alpha="0.85"/>
+        </LinearLayout>
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imgProfile"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/ic_profile"
-                android:scaleType="centerCrop"
-                android:padding="2dp"
-                app:shapeAppearanceOverlay="@style/CircleImageView"
-                app:strokeColor="#36b3b8"
-                app:strokeWidth="2dp"/>
-
-            <ImageButton
-                android:id="@+id/btnEditProfilePic"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="bottom|end"
-                android:src="@drawable/ic_edit"
-                android:backgroundTint="#36b3b8"
-                app:tint="@android:color/white"
-                android:layout_margin="4dp"/>
-        </FrameLayout>
-
-
-
-        <!-- כרטיס מידע -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- ===== גוף הטופס ===== -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp"
-            android:layout_margin="16dp">
+            android:orientation="vertical"
+            android:padding="20dp">
 
+            <!-- שם משתמש -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/usernameInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="שם משתמש"
+                android:layout_marginBottom="12dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/usernameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- שם פרטי + משפחה -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="פרטים אישיים"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_gravity="right"/>
-
-                <!-- שדה שם משתמש -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/usernameInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
+                    android:id="@+id/firstnameInput_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="שם משתמש"
-                    android:maxWidth="488dp"
-                    android:layout_gravity="center"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
+                    android:layout_weight="1"
+                    android:hint="שם פרטי"
+                    android:layout_marginEnd="4dp"
+                    app:boxStrokeColor="@color/lavender"
+                    app:boxStrokeWidthFocused="1.5dp"
+                    app:hintTextColor="@color/text_muted">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/usernameInput"
+                        android:id="@+id/firstnameInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
-                        android:textColor="@android:color/black"
-                        />
+                        android:textColor="@color/dark_purple"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- שם פרטי + משפחה -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layoutDirection="rtl">
-
-                    <!-- שדה שם פרטי -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/firstnameInput_layout"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="160dp"
-                        android:layout_height="wrap_content"
-                        android:hint="שם פרטי"
-                        android:maxWidth="488dp"
-                        android:layout_gravity="center"
-                        android:textColor="@android:color/black"
-                        android:textColorHint="@color/black"            >
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/firstnameInput"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textPersonName"
-                            android:textColor="@android:color/black"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- הרווח האוטומטי -->
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:layout_weight="1"/>
-
-                    <!-- שדה שם משפחה -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/lastnameInput_layout"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="160dp"
-                        android:layout_height="wrap_content"
-                        android:hint="שם משפחה"
-                        android:maxWidth="488dp"
-                        android:layout_gravity="center"
-                        android:textColor="@android:color/black"
-                        android:textColorHint="@color/black"            >
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/lastnameInput"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textPersonName"
-                            android:textColor="@android:color/black"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
-
-                <!-- שדה אימייל -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/emailInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
+                    android:id="@+id/lastnameInput_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="אימייל"
-                    android:maxWidth="488dp"
-                    android:layout_gravity="center"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
+                    android:layout_weight="1"
+                    android:hint="שם משפחה"
+                    android:layout_marginStart="4dp"
+                    app:boxStrokeColor="@color/lavender"
+                    app:boxStrokeWidthFocused="1.5dp"
+                    app:hintTextColor="@color/text_muted">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/emailInput"
+                        android:id="@+id/lastnameInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        android:textColor="@android:color/black"
-                        />
+                        android:inputType="textPersonName"
+                        android:textColor="@color/dark_purple"/>
                 </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- שדה מספר טלפון -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/phonenumberInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="מספר טלפון"
-                    android:maxWidth="488dp"
-                    android:layout_gravity="center"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/phonenumberInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="phone"
-                        android:textColor="@android:color/black"
-                        />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- שדה תאריך -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/dateInput_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="תאריך לידה"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_gravity="center"
-                    app:endIconMode="custom"
-                    app:endIconDrawable="@drawable/ic_calendar"
-                    app:endIconContentDescription="בחר תאריך"
-                    android:textColorHint="@color/black"
-                    >
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/dateInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:inputType="none"
-                        android:textColor="@android:color/black"
-                        android:paddingEnd="10dp"/>
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- שדה סיסמה -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/passwordInput_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="סיסמה"
-                    android:maxWidth="488dp"
-                    android:layout_gravity="center"
-                    app:endIconMode="password_toggle"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/black"            >
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/passwordInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:textColor="@android:color/black"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- כפתור למטה -->
-                <Button
-                    android:id="@+id/btn_updateDetails_toHome"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:backgroundTint="#36b3b8"
-                    android:fontFamily="@font/akitrg__"
-                    android:text="עידכון פרטים"
-                    android:textColor="@color/black"
-                    android:textSize="15pt"/>
-                <!--app:icon="@android:drawable/ic_menu_save"-->
-
 
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
+            <!-- אימייל -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="אימייל"
+                android:layout_marginBottom="12dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/emailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- טלפון -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/phonenumberInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="מספר טלפון"
+                android:layout_marginBottom="12dp"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/phonenumberInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- תאריך לידה -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/dateInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="תאריך לידה"
+                android:layout_marginBottom="12dp"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_calendar"
+                app:endIconContentDescription="בחר תאריך"
+                app:endIconTint="@color/dark_purple"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/dateInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- סיסמה -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordInput_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="סיסמה"
+                android:layout_marginBottom="20dp"
+                app:endIconMode="password_toggle"
+                app:boxStrokeColor="@color/lavender"
+                app:boxStrokeWidthFocused="1.5dp"
+                app:hintTextColor="@color/text_muted">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/dark_purple"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- כפתור עדכון -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_updateDetails_toHome"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="עדכון פרטים"
+                android:textSize="19sp"
+                android:backgroundTint="@color/dark_purple"
+                android:textColor="@color/light_lavender"
+                app:cornerRadius="12dp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -1,82 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    android:layout_marginVertical="5dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/lavender"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="12dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layoutDirection="rtl">
 
-        <!-- אייקון עגול -->
+        <!-- אווטאר -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_chat_avatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_profile"
-            app:shapeAppearanceOverlay="@style/CircleImageView"
             android:scaleType="centerCrop"
-            android:layout_marginEnd="12dp"/>
+            android:layout_marginStart="10dp"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            app:strokeColor="@color/lavender"
+            app:strokeWidth="1.5dp"/>
 
         <!-- טקסט -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginRight="10dp"
             android:orientation="vertical">
 
+            <!-- שם משתמש -->
             <TextView
                 android:id="@+id/tv_chat_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textColor="@color/dark_purple"/>
 
+            <!-- שם תרומה — קבוע, גלוי רק לצ'אטי תרומה -->
+            <TextView
+                android:id="@+id/tv_donation_name_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/medium_purple"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <!-- הודעה אחרונה -->
             <TextView
                 android:id="@+id/tv_last_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
-                android:textColor="#888888"
+                android:textColor="@color/text_muted"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:layout_marginTop="2dp" />
+                android:layout_marginTop="2dp"/>
 
         </LinearLayout>
 
-        <!-- זמן + עיגול הודעות -->
+        <!-- זמן + badge -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:layout_marginEnd="4dp">
 
             <TextView
                 android:id="@+id/tv_chat_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="11sp"
-                android:textColor="#AAAAAA" />
+                android:textColor="@color/text_muted"/>
 
             <TextView
                 android:id="@+id/tv_unread_count"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:gravity="center"
                 android:textSize="11sp"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
+                android:textStyle="bold"
                 android:background="@drawable/bg_unread_badge"
                 android:layout_marginTop="4dp"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
         </LinearLayout>
 
