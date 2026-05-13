@@ -371,6 +371,24 @@ public class DonationDetailActivity extends BaseActivity {
                                             ? "התרומה אושרה ✅"
                                             : "התרומה נדחתה ❌",
                                     Toast.LENGTH_SHORT).show();
+
+                            if (newStatus == DonationStatus.APPROVED_AVAILABLE) {
+                                sendAutoAdminMessage(currentDonation.getGiverID(),
+                                        "התרומה שלך אושרה! ✅\n\n" +
+                                                "\"" + currentDonation.getName() + "\"\n" +
+                                                "כעת זמינה לציבור 🎉\n\n" +
+                                                "תודה שאת/ה חלק מהקהילה שלנו 🌸");
+
+                            } else if (newStatus == DonationStatus.REJECTED) {
+                                sendAutoAdminMessage(currentDonation.getGiverID(),
+                                        "התרומה שלך נדחתה ❌\n\n" +
+                                                "\"" + currentDonation.getName() + "\"\n\n" +
+                                                (reason != null && !reason.isEmpty()
+                                                        ? "סיבה: " + reason + "\n\n"
+                                                        : "") +
+                                                "ניתן לפנות אלינו לפרטים נוספים 💬");
+                            }
+
                             finish();
                         });
                     }
