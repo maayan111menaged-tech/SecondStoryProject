@@ -1,6 +1,5 @@
 package com.example.secondstoryproject.models;
 
-import com.example.secondstoryproject.R;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -19,7 +18,7 @@ public class User implements Idable {
     private String phoneNumber;
     private String dateOfBirth;
     private int donationCounter;
-    private String profilePhoneUrl;
+    private String profilePic;
     private boolean isAdmin;
     private boolean isActive = true; //ברירת מחדל פעיל
     private ArrayList<Donation> donationList;
@@ -48,7 +47,7 @@ public class User implements Idable {
         this.donationCounter = 0;
         this.isAdmin = false;
         this.isActive = true;
-        this.profilePhoneUrl = null;
+        this.profilePic = null;
 
         this.donationList = new ArrayList<>();
         this.notifications = NotificationType.EMAIL;
@@ -75,7 +74,7 @@ public class User implements Idable {
         this.donationCounter = donationCounter;
         this.isAdmin = isAdmin;
         this.isActive = true;
-        this.profilePhoneUrl = profilePhoneUrl;
+        this.profilePic = profilePhoneUrl;
 
         this.donationList = new ArrayList<>();
         this.notifications = NotificationType.EMAIL;
@@ -110,8 +109,8 @@ public class User implements Idable {
     public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
     public int getDonationCounter() { return donationCounter; }
     public void setDonationCounter(int donationCounter) { this.donationCounter = donationCounter; }
-    public String getProfilePhoneUrl() { return profilePhoneUrl; }
-    public void setProfilePhoneUrl(String profilePhoneUrl) { this.profilePhoneUrl = profilePhoneUrl; }
+    public String getProfilePic() { return profilePic; }
+    public void setProfilePic(String profilePic) { this.profilePic = profilePic; }
     public boolean isAdmin() { return isAdmin; }
     public void setAdmin(boolean admin) { isAdmin = admin; }
 

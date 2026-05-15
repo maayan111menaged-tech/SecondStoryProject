@@ -9,7 +9,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -77,7 +76,7 @@ public abstract class BaseActivity extends AppCompatActivity
             navHeaderName.setText(currentUser.getFullName());
             navHeaderUsername.setText("@" + currentUser.getUserName());
 
-            String photo = currentUser.getProfilePhoneUrl();
+            String photo = currentUser.getProfilePic();
             if (photo != null && !photo.isEmpty()) {
                 navHeaderAvatar.setImageBitmap(ImageUtil.fromBase64(photo));
             }
@@ -216,10 +215,10 @@ public abstract class BaseActivity extends AppCompatActivity
     }
     private void showLogoutDialog() {
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Sign Out")
-                .setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Yes", (dialog, which) -> {
+        new androidx.appcompat.app.AlertDialog.Builder(this , R.style.DialogTheme)
+                .setTitle("התנתקות")
+                .setMessage("את/ה בטוח/ה שאת/ה רוצה להתנתק?")
+                .setPositiveButton("כן", (dialog, which) -> {
 
                     SharedPreferencesUtil.signOutUser(this);
 
@@ -227,7 +226,7 @@ public abstract class BaseActivity extends AppCompatActivity
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 })
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("לא", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 

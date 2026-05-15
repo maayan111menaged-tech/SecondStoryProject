@@ -197,7 +197,7 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
     private boolean checkInput(ImageView donationImageView) {
         if (donationImageView.getTag() != null) {
              Log.e(TAG, "Image is required");
-             Toast.makeText(this, "Image is required", Toast.LENGTH_SHORT).show();
+             Toast.makeText(this, "חובה לבחור תמונה", Toast.LENGTH_SHORT).show();
              return false;
         }
 

@@ -256,7 +256,7 @@ public class ChatServiceImpl implements IChatService {
         final int total = chats.size();
         for (Chat chat : chats) {
             if ("admin".equals(chat.getType())) {
-                chat.setOtherUserName("צוות Second Story");
+                chat.setOtherUserName("צוות סיפור שני");
                 chat.setDonationName("");
                 count[0]++;
                 if (count[0] == total) callback.onCompleted(chats);

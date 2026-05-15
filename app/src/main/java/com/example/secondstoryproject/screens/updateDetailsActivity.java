@@ -1,6 +1,5 @@
 package com.example.secondstoryproject.screens;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,7 +25,6 @@ import com.example.secondstoryproject.utils.Validator;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -155,7 +152,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         etUserName.setText(currentUser.getUserName());
         etPassword.setText(currentUser.getPassword());
 
-        String profileImageBase64 = currentUser.getProfilePhoneUrl();
+        String profileImageBase64 = currentUser.getProfilePic();
 
         if (profileImageBase64 != null && !profileImageBase64.isEmpty()) {
             ivProfile.setImageBitmap(ImageUtil.fromBase64(profileImageBase64));

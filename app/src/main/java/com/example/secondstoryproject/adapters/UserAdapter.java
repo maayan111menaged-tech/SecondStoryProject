@@ -1,12 +1,9 @@
 package com.example.secondstoryproject.adapters;
-import static com.example.secondstoryproject.utils.SharedPreferencesUtil.getUserId;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,7 +15,6 @@ import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
-import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +142,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
         holder.tvPhone.setText(user.getPhoneNumber());
 
         // Load profile image from Base64
-        String base64 = user.getProfilePhoneUrl();
+        String base64 = user.getProfilePic();
         if (base64 != null && !base64.isEmpty()) {
             Bitmap bitmap = ImageUtil.fromBase64(base64);
             holder.ivProfilePic.setImageBitmap(bitmap);

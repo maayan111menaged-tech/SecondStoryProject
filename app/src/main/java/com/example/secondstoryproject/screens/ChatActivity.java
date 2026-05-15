@@ -233,7 +233,7 @@ public class ChatActivity extends BaseActivity {
                     public void onCompleted(User user) {
                         if (user == null) return;
                         runOnUiThread(() -> {
-                            String photo = user.getProfilePhoneUrl();
+                            String photo = user.getProfilePic();
                             if (photo != null && !photo.isEmpty()) {
                                 ivChatAvatar.setImageBitmap(ImageUtil.fromBase64(photo));
                             }

@@ -25,6 +25,7 @@ import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,6 +38,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     private EditText etUName, etFName, etLName, etEmail, etPhoneNumber, etPassword;
     private TextInputEditText etDate;
+    private TextInputLayout usernameLayout, firstnameLayout, lastnameLayout,
+            emailLayout, phoneLayout, passwordLayout, dateInputLayout;
     private Button btnRegister;
     @Override
     protected boolean hasSideMenu() {
@@ -74,6 +77,15 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         btnRegister = findViewById(R.id.btn_register_toHome);
         etDate = findViewById(R.id.dateInput);
 
+        usernameLayout = findViewById(R.id.usernameInput_layout);
+        firstnameLayout = findViewById(R.id.firstnameInput_layout);
+        lastnameLayout = findViewById(R.id.lastnameInput_layout);
+        emailLayout = findViewById(R.id.emailInput_layout);
+        phoneLayout = findViewById(R.id.phonenumberInput_layout);
+        passwordLayout = findViewById(R.id.passwordInput_layout);
+        dateInputLayout = findViewById(R.id.dateInput_layout);
+
+
         etDate.setFocusable(false);
         etDate.setClickable(true);
         etDate.setOnClickListener(v -> {
@@ -91,6 +103,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 etDate.setText(dateFormat.format(new Date(selection)));
+                dateInputLayout.setError(null);
+                dateInputLayout.setErrorEnabled(false);
             });
 
             datePicker.addOnNegativeButtonClickListener(v1 -> etDate.clearFocus());
@@ -127,44 +141,53 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     private boolean checkInput(String uName, String fName, String lName, String email, String phone, String date, String password) {
+        clearErrors();
+
         if (!Validator.isUNameValid(uName)) {
-            etUName.setError("שם משתמש יכול להכיל אותיות, מספרים, נקודה וקו תחתון");
-            etEmail.requestFocus();
+            usernameLayout.setErrorEnabled(true);
+            usernameLayout.setError("שם משתמש יכול להכיל אותיות, מספרים, נקודה וקו תחתון");
+            etUName.requestFocus();
             return false;
         }
 
         if (!Validator.isNameValid(fName)) {
-            etFName.setError("שם פרטי חייב להכיל לפחות 3 תווים");
+            firstnameLayout.setErrorEnabled(true);
+            firstnameLayout.setError("שם פרטי חייב להכיל לפחות 3 תווים");
             etFName.requestFocus();
             return false;
         }
 
         if (!Validator.isNameValid(lName)) {
-            etLName.setError("שם משפחה חייב להכיל לפחות 3 תווים");
+            lastnameLayout.setErrorEnabled(true);
+            lastnameLayout.setError("שם משפחה חייב להכיל לפחות 3 תווים");
             etLName.requestFocus();
             return false;
         }
 
         if (!Validator.isEmailValid(email)) {
-            etEmail.setError("כתובת אימייל לא תקינה");
+            emailLayout.setErrorEnabled(true);
+            emailLayout.setError("כתובת אימייל לא תקינה");
             etEmail.requestFocus();
             return false;
         }
 
-        if (!Validator.isBirthDateValid(date)) {
-            etDate.setError("נא לבחור תאריך לידה תקין");
-            etDate.requestFocus();
-            return false;
-        }
-
         if (!Validator.isPhoneValid(phone)) {
-            etPhoneNumber.setError("מספר טלפון חייב להכיל לפחות 10 ספרות");
+            phoneLayout.setErrorEnabled(true);
+            phoneLayout.setError("מספר טלפון חייב להכיל לפחות 10 ספרות");
             etPhoneNumber.requestFocus();
             return false;
         }
 
+        if (!Validator.isBirthDateValid(date)) {
+            dateInputLayout.setErrorEnabled(true);
+            dateInputLayout.setError("נא לבחור תאריך לידה תקין");
+            etDate.requestFocus();
+            return false;
+        }
+
         if (!Validator.isPasswordValid(password)) {
-            etPassword.setError("סיסמה חייבת להכיל לפחות 6 תווים");
+            passwordLayout.setErrorEnabled(true);
+            passwordLayout.setError("סיסמה חייבת להכיל לפחות 6 תווים");
             etPassword.requestFocus();
             return false;
         }
@@ -190,8 +213,14 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         databaseService.getUserService().checkIfUserNameExists(username, new DatabaseService.DatabaseCallback<Boolean>() {
             @Override
             public void onCompleted(Boolean exists) {
+                Log.d(TAG, "checkIfUserNameExists result: " + exists); // ← הוסיפי את זה
                 if (exists) {
-                    Toast.makeText(RegisterActivity.this, "שם המשתמש קיים במערכת, בחרו שם משתמש אחר", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> {
+                        usernameLayout.setErrorEnabled(true);
+                        usernameLayout.setError("שם המשתמש קיים במערכת, בחרו שם משתמש אחר");
+                        etUName.requestFocus();
+                        usernameLayout.setErrorIconDrawable(null); // מניעת באג ויזואלי
+                    });
                 } else {
                     createUserInDatabase(user);
                 }
@@ -242,5 +271,28 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 SharedPreferencesUtil.signOutUser(RegisterActivity.this);
             }
         });
+    }
+
+    private void clearErrors() {
+        usernameLayout.setError(null);
+        usernameLayout.setErrorEnabled(false);
+
+        firstnameLayout.setError(null);
+        firstnameLayout.setErrorEnabled(false);
+
+        lastnameLayout.setError(null);
+        lastnameLayout.setErrorEnabled(false);
+
+        emailLayout.setError(null);
+        emailLayout.setErrorEnabled(false);
+
+        phoneLayout.setError(null);
+        phoneLayout.setErrorEnabled(false);
+
+        passwordLayout.setError(null);
+        passwordLayout.setErrorEnabled(false);
+
+        dateInputLayout.setError(null);
+        dateInputLayout.setErrorEnabled(false);
     }
 }

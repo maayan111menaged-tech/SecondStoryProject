@@ -211,7 +211,7 @@ public class DonationDetailActivity extends BaseActivity {
                         runOnUiThread(() -> {
                             if (giver != null) {
                                 tvGiverName.setText(giver.getFullName());
-                                String avatar = giver.getProfilePhoneUrl();
+                                String avatar = giver.getProfilePic();
                                 if (avatar != null && !avatar.isEmpty()) {
                                     ivGiverAvatar.setImageBitmap(ImageUtil.fromBase64(avatar));
                                 }
@@ -236,7 +236,7 @@ public class DonationDetailActivity extends BaseActivity {
                         runOnUiThread(() -> {
                             if (receiver != null) {
                                 tvReceiverName.setText(receiver.getFullName());
-                                String avatar = receiver.getProfilePhoneUrl();
+                                String avatar = receiver.getProfilePic();
                                 if (avatar != null && !avatar.isEmpty()) {
                                     ivReceiverAvatar.setImageBitmap(ImageUtil.fromBase64(avatar));
                                 }

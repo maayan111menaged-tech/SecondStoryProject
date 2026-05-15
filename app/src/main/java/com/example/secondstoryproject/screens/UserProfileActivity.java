@@ -192,7 +192,7 @@ public class UserProfileActivity extends BaseActivity {
         tvFullName.setText(profileUser.getFullName());
         tvDonationCount.setText(profileUser.getDonationCounter() + " תרומות");
 
-        String photo = profileUser.getProfilePhoneUrl();
+        String photo = profileUser.getProfilePic();
         if (photo != null && !photo.isEmpty()) {
             ivProfile.setImageBitmap(ImageUtil.fromBase64(photo));
         }

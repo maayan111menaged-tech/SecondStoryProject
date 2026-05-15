@@ -9,22 +9,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.secondstoryproject.R;
-import com.example.secondstoryproject.adapters.UserAdapter;
 import com.example.secondstoryproject.adapters.UserAdapterLeaderBoard;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
-
-import java.util.List;
 
 public class LeaderBoardActivity extends BaseActivity {
 
@@ -107,8 +99,8 @@ public class LeaderBoardActivity extends BaseActivity {
             User u = sorted.get(0);
             tvPodium1Name.setText(u.getUserName());
             tvPodium1Count.setText(u.getDonationCounter() + " תרומות");
-            if (u.getProfilePhoneUrl() != null && !u.getProfilePhoneUrl().isEmpty()) {
-                ivPodium1.setImageBitmap(ImageUtil.fromBase64(u.getProfilePhoneUrl()));
+            if (u.getProfilePic() != null && !u.getProfilePic().isEmpty()) {
+                ivPodium1.setImageBitmap(ImageUtil.fromBase64(u.getProfilePic()));
                 ivPodium1.setColorFilter(null); // מסיר את ה-tint
             }
             findViewById(R.id.podium_item_1).setOnClickListener(v -> navigateToProfile(u));
@@ -117,8 +109,8 @@ public class LeaderBoardActivity extends BaseActivity {
             User u = sorted.get(1);
             tvPodium2Name.setText(u.getUserName());
             tvPodium2Count.setText(u.getDonationCounter() + " תרומות");
-            if (u.getProfilePhoneUrl() != null && !u.getProfilePhoneUrl().isEmpty()) {
-                ivPodium2.setImageBitmap(ImageUtil.fromBase64(u.getProfilePhoneUrl()));
+            if (u.getProfilePic() != null && !u.getProfilePic().isEmpty()) {
+                ivPodium2.setImageBitmap(ImageUtil.fromBase64(u.getProfilePic()));
                 ivPodium2.setColorFilter(null);
             }
             findViewById(R.id.podium_item_2).setOnClickListener(v -> navigateToProfile(u));
@@ -127,8 +119,8 @@ public class LeaderBoardActivity extends BaseActivity {
             User u = sorted.get(2);
             tvPodium3Name.setText(u.getUserName());
             tvPodium3Count.setText(u.getDonationCounter() + " תרומות");
-            if (u.getProfilePhoneUrl() != null && !u.getProfilePhoneUrl().isEmpty()) {
-                ivPodium3.setImageBitmap(ImageUtil.fromBase64(u.getProfilePhoneUrl()));
+            if (u.getProfilePic() != null && !u.getProfilePic().isEmpty()) {
+                ivPodium3.setImageBitmap(ImageUtil.fromBase64(u.getProfilePic()));
                 ivPodium3.setColorFilter(null);
             }
             findViewById(R.id.podium_item_3).setOnClickListener(v -> navigateToProfile(u));

@@ -5,15 +5,10 @@ import com.example.secondstoryproject.R;
 public enum DonationStatus {
 
     PENDING_APPROVAL("PENDING_APPROVAL", "ממתין לאישור", R.drawable.ic_pending),
-    ///UNDER_REVIEW("UNDER_REVIEW", "בבדיקה", R.drawable.ic_review),
-
     APPROVED_AVAILABLE("APPROVED_AVAILABLE", "זמין לתרומה", R.drawable.ic_available),
-
     MATCHED("MATCHED", "נמצא מקבל", R.drawable.ic_matched),
-
     REJECTED("REJECTED", "נדחה", R.drawable.ic_rejected),
     CANCELLED("CANCELLED", "בוטל", R.drawable.ic_cancelled),
-
     DONOR_DELETED("DONOR_DELETED", "תורם הוסר", R.drawable.ic_cancelled);
 
     // ---- שדות ----

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,7 +24,6 @@ import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.adapters.ImageSourceAdapter;
 import com.example.secondstoryproject.models.ImageSourceOption;
 import com.example.secondstoryproject.models.User;
-import com.example.secondstoryproject.models.UserLevel;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.services.IDatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
@@ -92,7 +89,7 @@ public class ProfilePicActivity extends BaseActivity {
 
     private void showUserProfilePic() {
 
-        String base64 = currentUser.getProfilePhoneUrl();
+        String base64 = currentUser.getProfilePic();
 
         if (base64 != null && !base64.isEmpty()) {
             ivProfile.setImageBitmap(ImageUtil.fromBase64(base64));
@@ -133,7 +130,7 @@ public class ProfilePicActivity extends BaseActivity {
 
         String base64 = ImageUtil.toBase64(ivProfile);
 
-        currentUser.setProfilePhoneUrl(base64);
+        currentUser.setProfilePic(base64);
 
         DatabaseService.getInstance().getUserService().update(
                 currentUser.getId(),
@@ -150,7 +147,7 @@ public class ProfilePicActivity extends BaseActivity {
 
                     @Override
                     public void onFailed(Exception e) {
-                        Toast.makeText(ProfilePicActivity.this, "עדכון נכשל, נסי שוב", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfilePicActivity.this, "עדכון נכשל, נסו שוב", Toast.LENGTH_SHORT).show();
                     }
                 }
         );

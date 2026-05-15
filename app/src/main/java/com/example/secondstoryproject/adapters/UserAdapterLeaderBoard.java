@@ -16,7 +16,6 @@ import com.example.secondstoryproject.utils.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -73,8 +72,8 @@ public class UserAdapterLeaderBoard extends RecyclerView.Adapter<UserAdapterLead
         holder.tvDonationCount.setText(String.valueOf(user.getDonationCounter()));
 
         // Display user profile picture
-        if (user.getProfilePhoneUrl() != null && !user.getProfilePhoneUrl().isEmpty()) {
-            holder.ivProfilePic.setImageBitmap(ImageUtil.fromBase64(user.getProfilePhoneUrl()));
+        if (user.getProfilePic() != null && !user.getProfilePic().isEmpty()) {
+            holder.ivProfilePic.setImageBitmap(ImageUtil.fromBase64(user.getProfilePic()));
         }
 
         // Click events

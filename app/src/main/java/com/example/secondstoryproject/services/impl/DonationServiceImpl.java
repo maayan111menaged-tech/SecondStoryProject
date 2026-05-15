@@ -159,37 +159,6 @@ public class DonationServiceImpl extends BaseFirebaseService<Donation> implement
         });
     }
 
-    /// Count how many donations exist in a specific city
-    /// @param city The city to filter by
-    /// @param callback Returns the number of matching donations
-    @Override
-    public void getDonationsCountByCity(@NonNull IsraelCity city,
-                                          @NonNull DatabaseCallback<Integer> callback) {
-
-        super.getAll(new DatabaseCallback<List<Donation>>() {
-            @Override
-            public void onCompleted(List<Donation> donations) {
-
-                int count = 0;
-
-                for (Donation donation : donations) {
-                    if (donation.getCity() != null &&
-                            donation.getCity().equals(city.getHebrewName())) {
-
-                        count++;
-                    }
-                }
-
-                callback.onCompleted(count);
-            }
-
-            @Override
-            public void onFailed(Exception e) {
-                callback.onFailed(e);
-            }
-        });
-    }
-
     /// Count donations grouped by city
     /// @param callback Returns a map where:
     /// key = city name, value = number of donations

@@ -83,13 +83,6 @@ public interface IDonationService {
     void getDonationsByStatus(@NonNull DonationStatus status,
                               @NonNull DatabaseCallback<List<Donation>> callback);
 
-    /**
-     * Returns the number of donations in a specific city.
-     * @param city city to filter by
-     * @param callback number of donations in the city
-     */
-    void getDonationsCountByCity(@NonNull IsraelCity city,
-                           @NonNull DatabaseCallback<Integer> callback);
 
     /**
      * Returns the number of donations grouped by cities.
