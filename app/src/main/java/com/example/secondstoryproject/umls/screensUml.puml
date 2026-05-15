@@ -1,0 +1,152 @@
+@startuml Screens
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+
+abstract class BaseActivity {
+  #databaseService: IDatabaseService
+  #drawerLayout: DrawerLayout
+  #bottomNav: BottomNavigationView
+  #isAdmin(): boolean
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+  #navigateTo(targetActivity): void
+  #sendAutoAdminMessage(userId, text): void
+  #listenToTotalUnread(): void
+}
+
+class SplashActivity extends BaseActivity
+class LandingActivity extends BaseActivity
+class LoginActivity extends BaseActivity
+class RegisterActivity extends BaseActivity
+class forgotPwActivity extends BaseActivity
+class updateDetailsActivity extends BaseActivity
+class ProfilePicActivity extends BaseActivity
+
+class MainActivity extends BaseActivity {
+  -miniMap: MapView
+  -carouselAdapter: CarouselDonationAdapter
+  +AddAllMarkers(): void
+  -updateUserLevelUI(user): void
+  -loadCarouselDonations(): void
+}
+
+class AdminMainActivity extends BaseActivity {
+  -pieChart: PieChart
+  -tvUsersCount: TextView
+  -tvPendingDonations: TextView
+  -loadStats(): void
+  -setupPieChart(donations): void
+}
+
+class UserProfileActivity extends BaseActivity {
+  -mode: ProfileMode
+  -profileUser: User
+  -donationAdapter: ProfileDonationAdapter
+  -loadUserFromDb(userId): void
+  -renderProfile(): void
+  -loadDonations(availableOnly): void
+  -loadRating(): void
+}
+
+enum ProfileMode {
+  SELF
+  SELF_ADMIN
+  OTHER_USER
+  OTHER_ADMIN
+  ADMIN_ADMIN
+}
+
+class UserDonationsActivity extends BaseActivity {
+  -viewMode: String
+  -userId: String
+  -loadDonations(): void
+  -applyFilters(): void
+}
+
+class DonationDetailActivity extends BaseActivity {
+  -currentDonation: Donation
+  -currentUser: User
+  -loadDonationDetails(donationId): void
+  -showDonationDetails(donation): void
+  -updateDonationStatus(status, reason): void
+  -interestedFunction(): void
+  -loadDonationRating(): void
+}
+
+class SearchDonationsActivity extends BaseActivity {
+  -donationAdapter: DonationAdapter
+  -loadDonations(): void
+  -setupCategoryFilter(): void
+  -setupCityFilter(): void
+}
+
+class DonationsListActivity extends BaseActivity {
+  -donationAdapter: DonationAdapter
+  -statusFilter: Set<DonationStatus>
+  -setupStatusFilter(): void
+}
+
+class AcceptDonationActivity extends BaseActivity {
+  -adapter: DonationAdapter
+  -loadDonations(): void
+}
+
+class PickCatergoryActivity extends BaseActivity
+class AddDonationStep2Activity extends BaseActivity
+class AddDonationStep3Activity extends BaseActivity
+class AddDonationStep4Activity extends BaseActivity
+
+class ChatActivity extends BaseActivity {
+  -chatId: String
+  -messageAdapter: MessageAdapter
+  -checkChatStatus(userId): void
+  -performMatch(userId): void
+  -sendMessage(): void
+  -listenToMessages(): void
+  +setHeaderState(state, message): void
+}
+
+enum HeaderState {
+  DEFAULT
+  INACTIVE
+  DELETED
+  TAKEN
+  MATCH
+}
+
+class ChatsListActivity extends BaseActivity {
+  -chatListAdapter: ChatListAdapter
+  -loadChats(): void
+}
+
+class UsersListActivity extends BaseActivity {
+  -userAdapter: UserAdapter
+  -performFullDelete(user): void
+  -showDeactivateConfirmDialog(user): void
+  -reactivateUser(user): void
+}
+
+class LeaderBoardActivity extends BaseActivity {
+  -userAdapterLeaderBoard: UserAdapterLeaderBoard
+  -updatePodium(sorted): void
+}
+
+class FullMapActivity extends BaseActivity {
+  -fullMap: MapView
+  +AddAllMarkers(): void
+}
+
+class CityInfoWindow {
+  -cityName: String
+  -donationCount: int
+  +onOpen(item): void
+  +onClose(): void
+}
+
+UserProfileActivity --> ProfileMode
+ChatActivity --> HeaderState
+FullMapActivity --> CityInfoWindow
+
+@enduml

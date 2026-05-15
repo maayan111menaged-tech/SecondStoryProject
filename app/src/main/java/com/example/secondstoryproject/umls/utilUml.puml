@@ -1,0 +1,45 @@
+@startuml Utils
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+
+class ImageUtil {
+  +{static} requestPermission(activity: Activity): void
+  +{static} toBase64(postImage: ImageView): String
+  +{static} fromBase64(base64Code: String): Bitmap
+}
+
+class SharedPreferencesUtil {
+  -{static} PREF_NAME: String
+  +{static} saveUser(context, user: User): void
+  +{static} getUser(context): User
+  +{static} signOutUser(context): void
+  +{static} isUserLoggedIn(context): boolean
+  +{static} getUserId(context): String
+  -{static} saveString(context, key, value): void
+  -{static} getString(context, key, default): String
+  -{static} saveObject(context, key, object): void
+  -{static} getObject(context, key, type): T
+  -{static} clear(context): void
+  -{static} remove(context, key): void
+  -{static} contains(context, key): boolean
+}
+
+class Validator {
+  +{static} isUNameValid(uName: String): boolean
+  +{static} isNameValid(name: String): boolean
+  +{static} isEmailValid(email: String): boolean
+  +{static} isPhoneValid(phone: String): boolean
+  +{static} isPasswordValid(password: String): boolean
+  +{static} isDonationNameValid(name: String): boolean
+  +{static} isDescriptionValid(desc: String): boolean
+  +{static} isCityValid(city: String): boolean
+  +{static} isCityInList(context, city: String): boolean
+  +{static} isBirthDateValid(dateStr: String): boolean
+}
+
+ImageUtil ..> SharedPreferencesUtil : independent
+Validator ..> SharedPreferencesUtil : independent
+
+@enduml

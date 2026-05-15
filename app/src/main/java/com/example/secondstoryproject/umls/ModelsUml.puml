@@ -1,0 +1,154 @@
+@startuml Models
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+
+interface Idable {
+  +getId(): String
+  +setId(id: String): void
+}
+
+class User implements Idable {
+  -id: String
+  -userName: String
+  -password: String
+  -fName: String
+  -lName: String
+  -email: String
+  -phoneNumber: String
+  -dateOfBirth: String
+  -donationCounter: int
+  -profilePic: String
+  -isAdmin: boolean
+  -isActive: boolean
+  -donationList: ArrayList<Donation>
+  -createdAt: Date
+  -notifications: NotificationType
+  +getLevel(): UserLevel
+  +getFullName(): String
+}
+
+enum NotificationType {
+  PHONE_NUMBER
+  EMAIL
+}
+
+enum UserLevel {
+  BRONZE
+  SILVER
+  GOLD
+  TROPHY
+  CROWN
+  EARTH
+  +getLabel(): String
+  +getIconRes(): int
+  +fromDonationCount(count: int): UserLevel
+}
+
+class Donation implements Idable {
+  -id: String
+  -name: String
+  -description: String
+  -category: DonationCategory
+  -status: DonationStatus
+  -photoUrl: String
+  -city: String
+  -giverID: String
+  -receiverID: String
+  -statusHistory: ArrayList<StatusLog>
+  +updateStatus(newStatus: DonationStatus, reason: String): void
+  +getRejectionReason(): String
+}
+
+class StatusLog {
+  -status: DonationStatus
+  -timestamp: Date
+  -reason: String
+}
+
+enum DonationCategory {
+  CLOTHES
+  TOYS
+  FOOD
+  BOOKS
+  FURNITURE
+  BABY_ITEMS
+  SCHOOL_SUPPLIES
+  OTHER
+  +getEnglishName(): String
+  +getHebrewName(): String
+  +getIconResId(): int
+  +fromString(value: String): DonationCategory
+}
+
+enum DonationStatus {
+  PENDING_APPROVAL
+  APPROVED_AVAILABLE
+  MATCHED
+  REJECTED
+  CANCELLED
+  DONOR_DELETED
+  +getHebrewName(): String
+  +getIconResId(): int
+  +isActive(): boolean
+  +isFinished(): boolean
+  +fromString(value: String): DonationStatus
+}
+
+class Chat {
+  -id: String
+  -type: String
+  -donationId: String
+  -giverId: String
+  -receiverId: String
+  -lastMessage: String
+  -lastTimestamp: long
+  -unreadCount: int
+  -donationName: String
+  -otherUserName: String
+  -otherUserId: String
+  -otherUserProfilePic: String
+}
+
+class Message {
+  -id: String
+  -senderId: String
+  -text: String
+  -timestamp: long
+  -adminSender: boolean
+  -isRatingRequest: boolean
+}
+
+class Rate {
+  -ratedUserId: String
+  -ratingUserId: String
+  -donationId: String
+  -starAmount: int
+  -comment: String
+  -timestamp: long
+}
+
+class ImageSourceOption {
+  -title: String
+  -description: String
+  -iconResource: int
+}
+
+enum IsraelCity {
+  TEL_AVIV
+  JERUSALEM
+  HAIFA
+  +getHebrewName(): String
+  +getGeoPoint(): GeoPoint
+  +fromHebrewName(name: String): IsraelCity
+}
+
+User "1" *-- "many" Donation
+User --> NotificationType
+User --> UserLevel
+Donation *-- StatusLog
+Donation --> DonationCategory
+Donation --> DonationStatus
+
+@enduml
