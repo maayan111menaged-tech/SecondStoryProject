@@ -10,7 +10,7 @@ public class Donation implements Idable {
     private String description;
     private DonationCategory category;
     private DonationStatus status;
-    private String photoUrl;
+    private String donationPhoto;
     private String city;
 
     private String giverID;
@@ -29,7 +29,7 @@ public class Donation implements Idable {
                     String description,
                     DonationCategory category,
                     DonationStatus status,
-                    String photoUrl,
+                    String donationPhoto,
                     String city,
                     String giverID,
                     String receiverID) {
@@ -39,7 +39,7 @@ public class Donation implements Idable {
         this.description = description;
         this.category = category;
         this.status = status;
-        this.photoUrl = photoUrl;
+        this.donationPhoto = donationPhoto;
         this.city = city;
         this.giverID = giverID;
         this.receiverID = receiverID;
@@ -69,8 +69,8 @@ public class Donation implements Idable {
     public DonationStatus getStatus() { return status; }
     public void setStatus(DonationStatus status) { this.status = status; }
 
-    public String getPhotoUrl() { return photoUrl; }
-    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
+    public String getDonationPhoto() { return donationPhoto; }
+    public void setDonationPhoto(String donationPhoto) { this.donationPhoto = donationPhoto; }
 
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }

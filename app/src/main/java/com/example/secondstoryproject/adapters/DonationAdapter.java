@@ -3,16 +3,13 @@ package com.example.secondstoryproject.adapters;
 import com.example.secondstoryproject.models.Donation;
 import com.example.secondstoryproject.models.DonationCategory;
 
-import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Button;
 
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -175,8 +172,8 @@ public class DonationAdapter extends RecyclerView.Adapter<DonationAdapter.ViewHo
         holder.tvCity.setText(donation.getCity());
 
         // Load donation image if exists
-        if (donation.getPhotoUrl() != null && !donation.getPhotoUrl().isEmpty()) {
-            holder.imgDonation.setImageBitmap(ImageUtil.fromBase64(donation.getPhotoUrl()));
+        if (donation.getDonationPhoto() != null && !donation.getDonationPhoto().isEmpty()) {
+            holder.imgDonation.setImageBitmap(ImageUtil.fromBase64(donation.getDonationPhoto()));
         }
 
         // Show "Mine" badge if donation belongs to current user

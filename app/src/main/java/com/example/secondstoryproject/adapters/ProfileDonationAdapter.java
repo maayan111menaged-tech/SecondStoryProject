@@ -57,8 +57,8 @@ public class ProfileDonationAdapter extends RecyclerView.Adapter<ProfileDonation
             holder.imgStatus.setImageResource(status.getIconResId());
         }
 
-        if (donation.getPhotoUrl() != null && !donation.getPhotoUrl().isEmpty()) {
-            holder.imgDonation.setImageBitmap(ImageUtil.fromBase64(donation.getPhotoUrl()));
+        if (donation.getDonationPhoto() != null && !donation.getDonationPhoto().isEmpty()) {
+            holder.imgDonation.setImageBitmap(ImageUtil.fromBase64(donation.getDonationPhoto()));
         } else {
             holder.imgDonation.setImageResource(R.drawable.ic_profile);
         }

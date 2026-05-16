@@ -1,0 +1,124 @@
+@startuml Users_Auth
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classHeaderBackgroundColor #33083f
+skinparam classHeaderFontColor #FFFFFF
+skinparam classFontSize 13
+skinparam packageBorderColor #732D87
+skinparam packageBackgroundColor #F3E8FF
+
+abstract class BaseActivity
+
+package "כניסה והרשמה" #EDE9FE {
+  class LoginActivity {
+    -etUName: EditText
+    -etPassword: EditText
+    -btnLogin: Button
+    --
+    -loginUser(uname, password): void
+    -checkInput(uname, password): boolean
+  }
+
+  class RegisterActivity {
+    -etUName, etFName, etLName: EditText
+    -etEmail, etPhone, etPassword: EditText
+    -etDate: TextInputEditText
+    --
+    -registerUser(...): void
+    -createUserInDatabase(user): void
+    -checkInput(...): boolean
+  }
+
+  class forgotPwActivity {
+    -etUName, etEmail: EditText
+    -etPw, etConfirmPw: EditText
+    --
+    -checkInput(...): boolean
+  }
+}
+
+package "פרופיל משתמש" #E8F5E9 {
+  enum ProfileMode {
+    SELF
+    SELF_ADMIN
+    OTHER_USER
+    OTHER_ADMIN
+    ADMIN_ADMIN
+  }
+
+  class UserProfileActivity {
+    -mode: ProfileMode
+    -profileUser: User
+    -currentUser: User
+    -donationAdapter: ProfileDonationAdapter
+    --
+    -loadUserFromDb(userId): void
+    -renderProfile(): void
+    -loadDonations(availableOnly): void
+    -loadRating(): void
+    -setupChatButton(): void
+    -setupAdminChatButton(): void
+  }
+
+  class updateDetailsActivity {
+    -currentUser: User
+    -etUserName, etFirstName...: EditText
+    --
+    -updateUserProfile(): void
+    -saveUpdatedUser(...): void
+    -isValid(...): boolean
+  }
+
+  class ProfilePicActivity {
+    -currentUser: User
+    -ivProfile: ImageView
+    -selectImageLauncher: ActivityResultLauncher
+    -captureImageLauncher: ActivityResultLauncher
+    --
+    -saveProfileImage(): void
+    -showImageSourceDialog(): void
+  }
+}
+
+package "תרומות משתמש" #FFF3E0 {
+  class UserDonationsActivity {
+    -userId: String
+    -viewMode: String
+    -donationAdapter: DonationAdapter
+    -allDonations: List<Donation>
+    --
+    -loadDonations(): void
+    -applyFilters(): void
+    -getAllowedStatuses(): List<DonationStatus>
+  }
+}
+
+package "לוח מובילים" #E8F5E9 {
+  class LeaderBoardActivity {
+    -userAdapterLeaderBoard: UserAdapterLeaderBoard
+    --
+    -updatePodium(sorted): void
+    -navigateToProfile(user): void
+  }
+}
+
+LoginActivity --|> BaseActivity
+RegisterActivity --|> BaseActivity
+forgotPwActivity --|> BaseActivity
+UserProfileActivity --|> BaseActivity
+updateDetailsActivity --|> BaseActivity
+ProfilePicActivity --|> BaseActivity
+UserDonationsActivity --|> BaseActivity
+LeaderBoardActivity --|> BaseActivity
+
+UserProfileActivity --> ProfileMode : uses
+UserProfileActivity --> updateDetailsActivity : navigates to
+UserProfileActivity --> ProfilePicActivity : navigates to (via updateDetails)
+UserProfileActivity --> UserDonationsActivity : navigates to
+LoginActivity --> UserProfileActivity : after login
+RegisterActivity --> UserProfileActivity : after register
+
+@enduml
+

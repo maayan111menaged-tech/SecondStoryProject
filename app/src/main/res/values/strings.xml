@@ -3,10 +3,10 @@
     <string name="open_drawer">פתח תפריט צד</string>
     <string name="close_drawer">סגור תפריט צד</string>
 
-    <string name="image_source_title">Choose Image Source</string>
-    <string name="image_source_subtitle">Select how you want to add an image</string>
-    <string name="gallery_title">Gallery</string>
-    <string name="gallery_description">Choose from your photo library</string>
-    <string name="camera_title">Camera</string>
-    <string name="camera_description">Take a new photo</string>
+    <string name="image_source_title">בחר מקור תמונה</string>
+    <string name="image_source_subtitle">בחר כיצד ברצונך להוסיף תמונה</string>
+    <string name="gallery_title">גלריה</string>
+    <string name="gallery_description">בחר תמונה מספריית התמונות שלך</string>
+    <string name="camera_title">מצלמה</string>
+    <string name="camera_description">צלם תמונה חדשה</string>
 </resources>

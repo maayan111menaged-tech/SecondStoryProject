@@ -1,0 +1,61 @@
+@startuml Overview_Base
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classHeaderBackgroundColor #FFFFFF
+skinparam classHeaderFontColor #FFFFFF
+skinparam classFontSize 13
+skinparam packageBorderColor #732D87
+skinparam packageBackgroundColor #F3E8FF
+
+abstract class BaseActivity {
+  #databaseService: IDatabaseService
+  #drawerLayout: DrawerLayout
+  #bottomNav: BottomNavigationView
+  --
+  #isAdmin(): boolean
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+  #getSelectedBottomNavItem(): int
+  #navigateTo(targetActivity: Class<?>): void
+  #sendAutoAdminMessage(userId: String, text: String): void
+  #listenToTotalUnread(): void
+  #setContentLayout(layoutResId: int): void
+}
+
+class SplashActivity {
+  +onCreate(): void
+}
+
+class LandingActivity {
+  +hasSideMenu(): boolean
+  +hasBottomMenu(): boolean
+}
+
+package "Navigation Components" {
+  class BottomNavigationView << (C,#EDD6F5) >> {
+    בית · צ'אטים · פרופיל
+  }
+  class NavigationDrawer << (C,#EDD6F5) >> {
+    תפריט צד (user / admin)
+  }
+  class Toolbar << (C,#EDD6F5) >> {
+    לוגו · כפתור Drawer
+  }
+}
+
+SplashActivity --|> BaseActivity
+LandingActivity --|> BaseActivity
+BaseActivity --> BottomNavigationView : manages
+BaseActivity --> NavigationDrawer : manages
+BaseActivity --> Toolbar : manages
+
+note right of BaseActivity
+  כל מסכי האפליקציה יורשים מ-BaseActivity.
+  BaseActivity מטפל בניווט, Drawer, BottomNav,
+  ו-unread badge לצ'אטים.
+end note
+
+@enduml
+

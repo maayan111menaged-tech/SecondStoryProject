@@ -1,0 +1,59 @@
+@startuml DonationSystem
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam classBackgroundColor #FFF7ED
+skinparam classBorderColor #F97316
+skinparam arrowColor #EA580C
+skinparam roundcorner 18
+skinparam shadowing false
+
+abstract class BaseActivity
+
+class SearchDonationsActivity {
+  -loadDonations(): void
+  -setupCategoryFilter(): void
+  -setupCityFilter(): void
+}
+
+class DonationDetailActivity {
+  -loadDonationDetails(): void
+  -updateDonationStatus(): void
+  -interestedFunction(): void
+}
+
+class UserDonationsActivity {
+  -loadDonations(): void
+  -applyFilters(): void
+}
+
+class DonationsListActivity {
+  -setupStatusFilter(): void
+}
+
+class AcceptDonationActivity {
+  -loadDonations(): void
+}
+
+class PickCatergoryActivity
+
+class AddDonationStep2Activity
+class AddDonationStep3Activity
+class AddDonationStep4Activity
+
+SearchDonationsActivity --|> BaseActivity
+DonationDetailActivity --|> BaseActivity
+UserDonationsActivity --|> BaseActivity
+DonationsListActivity --|> BaseActivity
+AcceptDonationActivity --|> BaseActivity
+PickCatergoryActivity --|> BaseActivity
+AddDonationStep2Activity --|> BaseActivity
+AddDonationStep3Activity --|> BaseActivity
+AddDonationStep4Activity --|> BaseActivity
+
+PickCatergoryActivity --> AddDonationStep2Activity
+AddDonationStep2Activity --> AddDonationStep3Activity
+AddDonationStep3Activity --> AddDonationStep4Activity
+
+@enduml

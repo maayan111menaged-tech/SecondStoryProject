@@ -138,7 +138,7 @@ public class DonationDetailActivity extends BaseActivity {
             ivStatus.setImageResource(status.getIconResId());
         }
 
-        String photo = donation.getPhotoUrl();
+        String photo = donation.getDonationPhoto();
         if (photo != null && !photo.isEmpty()) {
             ivDonation.setImageBitmap(ImageUtil.fromBase64(photo));
         } else {
