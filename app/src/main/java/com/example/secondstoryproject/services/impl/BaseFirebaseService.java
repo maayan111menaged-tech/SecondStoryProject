@@ -172,8 +172,6 @@ public abstract class BaseFirebaseService<T extends Idable> {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                // bug note: currentValue can be null even if the data exists in the database.
-                // Firebase will then re-run the transaction with the correct data.
                 T currentValue = currentData.getValue(clazz);
                 if (currentValue != null) {
                     currentValue = function.apply(currentValue);

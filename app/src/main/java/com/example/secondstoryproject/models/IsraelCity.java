@@ -50,7 +50,7 @@ public enum IsraelCity {
         return names;
     }
 
-    // מחיפוש לפי שם עברי — לשימוש במפה
+    // משם בעברית לעיר
     public static IsraelCity fromHebrewName(String hebrewName) {
         for (IsraelCity city : values()) {
             if (city.hebrewName.equals(hebrewName)) {

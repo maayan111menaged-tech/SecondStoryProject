@@ -96,7 +96,6 @@ public class DonationDetailActivity extends BaseActivity {
         tvDonationRatingAvg     = findViewById(R.id.tvDonationRatingAvg);
         tvDonationRatingComment = findViewById(R.id.tvDonationRatingComment);
 
-        // צביעת כוכבי RatingBar בקוד (app:tint לא עובד על RatingBar)
         ratingBarDonation.getProgressDrawable()
                 .setColorFilter(getColor(R.color.medium_purple), PorterDuff.Mode.SRC_ATOP);
 

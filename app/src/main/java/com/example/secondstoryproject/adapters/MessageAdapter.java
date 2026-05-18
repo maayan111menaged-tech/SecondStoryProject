@@ -153,7 +153,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             SystemMessageViewHolder vh = (SystemMessageViewHolder) holder;
             vh.tvText.setText(item.message.getText());
 
-            // ✅ קודם כל איפוס מצב – חשוב למניעת מחזור שגוי
+            // קודם כל איפוס מצב – חשוב למניעת מחזור שגוי
             vh.btnRate.setVisibility(View.GONE);
             vh.tvRated.setVisibility(View.GONE);
             vh.btnRate.setOnClickListener(null);
@@ -167,7 +167,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         || !currentUserId.equals(donationGiverId);
 
                 if (isReceiver) {
-                    // ✅ שמור reference לפוזיציה הנוכחית למניעת recycling bugs
                     final int currentPosition = position;
 
                     DatabaseService.getInstance().getRateService()
@@ -185,7 +184,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                                 } else {
                                                     vh.btnRate.setVisibility(View.VISIBLE);
                                                     vh.tvRated.setVisibility(View.GONE);
-                                                    // ✅ ה-listener מוגדר כאן, לא בתוך async callback
+
                                                     vh.btnRate.setOnClickListener(v ->
                                                             showRatingDialog(v.getContext()));
                                                 }
@@ -220,7 +219,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         RatingBar ratingBar = dialogView.findViewById(R.id.rating_bar);
         EditText etComment  = dialogView.findViewById(R.id.et_comment);
 
-        new androidx.appcompat.app.AlertDialog.Builder(context)
+        new androidx.appcompat.app.AlertDialog.Builder(context, R.style.DialogTheme)
                 .setTitle("דרג את התורם")
                 .setView(dialogView)
                 .setPositiveButton("שלח דירוג", (d, w) -> {

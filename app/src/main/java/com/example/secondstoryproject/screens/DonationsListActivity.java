@@ -79,7 +79,7 @@ public class DonationsListActivity extends BaseActivity {
         });
         recyclerView.setAdapter(donationAdapter);
 
-        // ✅ עדכון ספירה + showList/showEmpty אחרי כל פילטור
+        //  עדכון ספירה + showList/showEmpty אחרי כל פילטור
         donationAdapter.setOnFilterListener(count -> {
             tvDonationCount.setText("סה״כ: " + count);
             if (count == 0) showEmpty();
@@ -164,7 +164,6 @@ public class DonationsListActivity extends BaseActivity {
             categoryNames.add(cat.getHebrewName());
         }
 
-        // ✅ android.R.layout.simple_dropdown_item_1line עובד — לא נגע בזה
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, categoryNames);
         spinnerCategory.setAdapter(adapter);

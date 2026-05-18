@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="?attr/colorSurface"
+    android:layoutDirection="rtl"
     android:paddingBottom="16dp">
 
     <!-- Handle bar -->

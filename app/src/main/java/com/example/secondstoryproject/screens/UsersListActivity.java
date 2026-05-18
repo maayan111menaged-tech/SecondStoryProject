@@ -108,7 +108,7 @@ public class UsersListActivity extends BaseActivity {
                                                         userAdapter.resetMakeAdminButton(user);
                                                         return;
                                                     }
-                                                    // ✅ אין תרומות פעילות — מעדכן רק את השדה
+                                                    // אין תרומות פעילות — מעדכן רק את השדה
                                                     DatabaseService.getInstance().getUserService()
                                                             .updateUserFields(user.getId(), Map.of("admin", true),
                                                                     new IDatabaseService.DatabaseCallback<Void>() {

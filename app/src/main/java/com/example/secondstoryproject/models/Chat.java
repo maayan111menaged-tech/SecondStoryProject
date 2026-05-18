@@ -14,7 +14,7 @@ public class Chat {
     private long lastTimestamp;
 
     @Exclude
-    private int unreadCount; // לא נשמר ב-DB, רק בזיכרון
+    private int unreadCount;
 
     @Exclude
     private String donationName;    // שם התרומה

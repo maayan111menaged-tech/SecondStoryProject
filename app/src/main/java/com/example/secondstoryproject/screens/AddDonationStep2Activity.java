@@ -28,7 +28,7 @@ public class AddDonationStep2Activity extends BaseActivity {
     private ImageView imgCategory;
     private TextView tvCategoryName;
 
-    private DonationCategory selectedCategory; // enum אמיתי
+    private DonationCategory selectedCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

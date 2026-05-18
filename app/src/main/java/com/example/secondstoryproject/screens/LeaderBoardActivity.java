@@ -101,7 +101,7 @@ public class LeaderBoardActivity extends BaseActivity {
             tvPodium1Count.setText(u.getDonationCounter() + " תרומות");
             if (u.getProfilePic() != null && !u.getProfilePic().isEmpty()) {
                 ivPodium1.setImageBitmap(ImageUtil.fromBase64(u.getProfilePic()));
-                ivPodium1.setColorFilter(null); // מסיר את ה-tint
+                ivPodium1.setColorFilter(null);
             }
             findViewById(R.id.podium_item_1).setOnClickListener(v -> navigateToProfile(u));
         }

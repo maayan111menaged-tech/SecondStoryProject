@@ -170,7 +170,7 @@ public class ChatServiceImpl implements IChatService {
     }
 
     /**
-     * ✅ מוחק את כל הצ'אטים של משתמש שנמחק.
+     * מוחק את כל הצ'אטים של משתמש שנמחק.
      * מוחק את node הצ'אט מ-chats + האינדקס מ-users של שני הצדדים.
      */
     @Override
@@ -360,7 +360,7 @@ public class ChatServiceImpl implements IChatService {
     }
 
     /**
-     * ✅ מסמן את כל הצ'אטים של משתמש שנמחק עם donorDeleted=true.
+     *  מסמן את כל הצ'אטים של משתמש שנמחק עם donorDeleted=true.
      * הצ'אטים לא נמחקים – הצד השני רואה באנר ויכול למחוק בעצמו.
      */
     @Override

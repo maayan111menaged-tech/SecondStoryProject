@@ -188,7 +188,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
             if (onUserClickListener != null) onUserClickListener.onToggleActiveClick(user);
         });
 
-        // ✅ כפתור INFO
+        // כפתור INFO
         holder.btnInfoUser.setOnClickListener(v -> {
             if (onUserClickListener != null) onUserClickListener.onInfoClick(user);
         });
@@ -254,7 +254,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
      * Adds a new user to the list.
      */
     public void addUser(User user) {
-        fullUserList.add(user);   // ← חשוב! כדי שהפילטר יעבוד
+        fullUserList.add(user);   // כדי שהפילטר יעבוד
         userList.add(user);
         notifyItemInserted(userList.size() - 1);
     }

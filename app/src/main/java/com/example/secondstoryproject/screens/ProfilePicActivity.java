@@ -105,8 +105,8 @@ public class ProfilePicActivity extends BaseActivity {
         bottomSheetDialog.setContentView(view);
 
         ArrayList<ImageSourceOption> options = new ArrayList<>();
-        options.add(new ImageSourceOption("Gallery", "Choose from gallery", R.drawable.gallery_thumbnail));
-        options.add(new ImageSourceOption("Camera", "Take a photo", R.drawable.photo_camera));
+        options.add(new ImageSourceOption(getString(R.string.gallery_title), getString(R.string.gallery_description), R.drawable.gallery_thumbnail));
+        options.add(new ImageSourceOption(getString(R.string.camera_title), getString(R.string.camera_description), R.drawable.photo_camera));
 
         ListView listView = view.findViewById(R.id.list_view_image_sources);
 

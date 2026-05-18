@@ -60,7 +60,6 @@ public class Validator {
         return phone != null && phone.length() >= 10 && Patterns.PHONE.matcher(phone).matches();
     }
 
-    /// date
 
 
     /**

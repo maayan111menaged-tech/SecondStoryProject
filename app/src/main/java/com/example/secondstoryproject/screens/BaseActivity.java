@@ -162,7 +162,7 @@ public abstract class BaseActivity extends AppCompatActivity
         setContentLayout(layoutResID);
     }
 
-    // 👇 מזריק את ה-layout של המסך לתוך Base
+    //  מזריק את ה-layout של המסך לתוך Base
     protected void setContentLayout(int layoutResId) {
         FrameLayout contentFrame = findViewById(R.id.content_frame);
         getLayoutInflater().inflate(layoutResId, contentFrame, true);

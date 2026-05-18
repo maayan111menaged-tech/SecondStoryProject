@@ -146,7 +146,7 @@ public class UserDonationsActivity extends BaseActivity {
             applyFilters();
         });
 
-        // ✅ OTHER — מסתירים ספינר סטטוס (יש רק סטטוס אחד ממילא)
+        //  OTHER — מסתירים ספינר סטטוס (יש רק סטטוס אחד ממילא)
         if ("OTHER".equals(viewMode)) {
             spinnerStatus.setVisibility(View.GONE);
             // מסתירים גם את ה-TextInputLayout שעוטף אותו
