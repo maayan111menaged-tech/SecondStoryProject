@@ -330,6 +330,8 @@ public class UsersListActivity extends BaseActivity {
                                                             @Override public void onCompleted(String chatId) {}
                                                             @Override public void onFailed(Exception e) {}
                                                         });
+                                                sendAutoAdminMessage(uid,
+                                                        "ברוכ/ה הבא/ה לסיפור שני! 🌸\nשמחים שהצטרפת לקהילה שלנו.\nאם יש שאלות או צורך בעזרה — אנחנו כאן!");
                                                 userAdapter.addUser(newUser);
                                                 tvUserCount.setText("סה״כ: " + userAdapter.getItemCount());
                                                 dialog.dismiss();

@@ -391,7 +391,7 @@ public class ChatActivity extends BaseActivity {
     private void showDeletedUserHeader() {
         setHeaderState(HeaderState.DELETED, "משתמש זה הוסר מהמערכת");
         btnDeleteChat.setOnClickListener(v ->
-                new androidx.appcompat.app.AlertDialog.Builder(this)
+                new androidx.appcompat.app.AlertDialog.Builder(this ,R.style.DialogTheme)
                         .setTitle("מחיקת שיחה")
                         .setMessage("האם למחוק את השיחה לצמיתות?")
                         .setPositiveButton("מחק", (d, w) ->
@@ -427,7 +427,7 @@ public class ChatActivity extends BaseActivity {
                 + (name != null ? name : "המשתמש"));
 
         btnMatch.setOnClickListener(v ->
-                new androidx.appcompat.app.AlertDialog.Builder(this)
+                new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
                         .setTitle("אישור תרומה")
                         .setMessage("לאשר את " + (name != null ? name : "המשתמש")
                                 + " כמקבל התרומה?")

@@ -145,7 +145,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
         if (!Validator.isUNameValid(uName)) {
             usernameLayout.setErrorEnabled(true);
-            usernameLayout.setError("שם משתמש יכול להכיל אותיות, מספרים, נקודה וקו תחתון");
+            usernameLayout.setError("שם משתמש יכול להכיל אותיות באנגלית, מספרים, נקודה וקו תחתון");
             etUName.requestFocus();
             return false;
         }
