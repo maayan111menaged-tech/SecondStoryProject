@@ -1,0 +1,92 @@
+@startuml Donations
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 10
+skinparam dpi 150
+skinparam nodesep 20
+skinparam ranksep 35
+
+top to bottom direction
+
+abstract class BaseActivity
+
+class PickCatergoryActivity {
+  -rvCategories: RecyclerView
+}
+
+class AddDonationStep2Activity {
+  -selectedCategory: DonationCategory
+  -etDonationName: EditText
+  -etDescription: EditText
+  -actCity: AutoCompleteTextView
+  -setupCityDropdown(): void
+  -submitDonation(): void
+  -checkInput(...): boolean
+}
+
+class AddDonationStep3Activity {
+  -selectedDonationName: String
+  -selectedCity: String
+  -selectedCategoryName: String
+  -selectImageLauncher: ActivityResultLauncher
+  -captureImageLauncher: ActivityResultLauncher
+  -showImageSourceDialog(): void
+  -addDonationToDatabase(): void
+}
+
+class AddDonationStep4Activity {
+  -donationName: String
+  -description: String
+  -city: String
+  -imageBase64: String
+  -publishDonation(): void
+}
+
+class DonationDetailActivity {
+  -currentDonation: Donation
+  -currentUser: User
+  -loadDonationDetails(donationId): void
+  -showDonationDetails(donation): void
+  -updateDonationStatus(status, reason): void
+  -interestedFunction(): void
+  -loadDonationRating(...): void
+}
+
+class SearchDonationsActivity {
+  -donationAdapter: DonationAdapter
+  -searchQuery: String
+  -categoryFilter: DonationCategory
+  -cityFilter: String
+  -loadDonations(): void
+  -setupCategoryFilter(): void
+  -setupCityFilter(): void
+}
+
+class UserDonationsActivity {
+  -donationAdapter: DonationAdapter
+  -viewMode: String
+  -userId: String
+  -categoryFilter: DonationCategory
+  -statusFilter: DonationStatus
+  -loadDonations(): void
+  -applyFilters(): void
+}
+
+PickCatergoryActivity --|> BaseActivity
+AddDonationStep2Activity --|> BaseActivity
+AddDonationStep3Activity --|> BaseActivity
+AddDonationStep4Activity --|> BaseActivity
+DonationDetailActivity --|> BaseActivity
+SearchDonationsActivity --|> BaseActivity
+UserDonationsActivity --|> BaseActivity
+
+PickCatergoryActivity --> AddDonationStep2Activity
+AddDonationStep2Activity --> AddDonationStep3Activity
+AddDonationStep3Activity --> AddDonationStep4Activity
+DonationDetailActivity --> ChatActivity
+
+@enduml

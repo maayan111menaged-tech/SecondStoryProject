@@ -31,6 +31,7 @@ import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ProfilePicActivity extends BaseActivity {
     private User currentUser;
@@ -125,29 +126,31 @@ public class ProfilePicActivity extends BaseActivity {
         bottomSheetDialog.show();
     }
     private void saveProfileImage() {
-
         if (currentUser == null) return;
 
         String base64 = ImageUtil.toBase64(ivProfile);
 
-        currentUser.setProfilePic(base64);
+        // Update only the profilePic field instead of the entire user object
+        Map<String, Object> fields = new java.util.HashMap<>();
+        fields.put("profilePic", base64);
 
-        DatabaseService.getInstance().getUserService().update(
+        DatabaseService.getInstance().getUserService().updateUserFields(
                 currentUser.getId(),
-                oldUser -> currentUser,
-                new IDatabaseService.DatabaseCallback<User>() {
-
+                fields,
+                new IDatabaseService.DatabaseCallback<Void>() {
                     @Override
-                    public void onCompleted(User result) {
+                    public void onCompleted(Void result) {
+                        currentUser.setProfilePic(base64);
                         SharedPreferencesUtil.saveUser(ProfilePicActivity.this, currentUser);
-                        Toast.makeText(ProfilePicActivity.this, "הפרופיל עודכן בהצלחה!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfilePicActivity.this,
+                                "הפרופיל עודכן בהצלחה!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(ProfilePicActivity.this, updateDetailsActivity.class));
                         finish();
                     }
-
                     @Override
                     public void onFailed(Exception e) {
-                        Toast.makeText(ProfilePicActivity.this, "עדכון נכשל, נסו שוב", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfilePicActivity.this,
+                                "עדכון נכשל, נסו שוב", Toast.LENGTH_SHORT).show();
                     }
                 }
         );

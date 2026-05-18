@@ -1,0 +1,58 @@
+@startuml HomeMap
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 10
+skinparam dpi 150
+skinparam nodesep 20
+skinparam ranksep 35
+
+top to bottom direction
+
+abstract class BaseActivity
+
+class MainActivity {
+  -miniMap: MapView
+  -carouselAdapter: CarouselDonationAdapter
+  -rateProgressBar: ProgressBar
+  #getSelectedBottomNavItem(): int
+  +AddAllMarkers(): void
+  -updateUserLevelUI(user): void
+  -loadCarouselDonations(): void
+  -setupMap(): void
+  -setupCarousel(): void
+}
+
+class FullMapActivity {
+  -fullMap: MapView
+  +AddAllMarkers(): void
+  -addCityMarker(city, lat, lon, count): void
+}
+
+class CityInfoWindow {
+  -cityName: String
+  -donationCount: int
+  +onOpen(item): void
+  +onClose(): void
+}
+
+class LeaderBoardActivity {
+  -userAdapterLeaderBoard: UserAdapterLeaderBoard
+  -tvUserCount: TextView
+  -ivPodium1: ImageView
+  -ivPodium2: ImageView
+  -ivPodium3: ImageView
+  -updatePodium(sorted): void
+  -navigateToProfile(user): void
+}
+
+MainActivity --|> BaseActivity
+FullMapActivity --|> BaseActivity
+LeaderBoardActivity --|> BaseActivity
+FullMapActivity --> CityInfoWindow
+MainActivity --> FullMapActivity
+
+@enduml

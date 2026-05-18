@@ -1,0 +1,172 @@
+@startuml Services_Full
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 5
+skinparam dpi 150
+skinparam scale 0.42
+skinparam linetype ortho
+
+left to right direction
+
+interface IDatabaseService {
+  +getUserService(): IUserService
+  +getDonationService(): IDonationService
+  +getChatService(): IChatService
+  +getRateService(): IRateService
+  --
+  <<interface>> DatabaseCallback<T>
+  +onCompleted(object: T): void
+  +onFailed(e: Exception): void
+}
+
+interface IUserService {
+  +generateId(): String
+  +create(user, callback): void
+  +get(uid, callback): void
+  +getAll(callback): void
+  +delete(uid, callback): void
+  +update(userId, function, callback): void
+  +getUserByUserNameAndPassword(u,p,cb): void
+  +checkIfUserNameExists(username, cb): void
+  +findUserByUserName(username, cb): void
+  +getUsersCount(callback): void
+  +isAdmin(userId, callback): void
+  +incrementDonationCounter(userId, cb): void
+  +updateUserFields(userId, fields, cb): void
+}
+
+interface IDonationService {
+  +generateId(): String
+  +create(donation, callback): void
+  +get(donationId, callback): void
+  +getAll(callback): void
+  +delete(donationId, callback): void
+  +update(donationId, function, callback): void
+  +getByGiverId(giverId, callback): void
+  +getDonationsCountByStatus(status, cb): void
+  +getDonationsByStatus(status, callback): void
+  +getDonationsCountByCities(status, cb): void
+}
+
+interface IChatService {
+  +getOrCreateDonationChat(dId,gId,rId,cb): void
+  +sendMessage(chatId,senderId,text,isAdmin,cb): void
+  +listenToMessages(chatId,cb): ValueEventListener
+  +getUserChats(userId, callback): void
+  +removeListener(chatId, listener): void
+  +incrementUnread(chatId, userId): void
+  +resetUnread(chatId, userId): void
+  +getOrCreateAdminChat(userId, callback): void
+  +getAllAdminChats(callback): void
+  +deleteAdminChat(userId, callback): void
+  +deleteAllUserChats(userId, callback): void
+  +markUserAsDeleted(userId, callback): void
+  +deleteChat(chatId, userId, callback): void
+  +setMatch(donationId, matchedUserId, cb): void
+  +getChatsRef(): DatabaseReference
+}
+
+interface IRateService {
+  +saveRate(rate, callback): void
+  +getRatesForUser(userId, callback): void
+  +hasRated(ratingUserId, donationId, cb): void
+}
+
+class DatabaseService {
+  -{static} instance: DatabaseService
+  -userService: IUserService
+  -donationService: IDonationService
+  -chatService: IChatService
+  -rateService: IRateService
+  +{static} getInstance(): IDatabaseService
+  +getUserService(): IUserService
+  +getDonationService(): IDonationService
+  +getChatService(): IChatService
+  +getRateService(): IRateService
+}
+
+abstract class "BaseFirebaseService<T>" {
+  -databaseReference: DatabaseReference
+  -path: String
+  -clazz: Class<T>
+  #generateId(): String
+  #create(item, callback): void
+  #get(id, callback): void
+  #getAll(callback): void
+  #delete(id, callback): void
+  #update(id, function, callback): void
+  #getRootRef(): DatabaseReference
+  #updateFields(id, fields, callback): void
+}
+
+class UserServiceImpl {
+  +generateId(): String
+  +create(user, callback): void
+  +get(uid, callback): void
+  +getAll(callback): void
+  +delete(uid, callback): void
+  +update(userId, function, callback): void
+  +getUserByUserNameAndPassword(): void
+  +checkIfUserNameExists(): void
+  +findUserByUserName(): void
+  +getUsersCount(): void
+  +isAdmin(): void
+  +incrementDonationCounter(): void
+  +updateUserFields(): void
+}
+
+class DonationServiceImpl {
+  +generateId(): String
+  +create(donation, callback): void
+  +get(donationId, callback): void
+  +getAll(callback): void
+  +delete(donationId, callback): void
+  +update(donationId, function, callback): void
+  +getByGiverId(): void
+  +getDonationsCountByStatus(): void
+  +getDonationsByStatus(): void
+  +getDonationsCountByCities(): void
+}
+
+class ChatServiceImpl {
+  -chatsRef: DatabaseReference
+  -usersRef: DatabaseReference
+  +getOrCreateDonationChat(): void
+  +sendMessage(): void
+  +listenToMessages(): ValueEventListener
+  +getUserChats(): void
+  +getAllAdminChats(): void
+  +getOrCreateAdminChat(): void
+  +markUserAsDeleted(): void
+  +deleteChat(): void
+  +setMatch(): void
+  +incrementUnread(): void
+  +resetUnread(): void
+}
+
+class RateServiceImpl {
+  -ratingsRef: DatabaseReference
+  +saveRate(rate, callback): void
+  +getRatesForUser(): void
+  +hasRated(): void
+}
+
+DatabaseService ..|> IDatabaseService
+UserServiceImpl ..|> IUserService
+DonationServiceImpl ..|> IDonationService
+ChatServiceImpl ..|> IChatService
+RateServiceImpl ..|> IRateService
+
+UserServiceImpl --|> "BaseFirebaseService<T>"
+DonationServiceImpl --|> "BaseFirebaseService<T>"
+
+DatabaseService --> IUserService
+DatabaseService --> IDonationService
+DatabaseService --> IChatService
+DatabaseService --> IRateService
+
+@enduml

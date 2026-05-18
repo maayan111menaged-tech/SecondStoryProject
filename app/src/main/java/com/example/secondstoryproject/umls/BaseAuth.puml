@@ -1,0 +1,81 @@
+@startuml Auth
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 10
+skinparam dpi 150
+skinparam nodesep 20
+skinparam ranksep 35
+
+top to bottom direction
+
+abstract class BaseActivity {
+  #databaseService: IDatabaseService
+  #drawerLayout: DrawerLayout
+  ~bottomNav: BottomNavigationView
+  #isAdmin(): boolean
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+  #getSelectedBottomNavItem(): int
+  #navigateTo(targetActivity): void
+  #sendAutoAdminMessage(userId, text): void
+  #setContentLayout(layoutResId): void
+}
+
+class SplashActivity {
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+}
+
+class LandingActivity {
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+}
+
+class LoginActivity {
+  -etUName: EditText
+  -etPassword: EditText
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+  -checkInput(uname, password): boolean
+  -loginUser(uname, password): void
+}
+
+class RegisterActivity {
+  -etUName: EditText
+  -etFName: EditText
+  -etLName: EditText
+  -etEmail: EditText
+  -etPassword: EditText
+  -etDate: TextInputEditText
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+  -checkInput(...): boolean
+  -registerUser(...): void
+  -createUserInDatabase(user): void
+}
+
+class forgotPwActivity {
+  -etUName: EditText
+  -etEmail: EditText
+  -etPw: EditText
+  -etConfirmPw: EditText
+  #hasSideMenu(): boolean
+  #hasBottomMenu(): boolean
+  -checkInput(...): boolean
+}
+
+SplashActivity --|> BaseActivity
+LandingActivity --|> BaseActivity
+LoginActivity --|> BaseActivity
+RegisterActivity --|> BaseActivity
+forgotPwActivity --|> BaseActivity
+
+LandingActivity --> LoginActivity
+LandingActivity --> RegisterActivity
+LoginActivity --> forgotPwActivity
+
+@enduml

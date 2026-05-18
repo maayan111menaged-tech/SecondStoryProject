@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="220dp"
+    android:layout_height="wrap_content"
     android:background="@color/dark_purple"
     android:layoutDirection="rtl">
 
@@ -17,8 +17,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="20dp"
-        android:paddingTop="40dp">
+        android:padding="20dp">
 
         <!-- תמונת פרופיל -->
         <com.google.android.material.imageview.ShapeableImageView
@@ -31,6 +30,7 @@
             android:background="@android:color/white"
             android:padding="6dp"
             android:elevation="6dp"
+            android:layout_marginTop="50dp"
             android:layout_gravity="start"/>
 
         <!-- שם מלא -->
@@ -54,6 +54,7 @@
             android:textColor="@color/lavender"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:layout_marginBottom="10dp"
             android:layout_gravity="start"/>
 
 

@@ -1,0 +1,67 @@
+@startuml Admin
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 10
+skinparam dpi 150
+skinparam nodesep 20
+skinparam ranksep 35
+
+top to bottom direction
+
+abstract class BaseActivity
+
+class AdminMainActivity {
+  -tvUsersCount: TextView
+  -tvPendingDonations: TextView
+  -pieChart: PieChart
+  -legendContainer: LinearLayout
+  -loadStats(): void
+  -setupPieChart(donations): void
+  -buildLegend(statuses, colors): void
+}
+
+class AcceptDonationActivity {
+  -rvDonations: RecyclerView
+  -adapter: DonationAdapter
+  -etSearch: EditText
+  -progressBar: ProgressBar
+  -loadDonations(): void
+  -getFirstStatusDate(donation): Date
+}
+
+class DonationsListActivity {
+  -donationAdapter: DonationAdapter
+  -searchQuery: String
+  -statusFilter: Set
+  -categoryFilter: DonationCategory
+  -cityFilter: String
+  -setupStatusFilter(): void
+  -setupCategoryFilter(): void
+  -setupCityFilter(): void
+}
+
+class UsersListActivity {
+  -userAdapter: UserAdapter
+  -searchQuery: String
+  -adminFilter: Boolean
+  -showAddUserDialog(): void
+  -performFullDelete(user): void
+  -showDeactivateConfirmDialog(user): void
+  -reactivateUser(user): void
+}
+
+AdminMainActivity --|> BaseActivity
+AcceptDonationActivity --|> BaseActivity
+DonationsListActivity --|> BaseActivity
+UsersListActivity --|> BaseActivity
+
+AdminMainActivity --> AcceptDonationActivity
+AdminMainActivity --> DonationsListActivity
+AdminMainActivity --> UsersListActivity
+AdminMainActivity --> ChatsListActivity
+
+@enduml

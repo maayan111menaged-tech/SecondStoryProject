@@ -1,0 +1,60 @@
+@startuml Profile
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 10
+skinparam dpi 150
+skinparam nodesep 20
+skinparam ranksep 35
+
+top to bottom direction
+
+abstract class BaseActivity
+
+class UserProfileActivity {
+  -profileUser: User
+  -currentUser: User
+  -donationAdapter: ProfileDonationAdapter
+  -{enum} ProfileMode
+  #getSelectedBottomNavItem(): int
+  -renderProfile(): void
+  -loadDonations(availableOnly): void
+  -loadRating(): void
+  -setupChatButton(): void
+  -setupAdminChatButton(): void
+  -loadUserFromDb(userId): void
+}
+
+class updateDetailsActivity {
+  -currentUser: User
+  -etUserName: EditText
+  -etFirstName: EditText
+  -etEmail: EditText
+  -etPhoneNumber: EditText
+  #hasSideMenu(): boolean
+  -updateUserProfile(): void
+  -saveUpdatedUser(...): void
+  -isValid(...): boolean
+}
+
+class ProfilePicActivity {
+  -currentUser: User
+  -ivProfile: ImageView
+  -selectImageLauncher: ActivityResultLauncher
+  -captureImageLauncher: ActivityResultLauncher
+  -saveProfileImage(): void
+  -showImageSourceDialog(): void
+  -setupClicks(): void
+}
+
+UserProfileActivity --|> BaseActivity
+updateDetailsActivity --|> BaseActivity
+ProfilePicActivity --|> BaseActivity
+
+UserProfileActivity --> updateDetailsActivity
+updateDetailsActivity --> ProfilePicActivity
+
+@enduml

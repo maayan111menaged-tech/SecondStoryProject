@@ -3,13 +3,21 @@
 skinparam classBackgroundColor #FAF5FF
 skinparam classBorderColor #732D87
 skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 5
+skinparam dpi 150
+skinparam scale 0.5
+skinparam linetype ortho
+
+left to right direction
 
 interface Idable {
   +getId(): String
   +setId(id: String): void
 }
 
-class User implements Idable {
+class User {
   -id: String
   -userName: String
   -password: String
@@ -22,7 +30,6 @@ class User implements Idable {
   -profilePic: String
   -isAdmin: boolean
   -isActive: boolean
-  -donationList: ArrayList<Donation>
   -createdAt: Date
   -notifications: NotificationType
   +getLevel(): UserLevel
@@ -46,18 +53,18 @@ enum UserLevel {
   +fromDonationCount(count: int): UserLevel
 }
 
-class Donation implements Idable {
+class Donation {
   -id: String
   -name: String
   -description: String
   -category: DonationCategory
   -status: DonationStatus
-  -photoUrl: String
+  -donationPhoto: String
   -city: String
   -giverID: String
   -receiverID: String
   -statusHistory: ArrayList<StatusLog>
-  +updateStatus(newStatus: DonationStatus, reason: String): void
+  +updateStatus(newStatus, reason): void
   +getRejectionReason(): String
 }
 
@@ -93,6 +100,8 @@ enum DonationStatus {
   +getIconResId(): int
   +isActive(): boolean
   +isFinished(): boolean
+  +isAvailableForReceiver(): boolean
+  +needsManagerAction(): boolean
   +fromString(value: String): DonationStatus
 }
 
@@ -139,16 +148,26 @@ enum IsraelCity {
   TEL_AVIV
   JERUSALEM
   HAIFA
+  BEER_SHEVA
+  ASHDOD
+  RISHON_LEZION
+  NETANYA
+  +getEnglishName(): String
   +getHebrewName(): String
+  +getLatitude(): double
+  +getLongitude(): double
   +getGeoPoint(): GeoPoint
   +fromHebrewName(name: String): IsraelCity
+  +fromString(value: String): IsraelCity
 }
 
-User "1" *-- "many" Donation
+User ..|> Idable
+Donation ..|> Idable
+
 User --> NotificationType
 User --> UserLevel
-Donation *-- StatusLog
 Donation --> DonationCategory
 Donation --> DonationStatus
+Donation "1" *-- "many" StatusLog
 
 @enduml

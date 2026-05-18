@@ -1,0 +1,119 @@
+@startuml Adapters
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 11
+skinparam classAttributeFontSize 10
+skinparam pageMargin 10
+skinparam dpi 150
+skinparam scale 0.75
+
+class CarouselDonationAdapter {
+  -context: Context
+  -donations: List<Donation>
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+}
+
+class CategoryAdapter {
+  -categories: DonationCategory[]
+  -listener: OnCategoryClickListener
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+  <<interface>> OnCategoryClickListener
+}
+
+class ChatListAdapter {
+  -chats: List<Chat>
+  -listener: OnChatClickListener
+  +setChats(chats: List<Chat>): void
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+  <<interface>> OnChatClickListener
+}
+
+class DonationAdapter {
+  -donationList: List<Donation>
+  -fullDonationList: List<Donation>
+  -listener: OnDonationClickListener
+  +setDonations(donations: List<Donation>): void
+  +setDonationList(donations: List<Donation>): void
+  +filter(query, category, city): void
+  +filterAdmin(query, status, category, city): void
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+  <<interface>> OnDonationClickListener
+  <<interface>> OnFilterListener
+}
+
+class ImageSourceAdapter {
+  -objects: List<ImageSourceOption>
+  -listener: OnImageSourceSelectedListener
+  +getCount(): int
+  +getItem(position): ImageSourceOption
+  +getView(): View
+  <<interface>> OnImageSourceSelectedListener
+}
+
+class MessageAdapter {
+  -currentUserId: String
+  -currentUserIsAdmin: boolean
+  -items: List<ListItem>
+  -donationGiverId: String
+  -donationId: String
+  +setMessages(messages: List<Message>): void
+  +setOnRateListener(): void
+  +setDonationGiverId(): void
+  +setDonationId(): void
+  +getItemViewType(position): int
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+  <<interface>> OnRateListener
+}
+
+class ProfileDonationAdapter {
+  -context: Context
+  -donations: List<Donation>
+  -listener: OnItemClickListener
+  +setOnItemClickListener(): void
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+  <<interface>> OnItemClickListener
+}
+
+class UserAdapter {
+  -userList: List<User>
+  -fullUserList: List<User>
+  -listener: OnUserClickListener
+  +setUserList(users, currentUserId): void
+  +filter(query, adminFilter): void
+  +addUser(user): void
+  +updateUser(user): void
+  +updateUserById(user): void
+  +resetMakeAdminButton(user): void
+  +removeUser(user): void
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+  <<interface>> OnUserClickListener
+  <<interface>> OnFilterListener
+}
+
+class UserAdapterLeaderBoard {
+  -userList: List<User>
+  -listener: OnUserClickListener
+  +setUserList(users: List<User>): void
+  +onCreateViewHolder()
+  +onBindViewHolder()
+  +getItemCount(): int
+  <<interface>> OnUserClickListener
+}
+
+@enduml

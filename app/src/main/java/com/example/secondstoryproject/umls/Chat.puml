@@ -1,0 +1,48 @@
+@startuml Chat
+
+skinparam classBackgroundColor #FAF5FF
+skinparam classBorderColor #732D87
+skinparam arrowColor #33083f
+skinparam classFontSize 9
+skinparam classAttributeFontSize 8
+skinparam pageMargin 10
+skinparam dpi 150
+skinparam nodesep 20
+skinparam ranksep 35
+
+top to bottom direction
+
+abstract class BaseActivity
+
+class ChatsListActivity {
+  -chatListAdapter: ChatListAdapter
+  -rvChats: RecyclerView
+  -layoutEmpty: LinearLayout
+  #getSelectedBottomNavItem(): int
+  -loadChats(): void
+  -openChat(chat): void
+}
+
+class ChatActivity {
+  -chatId: String
+  -currentUserId: String
+  -donationId: String
+  -otherUserId: String
+  -messageAdapter: MessageAdapter
+  -messagesListener: ValueEventListener
+  +{enum} HeaderState
+  -checkChatStatus(otherUserId): void
+  -checkDonationMatchStatus(giverId, otherUserId): void
+  -listenToMessages(): void
+  -sendMessage(): void
+  -setHeaderState(state, msg): void
+  -performMatch(matchedUserId): void
+  -sendSystemMessage(text, isRating): void
+  -setupRatingListener(): void
+}
+
+ChatsListActivity --|> BaseActivity
+ChatActivity --|> BaseActivity
+ChatsListActivity --> ChatActivity
+
+@enduml
