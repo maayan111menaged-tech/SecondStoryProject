@@ -33,11 +33,12 @@ import java.util.Map;
 import java.util.TimeZone;
 
 
+// Screen for editing the current user's profile details.
+// No side drawer needed here.
 public class updateDetailsActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "UpdateDetailsActivity";
     private EditText etUserName, etFirstName, etLastName, etEmail, etPhoneNumber, etDate, etPassword;
-    /// private date
     private Button btnUpdateProfile;
     private User currentUser;
     private ImageView ivProfile;
@@ -45,7 +46,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
 
     @Override
     protected boolean hasSideMenu() {
-        return false; // לא צריך Drawer
+        return false;
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         etUserName = findViewById(R.id.usernameInput);
         etPassword = findViewById(R.id.passwordInput);
 
+        // both the profile image and the edit button navigate to the picture selection screen
         ivProfile = findViewById(R.id.imgProfile);
         ivProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,26 +85,24 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
             }
         });
 
-
-        // אתחול הכפתור והגדרת OnClickListener
         btnUpdateProfile = findViewById(R.id.btn_updateDetails_toHome);
         btnUpdateProfile.setOnClickListener(this);
 
-        // קבלת המשתמש מהSharedPreferences
         currentUser = SharedPreferencesUtil.getUser(this);
 
-        // הצגת הפרטים בשדות
         if (currentUser != null) {
+            // fills all fields with the current user's existing data
             showUserProfile();
         }
 
-
+        // prevents manual typing in the date field — forces use of the date picker
         etDate.setFocusable(false);
         etDate.setClickable(true);
         etDate.setOnClickListener(v -> {
+            // only allows selecting dates up to today
             CalendarConstraints constraints = new CalendarConstraints.Builder()
                     .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
-                    .setValidator(DateValidatorPointBackward.now()) // ← החסימה האמיתית
+                    .setValidator(DateValidatorPointBackward.now())
                     .build();
 
             MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
@@ -110,6 +110,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
                     .setCalendarConstraints(constraints)
                     .build();
 
+            // if the user already has a date, pre-selects it in the picker
             String existingDate = etDate.getText().toString();
             if (!existingDate.isEmpty()) {
                 try {
@@ -129,6 +130,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
             }
 
             MaterialDatePicker<Long> finalDatePicker = datePicker;
+            // when user confirms a date — formats it as dd/MM/yyyy and sets it in the field
             finalDatePicker.addOnPositiveButtonClickListener(selection -> {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -139,10 +141,10 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
             finalDatePicker.addOnDismissListener(dialog -> etDate.clearFocus());
             finalDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
         });
-        /// set the click listener
-        btnUpdateProfile.setOnClickListener(this);
-    } // סוגר הסופי של onCreate
 
+    }
+
+    // populates all input fields with the current user's existing data
     private void showUserProfile() {
         etFirstName.setText(currentUser.getfName());
         etLastName.setText(currentUser.getlName());
@@ -160,6 +162,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
 
     }
 
+    // called when the update button is tapped
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.btn_updateDetails_toHome) {
@@ -167,13 +170,13 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         }
     }
 
+    // reads all fields, validates them, then checks username uniqueness before saving
     private void updateUserProfile() {
         if (currentUser == null) {
             Toast.makeText(this, "משתמש לא נמצא", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // קריאת הערכים מהשדות
         String firstName = etFirstName.getText().toString().trim();
         String lastName = etLastName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
@@ -182,32 +185,26 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         String userName = etUserName.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // בדיקה שהקלט תקין
         if (!isValid(firstName, lastName, phone, email, birthDate, userName, password)) {
             return;
         }
 
-        // אם המשתמש שינה username -> לבדוק אם כבר קיים
+        // if the username changed — checks that the new one isn't already taken
         if (!userName.equals(currentUser.getUserName())) {
 
-            DatabaseService.getInstance().getUserService()
+            databaseService.getUserService()
                     .checkIfUserNameExists(userName,
                             new DatabaseService.DatabaseCallback<Boolean>() {
-
                                 @Override
                                 public void onCompleted(Boolean exists) {
-
                                     if (exists) {
                                         Toast.makeText(updateDetailsActivity.this,
                                                 "שם המשתמש כבר קיים במערכת",
                                                 Toast.LENGTH_SHORT).show();
-
                                     } else {
-                                        saveUpdatedUser(firstName, lastName, email,
-                                                phone, birthDate, userName, password);
+                                        saveUpdatedUser(firstName, lastName, email, phone, birthDate, userName, password);
                                     }
                                 }
-
                                 @Override
                                 public void onFailed(Exception e) {
                                     Toast.makeText(updateDetailsActivity.this,
@@ -217,18 +214,17 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
                             });
 
         } else {
-            // המשתמש לא שינה username
-            saveUpdatedUser(firstName, lastName, email,
-                    phone, birthDate, userName, password);
+            // username unchanged — skip the uniqueness check
+            saveUpdatedUser(firstName, lastName, email, phone, birthDate, userName, password);
         }
     }
 
+    // updates the user object, saves the changed fields to the DB, then navigates back to profile
     private void saveUpdatedUser(String firstName, String lastName,
                                  String email, String phone,
                                  String birthDate, String userName,
                                  String password) {
 
-        // עדכון האובייקט
         currentUser.setfName(firstName);
         currentUser.setlName(lastName);
         currentUser.setEmail(email);
@@ -237,7 +233,7 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         currentUser.setUserName(userName);
         currentUser.setPassword(password);
 
-        // עדכון במסד הנתונים
+        // updates only the changed fields — not the entire user object
         Map<String, Object> fields = new java.util.HashMap<>();
         fields.put("fName", firstName);
         fields.put("lName", lastName);
@@ -247,41 +243,29 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         fields.put("userName", userName);
         fields.put("password", password);
 
-        DatabaseService.getInstance().getUserService().updateUserFields(
-                currentUser.getId(),
-                fields,
+        databaseService.getUserService().updateUserFields(currentUser.getId(), fields,
                 new IDatabaseService.DatabaseCallback<Void>() {
-
                     @Override
                     public void onCompleted(Void result) {
-
-                        SharedPreferencesUtil.saveUser(
-                                updateDetailsActivity.this,
-                                currentUser
-                        );
-
+                        SharedPreferencesUtil.saveUser(updateDetailsActivity.this, currentUser );
                         Toast.makeText(updateDetailsActivity.this,
-                                "פרטייך עודכנו בהצלחה!",
-                                Toast.LENGTH_LONG).show();
-
-                        Intent intent = new Intent(
-                                updateDetailsActivity.this,
-                                UserProfileActivity.class
-                        );
-
+                                "פרטייך עודכנו בהצלחה!", Toast.LENGTH_LONG)
+                                .show();
+                        Intent intent = new Intent(updateDetailsActivity.this, UserProfileActivity.class );
                         startActivity(intent);
                         finish();
                     }
 
                     @Override
                     public void onFailed(Exception e) {
-                        Toast.makeText(updateDetailsActivity.this,
-                                "שגיאה בעדכון הפרטים",
+                        Toast.makeText(updateDetailsActivity.this,"שגיאה בעדכון הפרטים",
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
         );
     }
+
+    // validates all fields — returns false and shows an error on the first invalid field
     private boolean isValid(String firstName, String lastName, String phone, String email,
                             String birthDate, String userName, String password) {
         if (!Validator.isNameValid(firstName)) {
@@ -327,4 +311,4 @@ public class updateDetailsActivity extends BaseActivity implements View.OnClickL
         return true;
     }
 
-} // סוגר הסופי של המחלקה
+}

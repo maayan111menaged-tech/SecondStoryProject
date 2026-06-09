@@ -33,6 +33,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.Map;
 
+// Screen for selecting or updating the user's profile picture.
 public class ProfilePicActivity extends BaseActivity {
     private User currentUser;
 
@@ -44,9 +45,6 @@ public class ProfilePicActivity extends BaseActivity {
 
     private ActivityResultLauncher<Intent> selectImageLauncher;
     private ActivityResultLauncher<Intent> captureImageLauncher;
-
-    private Bitmap selectedBitmap;
-    private boolean isBitmap = false;
 
     private ImageButton selectedButton = null;
 
@@ -62,43 +60,39 @@ public class ProfilePicActivity extends BaseActivity {
         });
 
         ivProfile = findViewById(R.id.imgProfile);
-
         pic1 = findViewById(R.id.pic1);
         pic2 = findViewById(R.id.pic2);
         pic3 = findViewById(R.id.pic3);
         pic4 = findViewById(R.id.pic4);
         pic5 = findViewById(R.id.pic5);
         pic6 = findViewById(R.id.pic6);
-
         btnAddImage = findViewById(R.id.btnAddImage);
         btnSubmit = findViewById(R.id.btnSubmit);
 
+        // requests storage/camera permissions if not already granted
         ImageUtil.requestPermission(this);
 
+        // registers the gallery and camera result launchers
         setupPickers();
+        // sets click listeners for preset avatars and buttons
         setupClicks();
 
-        // קבלת המשתמש מהSharedPreferences
         currentUser = SharedPreferencesUtil.getUser(this);
-
-        // הצגת הפרטים בשדות
         if (currentUser != null ) {
             showUserProfilePic();
         }
 
     }
 
+    // displays the user's current profile picture if one exists
     private void showUserProfilePic() {
-
         String base64 = currentUser.getProfilePic();
-
         if (base64 != null && !base64.isEmpty()) {
             ivProfile.setImageBitmap(ImageUtil.fromBase64(base64));
         }
-
-        isBitmap = false;
-        selectedBitmap = null;
     }
+
+    // shows a bottom sheet dialog letting the user choose between gallery and camera
     private void showImageSourceDialog() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_image_source, null);
@@ -134,7 +128,7 @@ public class ProfilePicActivity extends BaseActivity {
         Map<String, Object> fields = new java.util.HashMap<>();
         fields.put("profilePic", base64);
 
-        DatabaseService.getInstance().getUserService().updateUserFields(
+        databaseService.getUserService().updateUserFields(
                 currentUser.getId(),
                 fields,
                 new IDatabaseService.DatabaseCallback<Void>() {
@@ -171,8 +165,7 @@ public class ProfilePicActivity extends BaseActivity {
             ivProfile.setImageDrawable(clicked.getDrawable());
 
             selectedButton = clicked;
-            isBitmap = false;
-            selectedBitmap = null;
+
         };
 
         for (ImageButton btn : buttons) {
@@ -201,8 +194,6 @@ public class ProfilePicActivity extends BaseActivity {
                         Uri uri = result.getData().getData();
                         ivProfile.setImageURI(uri);
 
-                        isBitmap = false;
-                        selectedBitmap = null;
                     }
                 });
 
@@ -214,8 +205,6 @@ public class ProfilePicActivity extends BaseActivity {
                         Bitmap bitmap = (Bitmap) result.getData().getExtras().get("data");
                         ivProfile.setImageBitmap(bitmap);
 
-                        selectedBitmap = bitmap;
-                        isBitmap = true;
                     }
                 });
     }

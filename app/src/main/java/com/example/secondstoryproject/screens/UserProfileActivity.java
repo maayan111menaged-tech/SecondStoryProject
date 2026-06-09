@@ -35,15 +35,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * עמוד פרופיל – 5 מצבים:
- *  SELF        – משתמש רגיל רואה את עצמו
- *  SELF_ADMIN  – אדמין רואה את עצמו
- *  OTHER_USER  – משתמש רגיל רואה אחר (פרטים מצומצמים, תרומות זמינות בלבד)
- *  OTHER_ADMIN – אדמין רואה משתמש אחר (כל הפרטים + כל התרומות)
- *  ADMIN_ADMIN – אדמין רואה אדמין אחר
+ * Profile screen — 5 modes depending on who is viewing whose profile:
+ *  SELF        — regular user viewing their own profile
+ *  SELF_ADMIN  — admin viewing their own profile
+ *  OTHER_USER  — regular user viewing another user (limited info, available donations only)
+ *  OTHER_ADMIN — admin viewing another user (full info + all donations)
+ *  ADMIN_ADMIN — admin viewing another admin
  */
 public class UserProfileActivity extends BaseActivity {
 
+    // marks the profile icon as selected in the bottom nav only when viewing own profile
     @Override
     protected int getSelectedBottomNavItem() {
         String targetUserId = getIntent().getStringExtra("USER_ID");
@@ -56,7 +57,6 @@ public class UserProfileActivity extends BaseActivity {
     private enum ProfileMode { SELF, SELF_ADMIN, OTHER_USER, OTHER_ADMIN, ADMIN_ADMIN }
     private ProfileMode mode;
 
-    // Views
     private TextView   tvPageTitle, tvUserName, tvFullName, tvLevel, tvContactTitle;
     private TextView   tvPhone, tvEmail, tvBirthday, tvDonationCount, tvAdminState;
     private ImageView  ivProfile, ivLevel;
@@ -69,7 +69,6 @@ public class UserProfileActivity extends BaseActivity {
     private RatingBar ratingBar;
     private TextView tvRatingAvg, tvRatingCount, tvNoRating;
 
-    // Data
     private User profileUser;
     private User currentUser;
     private ProfileDonationAdapter donationAdapter;
@@ -92,6 +91,7 @@ public class UserProfileActivity extends BaseActivity {
 
         currentUser = SharedPreferencesUtil.getUser(this);
         String targetUserId = getIntent().getStringExtra("USER_ID");
+        // if no USER_ID was passed, or it matches the current user — viewing own profile
         boolean viewingSelf = targetUserId == null
                 || (currentUser != null && targetUserId.equals(currentUser.getId()));
 
@@ -105,6 +105,7 @@ public class UserProfileActivity extends BaseActivity {
         }
     }
 
+    // connects all XML views to their Java variables
     private void bindViews() {
         tvPageTitle         = findViewById(R.id.tvTitle);
         tvUserName          = findViewById(R.id.tvUserName);
@@ -135,10 +136,12 @@ public class UserProfileActivity extends BaseActivity {
         tvRatingCount       = findViewById(R.id.tvRatingCount);
         tvNoRating          = findViewById(R.id.tvNoRating);
 
+        // scroll the donations carousel left and right
         btnLeft.setOnClickListener(v  -> rvUserDonations.smoothScrollBy(300, 0));
         btnRight.setOnClickListener(v -> rvUserDonations.smoothScrollBy(-300, 0));
     }
 
+    // sets up the horizontal donations carousel with a click listener per item
     private void setupRecyclerView() {
         rvUserDonations.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -151,6 +154,7 @@ public class UserProfileActivity extends BaseActivity {
         rvUserDonations.setAdapter(donationAdapter);
     }
 
+    // fetches the profile user from the DB and determines the correct mode
     private void loadUserFromDb(String userId) {
         databaseService.getUserService().get(userId,
                 new IDatabaseService.DatabaseCallback<User>() {
@@ -165,6 +169,7 @@ public class UserProfileActivity extends BaseActivity {
                             return;
                         }
                         profileUser = user;
+                        // determines mode based on who is viewing and who is being viewed
                         if (currentUser != null && profileUser.isAdmin() && currentUser.isAdmin())
                             mode = ProfileMode.ADMIN_ADMIN;
                         else if (currentUser != null && currentUser.isAdmin())
@@ -185,6 +190,7 @@ public class UserProfileActivity extends BaseActivity {
                 });
     }
 
+    // renders the profile UI based on the current mode — controls which sections are visible
     private void renderProfile() {
         if (profileUser == null) return;
 
@@ -234,6 +240,7 @@ public class UserProfileActivity extends BaseActivity {
                 break;
 
             case OTHER_USER:
+                // regular user sees limited info — available donations only, no contact info
                 showLevelRow(level);
                 tvAdminState.setVisibility(View.GONE);
                 tvPageTitle.setText("פרופיל תורם");
@@ -247,6 +254,7 @@ public class UserProfileActivity extends BaseActivity {
                 break;
 
             case OTHER_ADMIN:
+                // admin sees full info and all donations
                 showLevelRow(level);
                 tvAdminState.setVisibility(View.GONE);
                 tvPageTitle.setText("פרופיל משתמש");
@@ -277,6 +285,7 @@ public class UserProfileActivity extends BaseActivity {
 
         loadRating();
 
+        // navigates to the full donations list with the correct VIEW_MODE for filtering
         btnViewAllDonations.setVisibility(View.VISIBLE);
         btnViewAllDonations.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserDonationsActivity.class);
@@ -302,6 +311,7 @@ public class UserProfileActivity extends BaseActivity {
         });
     }
 
+    // shows the level card with the matching icon and label
     private void showLevelRow(UserLevel level) {
         layoutPublicInfo.setVisibility(View.VISIBLE);
         cardLevel.setVisibility(View.VISIBLE);
@@ -309,40 +319,47 @@ public class UserProfileActivity extends BaseActivity {
         tvLevel.setText(level.getLabel());
     }
 
+    // hides the level card — used for admin profiles that don't have levels
     private void hideLevelRow() {
         cardLevel.setVisibility(View.GONE);
     }
 
+    // fills the contact info section with the profile user's details
     private void fillContactInfo() {
         tvPhone.setText(profileUser.getPhoneNumber());
         tvEmail.setText(profileUser.getEmail());
         tvBirthday.setText(profileUser.getDateOfBirth());
     }
 
+    // checks if there are existing chats between the current user and the profile user
     private void setupChatButton() {
         if (currentUser == null) {
             layoutChatRow.setVisibility(View.GONE);
             return;
         }
 
-        DatabaseService.getInstance().getChatService()
+        databaseService.getChatService()
                 .getUserChats(currentUser.getId(),
                         new IDatabaseService.DatabaseCallback<List<Chat>>() {
                             @Override
                             public void onCompleted(List<Chat> chats) {
+                                // filters chats that belong to this specific donor
                                 List<Chat> relevantChats = chats.stream()
                                         .filter(c -> profileUser.getId().equals(c.getOtherUserId()))
                                         .collect(Collectors.toList());
 
                                 runOnUiThread(() -> {
                                     if (relevantChats.isEmpty()) {
+                                        // no existing chats — hide the button
                                         layoutChatRow.setVisibility(View.GONE);
                                     } else if (relevantChats.size() == 1) {
+                                        // one chat — open it directly
                                         layoutChatRow.setVisibility(View.VISIBLE);
                                         btnChat.setText("המשך שיחה");
                                         btnChat.setOnClickListener(v ->
                                                 openChat(relevantChats.get(0)));
                                     } else {
+                                        // multiple chats — let the user pick which one to open
                                         layoutChatRow.setVisibility(View.VISIBLE);
                                         btnChat.setText("המשך שיחה");
                                         btnChat.setOnClickListener(v ->
@@ -357,6 +374,7 @@ public class UserProfileActivity extends BaseActivity {
                         });
     }
 
+    // sets up the admin chat button — opens the dedicated admin chat for this user
     private void setupAdminChatButton() {
         String chatId = "admin_" + profileUser.getId();
         layoutChatRow.setVisibility(View.VISIBLE);
@@ -370,6 +388,7 @@ public class UserProfileActivity extends BaseActivity {
         });
     }
 
+    // opens a specific chat screen
     private void openChat(Chat chat) {
         Intent i = new Intent(UserProfileActivity.this, ChatActivity.class);
         i.putExtra("CHAT_ID", chat.getId());
@@ -378,6 +397,7 @@ public class UserProfileActivity extends BaseActivity {
         startActivity(i);
     }
 
+    // shows a dialog when there are multiple chats with the same user — lets them pick one
     private void showChatPickerDialog(List<Chat> chats) {
         String[] labels = chats.stream()
                 .map(c -> {
@@ -395,6 +415,7 @@ public class UserProfileActivity extends BaseActivity {
                 .show();
     }
 
+    // fetches the user's donations — if availableOnly is true, shows only APPROVED_AVAILABLE
     private void loadDonations(boolean availableOnly) {
         databaseService.getDonationService().getByGiverId(
                 profileUser.getId(),
@@ -421,6 +442,7 @@ public class UserProfileActivity extends BaseActivity {
                 });
     }
 
+    // shows or hides the carousel and scroll buttons based on donation count
     private void updateDonationsLayout(int count) {
         View emptyView = findViewById(R.id.emptyDonationsView);
         if (count == 0) {
@@ -431,6 +453,7 @@ public class UserProfileActivity extends BaseActivity {
         } else {
             rvUserDonations.setVisibility(View.VISIBLE);
             if (emptyView != null) emptyView.setVisibility(View.GONE);
+            // scroll buttons only make sense when there are enough items to scroll
             if (count < 3) {
                 btnLeft.setVisibility(View.GONE);
                 btnRight.setVisibility(View.GONE);
@@ -441,6 +464,7 @@ public class UserProfileActivity extends BaseActivity {
         }
     }
 
+    // loads and displays the average rating for the profile user — hidden for admin profiles
     private void loadRating() {
         if (mode == ProfileMode.SELF_ADMIN || mode == ProfileMode.ADMIN_ADMIN) {
             cardRating.setVisibility(View.GONE);
@@ -450,7 +474,7 @@ public class UserProfileActivity extends BaseActivity {
         android.util.Log.d("RATING_DEBUG", "loadRating called, mode: " + mode
                 + ", userId: " + profileUser.getId());
 
-        DatabaseService.getInstance().getRateService()
+        databaseService.getRateService()
                 .getRatesForUser(profileUser.getId(),
                         new IDatabaseService.DatabaseCallback<List<Rate>>() {
                             @Override
@@ -468,7 +492,7 @@ public class UserProfileActivity extends BaseActivity {
                                             .average()
                                             .orElse(0);
                                     int count = rates.size();
-                                    // מעגל לחצי כוכב הכי קרוב
+                                    // rounds to the nearest half star for the RatingBar
                                     float roundedAvg = Math.round(avg * 2) / 2.0f;
 
                                     ratingBar.setRating(roundedAvg);
@@ -489,12 +513,14 @@ public class UserProfileActivity extends BaseActivity {
                         });
     }
 
+    // called when the activity is re-opened with a new Intent (e.g. from bottom nav)
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
     }
 
+    // reloads the profile on resume to reflect any changes made in edit screens
     @Override
     protected void onResume() {
         super.onResume();

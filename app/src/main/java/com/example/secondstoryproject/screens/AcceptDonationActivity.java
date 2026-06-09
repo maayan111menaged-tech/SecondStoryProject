@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Admin-only screen — shows all donations pending approval, sorted by submission date.
+// Filters out donations from inactive users before displaying.
 public class AcceptDonationActivity extends BaseActivity {
 
     private static final String TAG = "AcceptDonationActivity";
@@ -58,12 +60,10 @@ public class AcceptDonationActivity extends BaseActivity {
 
         layoutEmpty = findViewById(R.id.layout_empty);
         tvDonationCount = findViewById(R.id.tv_donation_to_accept_count);
-
         progressBar = findViewById(R.id.progress_bar);
-
         etSearch = findViewById(R.id.et_search);
 
-        // מעבר לפרטי התרומה
+        // tapping a donation opens its detail screen
         adapter = new DonationAdapter(donation -> {
             Intent intent = new Intent(AcceptDonationActivity.this, DonationDetailActivity.class);
             intent.putExtra("DONATION_ID", donation.getId());
@@ -72,12 +72,13 @@ public class AcceptDonationActivity extends BaseActivity {
 
         rvDonations.setAdapter(adapter);
 
+        // filters the visible list as the admin types in the search box
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 adapter.filter(s.toString(), null, null);  }    });
-        // עדכון מונה אחרי פילטר
+        // updates the donation count label after every filter operation
         adapter.setOnFilterListener(count ->
                 tvDonationCount.setText("ממתינות לאישור: " + count)  );
 
@@ -89,24 +90,26 @@ public class AcceptDonationActivity extends BaseActivity {
         loadDonations();
     }
 
+    // loads all users first to build an active-status map, then fetches PENDING_APPROVAL donations
     private void loadDonations() {
         showLoading();
 
-        DatabaseService.getInstance().getUserService().getAll(
+        databaseService.getUserService().getAll(
                 new DatabaseService.DatabaseCallback<List<User>>() {
                     @Override
                     public void onCompleted(List<User> users) {
+                        // maps each user ID to their active status for quick lookup
                         Map<String, Boolean> activeMap = new HashMap<>();
                         for (User u : users) {
                             activeMap.put(u.getId(), u.isActive());
                         }
 
-                        DatabaseService.getInstance()
-                                .getDonationService()
+                        databaseService.getDonationService()
                                 .getDonationsByStatus(DonationStatus.PENDING_APPROVAL,
                                         new DatabaseService.DatabaseCallback<List<Donation>>() {
                                             @Override
                                             public void onCompleted(List<Donation> donations) {
+                                                // excludes donations from deactivated donors
                                                 List<Donation> filtered = new ArrayList<>();
                                                 for (Donation d : donations) {
                                                     Boolean donorActive = activeMap.get(d.getGiverID());
@@ -115,6 +118,7 @@ public class AcceptDonationActivity extends BaseActivity {
                                                     }
                                                 }
 
+                                                // sorts by the earliest status history entry (oldest first)
                                                 filtered.sort((a, b) -> {
                                                     Date dateA = getFirstStatusDate(a);
                                                     Date dateB = getFirstStatusDate(b);
@@ -147,6 +151,7 @@ public class AcceptDonationActivity extends BaseActivity {
                 });
     }
 
+    // returns the timestamp of the first status change, used for sorting by submission date
     private Date getFirstStatusDate(Donation donation) {
         if (donation.getStatusHistory() == null || donation.getStatusHistory().isEmpty()) {
             return null;

@@ -34,19 +34,22 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 
+// Step 3 of adding a donation — handles image selection (gallery or camera).
+// Receives donation details from step 2 and passes everything to step 4.
 public class AddDonationStep3Activity extends BaseActivity implements View.OnClickListener {
+
     private static final String TAG = "AddDonationStep3Activity";
     private Button addDonationButton;
     private ImageView DonationImageView;
 
+    // data passed from step 2
     private String selectedDonationName;
     private String selectedDescription;
     private String selectedCity;
     private String selectedCategoryName;
 
-    /// Activity result launcher for selecting image from gallery
+    // launchers for picking from gallery or capturing from camera
     private ActivityResultLauncher<Intent> selectImageLauncher;
-    /// Activity result launcher for capturing image from camera
     private ActivityResultLauncher<Intent> captureImageLauncher;
 
     @Override
@@ -60,33 +63,32 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
             return insets;
         });
 
-        /// getting extra from AddDonationStep2Activity
+        // receives all donation data collected in the previous steps
         selectedDonationName = getIntent().getStringExtra("donationName");
         selectedDescription = getIntent().getStringExtra("description");
         selectedCity = getIntent().getStringExtra("city");
         selectedCategoryName = getIntent().getStringExtra("selected_category");
 
-        /// request permission for the camera and storage
+        // requests storage/camera permissions if not already granted
         ImageUtil.requestPermission(this);
 
-        /// get the views
+
         addDonationButton = findViewById(R.id.add_donation_button);
         DonationImageView = findViewById(R.id.donation_image);
         View layoutEmpty = findViewById(R.id.layoutUploadEmpty);
         View layoutFilled = findViewById(R.id.layoutUploadFilled);
 
-        /// set the tag for the image view
-        /// to check if the image was changed from app:srcCompat="@drawable/image"
+        // tag is used to detect whether the user has selected a real image or left the default
         DonationImageView.setTag(R.drawable.image);
 
-        /// set the on click listeners
         DonationImageView.setOnClickListener(this);
         addDonationButton.setOnClickListener(this);
 
+        // both the empty placeholder and the change button open the image source dialog
         layoutEmpty.setOnClickListener(v -> showImageSourceDialog());
         findViewById(R.id.btnChangeImage).setOnClickListener(v -> showImageSourceDialog());
 
-        /// register the activity result launcher for selecting image from gallery
+        // handles image selected from gallery — shows the filled layout and clears the tag
         selectImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -96,12 +98,12 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
 
                         layoutEmpty.setVisibility(View.GONE);
                         layoutFilled.setVisibility(View.VISIBLE);
-                        /// set the tag for the image view to null
+                        // null tag = a real image was selected
                         DonationImageView.setTag(null);
                     }
                 });
 
-        /// register the activity result launcher for capturing image from camera
+        // handles photo taken with camera — shows the filled layout and clears the tag
         captureImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -110,13 +112,13 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
                         DonationImageView.setImageBitmap(bitmap);
                         layoutEmpty.setVisibility(View.GONE);
                         layoutFilled.setVisibility(View.VISIBLE);
-                        /// set the tag for the image view to null
                         DonationImageView.setTag(null);
                     }
                 });
 
     }
 
+    // handles clicks for the image view and the submit button
     @Override
     public void onClick(View v) {
         if (v.getId() == addDonationButton.getId()) {
@@ -131,11 +133,7 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
         }
     }
 
-    /// show the image source dialog
-    /// this dialog will show the options to select image from gallery or capture image from camera
-    /// @see ImageSourceOption
-    /// @see ImageSourceAdapter
-    /// @see BottomSheetDialog
+    // shows a bottom sheet letting the user choose between gallery and camera
     private void showImageSourceDialog() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_image_source, null);
@@ -159,7 +157,7 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
         bottomSheetDialog.show();
     }
 
-    /// go to step 4
+    // validates the image, converts it to base64 and passes everything to step 4
     private void addDonationToDatabase() {
         DonationCategory selectedCategory = DonationCategory.fromString(selectedCategoryName);
 
@@ -180,20 +178,20 @@ public class AddDonationStep3Activity extends BaseActivity implements View.OnCli
         startActivity(intent);
     }
 
-    /// select image from gallery
+    // opens the gallery picker
     private void selectImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         selectImageLauncher.launch(intent);
     }
 
-    /// capture image from camera
+    // opens the camera
     private void captureImageFromCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         captureImageLauncher.launch(takePictureIntent);
     }
 
 
-    /// validate the input
+    // returns false if the user hasn't selected an image yet (tag is still set to the default drawable)
     private boolean checkInput(ImageView donationImageView) {
         if (donationImageView.getTag() != null) {
              Log.e(TAG, "Image is required");

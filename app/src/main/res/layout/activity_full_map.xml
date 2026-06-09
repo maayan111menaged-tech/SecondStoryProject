@@ -17,9 +17,10 @@
         android:layout_margin="16dp"
         android:background="@drawable/circle_background_dark"
         android:padding="10dp"
-        android:src="@drawable/ic_arrow_left"
+        android:src="@drawable/ic_arrow_right"
         app:tint="@color/light_lavender"
         android:contentDescription="חזור"
-        android:elevation="4dp"/>
+        android:elevation="4dp"
+        android:layout_gravity="left"/>
 
 </FrameLayout>

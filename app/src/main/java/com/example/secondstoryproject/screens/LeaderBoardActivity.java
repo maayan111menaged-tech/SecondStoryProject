@@ -18,13 +18,14 @@ import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
 
+// Leaderboard screen — shows top donors in a podium and a sorted list below.
 public class LeaderBoardActivity extends BaseActivity {
 
     private static final String TAG = "LeaderBoardActivity";
     private UserAdapterLeaderBoard userAdapterLeaderBoard;
     private TextView tvUserCount;
 
-    // פודיום
+    // podium views for the top 3 donors
     private ImageView ivPodium1, ivPodium2, ivPodium3;
     private TextView tvPodium1Name, tvPodium1Count;
     private TextView tvPodium2Name, tvPodium2Count;
@@ -36,8 +37,6 @@ public class LeaderBoardActivity extends BaseActivity {
         setContentView(R.layout.activity_leader_board);
 
         tvUserCount = findViewById(R.id.tv_user_count);
-
-        // פודיום
         ivPodium1 = findViewById(R.id.iv_podium_1);
         ivPodium2 = findViewById(R.id.iv_podium_2);
         ivPodium3 = findViewById(R.id.iv_podium_3);
@@ -51,6 +50,7 @@ public class LeaderBoardActivity extends BaseActivity {
         RecyclerView usersList = findViewById(R.id.rv_users_list_leader_board);
         usersList.setLayoutManager(new LinearLayoutManager(this));
 
+        // navigates to the selected user's profile on click
         userAdapterLeaderBoard = new UserAdapterLeaderBoard(new UserAdapterLeaderBoard.OnUserClickListener() {
             @Override
             public void onUserClick(User user) {
@@ -64,15 +64,19 @@ public class LeaderBoardActivity extends BaseActivity {
         usersList.setAdapter(userAdapterLeaderBoard);
     }
 
+    // reloads the leaderboard every time the screen is resumed to keep data fresh
     @Override
     protected void onResume() {
         super.onResume();
-        DatabaseService.getInstance().getUserService().getAll(
+        databaseService.getUserService().getAll(
                 new DatabaseService.DatabaseCallback<List<User>>() {
                     @Override
                     public void onCompleted(List<User> users) {
-                        // מיון לפי תרומות
-                        List<User> sorted = new ArrayList<>(users);
+                        // filters out admins, then sorts by donation count descending
+                        List<User> sorted = new ArrayList<>();
+                        for (User u : users) {
+                            if (!u.isAdmin()) sorted.add(u);
+                        }
                         sorted.sort((a, b) ->
                                 Integer.compare(b.getDonationCounter(), a.getDonationCounter()));
 
@@ -80,7 +84,7 @@ public class LeaderBoardActivity extends BaseActivity {
                             tvUserCount.setText(sorted.size() + " תורמים");
                             updatePodium(sorted);
 
-                            // הרשימה מקבלת רק מקום 4 ומעלה
+                            // the RecyclerView shows only rank 4 and below
                             List<User> rest = sorted.size() > 3
                                     ? sorted.subList(3, sorted.size())
                                     : new ArrayList<>();
@@ -94,6 +98,7 @@ public class LeaderBoardActivity extends BaseActivity {
                 });
     }
 
+    // populates the podium with the top 3 users — skips a slot if there aren't enough users
     private void updatePodium(List<User> sorted) {
         if (sorted.size() >= 1) {
             User u = sorted.get(0);
@@ -101,6 +106,7 @@ public class LeaderBoardActivity extends BaseActivity {
             tvPodium1Count.setText(u.getDonationCounter() + " תרומות");
             if (u.getProfilePic() != null && !u.getProfilePic().isEmpty()) {
                 ivPodium1.setImageBitmap(ImageUtil.fromBase64(u.getProfilePic()));
+                // removes the default tint so the real profile picture shows correctly
                 ivPodium1.setColorFilter(null);
             }
             findViewById(R.id.podium_item_1).setOnClickListener(v -> navigateToProfile(u));
@@ -126,6 +132,8 @@ public class LeaderBoardActivity extends BaseActivity {
             findViewById(R.id.podium_item_3).setOnClickListener(v -> navigateToProfile(u));
         }
     }
+
+    // navigates to the given user's profile screen
     private void navigateToProfile(User user) {
         Intent intent = new Intent(LeaderBoardActivity.this, UserProfileActivity.class);
         intent.putExtra("USER_ID", user.getId());

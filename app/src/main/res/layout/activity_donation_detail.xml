@@ -456,5 +456,37 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- ====== CARD: כפתור ביטול תרומה ====== -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="1dp"
+            app:strokeColor="@color/lavender"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="@color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <Button
+                    android:id="@+id/btnCancelDonation"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="ביטול תרומה"
+                    android:backgroundTint="@color/status_rejected_text"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:cornerRadius="15dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 </ScrollView>

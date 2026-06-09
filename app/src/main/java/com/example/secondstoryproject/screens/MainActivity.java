@@ -33,8 +33,10 @@ import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
 import java.util.List;
 
+// Main screen for regular users — shows greeting, user level progress, donation carousel and a mini map.
 public class MainActivity extends BaseActivity {
 
+    // marks the home icon as selected in the bottom navigation bar
     @Override
     protected int getSelectedBottomNavItem() { return R.id.menu_home; }
 
@@ -53,33 +55,39 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // connects all XML views to their Java variables
         bindViews();
 
         User currentUser = SharedPreferencesUtil.getUser(this);
 
-        // ברכה
+        // displays a greeting with the user's full name
         TextView tvGreeting = findViewById(R.id.tvGreetingName);
         tvGreeting.setText(currentUser.getFullName() + " 👋");
 
-        // רמה
+        // updates the level progress bar and level icons based on donation count
         updateUserLevelUI(currentUser);
 
-        // קרוסלה
+        // sets up the horizontal donations carousel
         setupCarousel();
         loadCarouselDonations();
 
-        // מפה
+        // sets up the mini map showing donations by city
         setupMap();
 
-        // כפתורים
+        // navigates to the add donation flow
         findViewById(R.id.btn_addDonation).setOnClickListener(v ->
                 startActivity(new Intent(this, PickCatergoryActivity.class)));
+
+        // navigates to the donation search screen
         findViewById(R.id.btn_searchDonation).setOnClickListener(v ->
                 startActivity(new Intent(this, SearchDonationsActivity.class)));
+
+        // tapping the mini map opens the full screen map
         findViewById(R.id.mapClickOverlay).setOnClickListener(v ->
                 startActivity(new Intent(this, FullMapActivity.class)));
     }
 
+    // finds and stores references to all views in the layout
     private void bindViews() {
         rateProgressBar   = findViewById(R.id.rateProgressBar);
         currentRateIcon   = findViewById(R.id.currentRateIcon);
@@ -96,17 +104,20 @@ public class MainActivity extends BaseActivity {
         rvCarousel        = findViewById(R.id.rvDonationsCarousel);
     }
 
+    // initializes the carousel RecyclerView with a horizontal layout and shows a loading spinner
     private void setupCarousel() {
         carouselAdapter = new CarouselDonationAdapter(this, carouselDonations);
         rvCarousel.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvCarousel.setAdapter(carouselAdapter);
 
+        // shows loading state until donations are fetched
         rvCarousel.setVisibility(View.GONE);
         findViewById(R.id.layout_empty).setVisibility(View.GONE);
         findViewById(R.id.carouselLoading).setVisibility(View.VISIBLE);
     }
 
+    // fetches approved donations from the DB and filters out the current user's own donations
     private void loadCarouselDonations() {
         User currentUser = SharedPreferencesUtil.getUser(this);
 
@@ -117,6 +128,7 @@ public class MainActivity extends BaseActivity {
                             public void onCompleted(List<Donation> donations) {
                                 List<Donation> others = new ArrayList<>();
                                 for (Donation d : donations) {
+                                    // excludes donations that belong to the current user
                                     if (!d.getGiverID().equals(currentUser.getId())) {
                                         others.add(d);
                                     }
@@ -124,6 +136,7 @@ public class MainActivity extends BaseActivity {
                                 runOnUiThread(() -> {
                                     carouselDonations.clear();
                                     carouselDonations.addAll(others);
+                                    // notifies the adapter that the data changed so it redraws the list
                                     carouselAdapter.notifyDataSetChanged();
                                     updateCarouselState(others.isEmpty());
                                 });
@@ -135,32 +148,37 @@ public class MainActivity extends BaseActivity {
                         });
     }
 
+    // shows the carousel or the empty state depending on whether there are donations to display
     private void updateCarouselState(boolean isEmpty) {
         rvCarousel.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
         findViewById(R.id.layout_empty).setVisibility(isEmpty ? View.VISIBLE : View.GONE);
         findViewById(R.id.carouselLoading).setVisibility(View.GONE);
     }
 
+    // initializes the mini map centered on Israel and loads city markers
     private void setupMap() {
         Configuration.getInstance().load(
                 getApplicationContext(),
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         miniMap = findViewById(R.id.miniMap);
         miniMap.setTileSource(TileSourceFactory.MAPNIK);
+        // disables touch controls — the user can only tap to open the full map
         miniMap.setMultiTouchControls(false);
         miniMap.getController().setZoom(7.5);
         miniMap.getController().setCenter(new GeoPoint(31.5, 34.8));
         AddAllMarkers();
     }
 
+    // fetches donation counts per city from the DB and places a marker for each city
     public void AddAllMarkers() {
         miniMap.getOverlays().clear();
-        DatabaseService.getInstance().getDonationService()
+        databaseService.getDonationService()
                 .getDonationsCountByCities(DonationStatus.APPROVED_AVAILABLE,
                         new DatabaseService.DatabaseCallback<java.util.HashMap<String, Integer>>() {
                             @Override
                             public void onCompleted(java.util.HashMap<String, Integer> cityCountMap) {
                                 for (IsraelCity city : IsraelCity.values()) {
+                                    // defaults to 0 if the city has no donations
                                     int count = cityCountMap.containsKey(city.getHebrewName())
                                             ? cityCountMap.get(city.getHebrewName()) : 0;
                                     addCityMarker(city.getHebrewName(),
@@ -172,6 +190,7 @@ public class MainActivity extends BaseActivity {
                         });
     }
 
+    // places a single marker on the map for the given city with its donation count as the title
     private void addCityMarker(String city, double lat, double lon, int count) {
         Marker marker = new Marker(miniMap);
         marker.setPosition(new GeoPoint(lat, lon));
@@ -180,6 +199,7 @@ public class MainActivity extends BaseActivity {
         miniMap.getOverlays().add(marker);
     }
 
+    // updates the level section — shows max level layout if the user reached the top, otherwise shows progress
     private void updateUserLevelUI(User user) {
         int donations = user.getDonationCounter();
         UserLevel currentLevel = UserLevel.fromDonationCount(donations);
@@ -202,6 +222,7 @@ public class MainActivity extends BaseActivity {
             int doneInLevel = donations - min;
             int totalInLevel = nextMin - min;
             int remaining = nextMin - donations;
+            // calculates progress percentage within the current level
             int progress = doneInLevel * 100 / totalInLevel;
             rateProgressBar.setProgress(progress);
             currentRateIcon.setImageResource(currentLevel.getIconRes());
@@ -213,24 +234,18 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    // required by the map library — must be called to resume map rendering when returning to the screen
     @Override
     public void onResume() {
         super.onResume();
         if (miniMap != null) miniMap.onResume();
     }
 
+    // required by the map library — must be called to pause map rendering when leaving the screen
     @Override
     public void onPause() {
         super.onPause();
         if (miniMap != null) miniMap.onPause();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
 }

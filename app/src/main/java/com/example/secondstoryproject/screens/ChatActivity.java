@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.adapters.MessageAdapter;
+import com.example.secondstoryproject.models.Donation;
+import com.example.secondstoryproject.models.DonationStatus;
 import com.example.secondstoryproject.models.Message;
 import com.example.secondstoryproject.models.Rate;
 import com.example.secondstoryproject.models.User;
@@ -31,15 +33,17 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
+// Chat screen — handles messaging between two users or between a user and admin.
+// Displays status banners for edge cases: inactive user, deleted user, taken donation, canceled donation, match
 public class ChatActivity extends BaseActivity {
 
-    // ── צבעי באנר ──
-    private static final String COLOR_DEFAULT  = "#33083f"; // dark_purple
-    private static final String COLOR_INACTIVE = "#B71C1C"; // אדום — נשמר
-    private static final String COLOR_TAKEN    = "#E65100"; // כתום — נשמר
-    private static final String COLOR_MATCH    = "#F57F17"; // צהוב — נשמר
+    // banner colors for each header state
+    private static final String COLOR_DEFAULT  = "#33083f"; // dark_purple — normal chat
+    private static final String COLOR_INACTIVE = "#B71C1C"; // red — blocked or deleted user
+    private static final String COLOR_TAKEN    = "#E65100"; // orange — donation taken or canceled
+    private static final String COLOR_MATCH    = "#F57F17"; // yellow — waiting for giver to confirm
 
-
+    // represents the current visual state of the chat header
     public enum HeaderState { DEFAULT, INACTIVE, DELETED, TAKEN, MATCH }
 
     // ── Views ──
@@ -49,11 +53,14 @@ public class ChatActivity extends BaseActivity {
     private ImageButton    btnBack;
     private ImageView      ivChatAvatar;
     private TextView       tvChatTitle;
+    // shows the donation name in the header — tappable to open donation details
     private TextView tvHeaderDonationName;
     private TextView       tvStatusIcon;
     private TextView       tvChatStatus;
     private TextView       tvMatchSubtitle;
+    // shown only when the other user was deleted — allows deleting the chat
     private MaterialButton btnDeleteChat;
+    // shown only when the giver can confirm a match
     private MaterialButton btnMatch;
 
     private RecyclerView   rvMessages;
@@ -62,7 +69,6 @@ public class ChatActivity extends BaseActivity {
     private MessageAdapter messageAdapter;
     private ValueEventListener messagesListener;
 
-    // ── Data ──
     private String  chatId;
     private String  currentUserId;
     private boolean currentUserIsAdmin;
@@ -71,9 +77,6 @@ public class ChatActivity extends BaseActivity {
     private String  otherUserId;
     private String  otherUserName;
 
-    // ─────────────────────────────────────────────────────────
-    //  onCreate
-    // ─────────────────────────────────────────────────────────
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +87,7 @@ public class ChatActivity extends BaseActivity {
         otherUserId   = getIntent().getStringExtra("OTHER_USER_ID");
 
         User currentUser = SharedPreferencesUtil.getUser(this);
+        // if there's no logged-in user or no chat ID — close the screen immediately
         if (currentUser == null || chatId == null) {
             finish();
             return;
@@ -103,21 +107,17 @@ public class ChatActivity extends BaseActivity {
         loadOtherUserAvatar(otherUserId);
         checkChatStatus(otherUserId);
 
-        // לחיצה על הבאנר העליון → פרופיל המשתמש
+        // tapping the header navigates to the other user's profile
         layoutChatHeader.setOnClickListener(v -> {
             if (chatId != null && chatId.startsWith("admin_")) {
                 if (currentUserIsAdmin) {
-                    // אדמין → פרופיל המשתמש
+                    // admin chat — extract the user ID from the chat ID
                     String userId = chatId.replace("admin_", "");
                     Intent intent = new Intent(this, UserProfileActivity.class);
                     intent.putExtra("USER_ID", userId);
                     startActivity(intent);
-                } else {
-
-                }
-                return;
+                } return;
             }
-
             if (otherUserId != null) {
                 Intent intent = new Intent(this, UserProfileActivity.class);
                 intent.putExtra("USER_ID", otherUserId);
@@ -126,9 +126,7 @@ public class ChatActivity extends BaseActivity {
         });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  Bind Views
-    // ─────────────────────────────────────────────────────────
+    // connects all XML views to their Java variables
     private void bindViews() {
         layoutChatHeader  = findViewById(R.id.layout_chat_header);
         layoutStatusRow   = findViewById(R.id.layout_status_row);
@@ -147,6 +145,7 @@ public class ChatActivity extends BaseActivity {
         etMessage  = findViewById(R.id.et_message);
         btnSend    = findViewById(R.id.btn_send);
 
+        // stackFromEnd keeps the latest messages visible at the bottom
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         rvMessages.setLayoutManager(layoutManager);
@@ -163,9 +162,7 @@ public class ChatActivity extends BaseActivity {
         btnBack.setOnClickListener(v -> finish());
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  setHeaderState
-    // ─────────────────────────────────────────────────────────
+    // updates the header color, status message, send block, and action buttons based on state
     private void setHeaderState(HeaderState state, String statusMessage) {
         String color;
         String icon;
@@ -194,7 +191,7 @@ public class ChatActivity extends BaseActivity {
 
         layoutChatHeader.setBackgroundColor(Color.parseColor(color));
 
-        // שורת סטטוס
+        // shows the status row only when there is a message to display
         if (statusMessage != null && !statusMessage.isEmpty()) {
             layoutStatusRow.setVisibility(View.VISIBLE);
             tvStatusIcon.setText(icon);
@@ -203,7 +200,7 @@ public class ChatActivity extends BaseActivity {
             layoutStatusRow.setVisibility(View.GONE);
         }
 
-        // חסימת שליחה
+        // blocks sending when the chat is no longer active
         boolean blocked = (state == HeaderState.INACTIVE
                 || state == HeaderState.DELETED
                 || state == HeaderState.TAKEN);
@@ -213,21 +210,19 @@ public class ChatActivity extends BaseActivity {
         btnSend.setAlpha(blocked ? 0.5f : 1f);
         if (blocked) etMessage.setHint("לא ניתן לשלוח הודעות");
 
-        // כפתור מחיקה
+        // delete button only shown when the other user was removed from the system
         btnDeleteChat.setVisibility(
                 state == HeaderState.DELETED ? View.VISIBLE : View.GONE);
 
-        // באנר MATCH
+        // match banner only shown when the giver can confirm a receiver
         layoutMatchBanner.setVisibility(
                 state == HeaderState.MATCH ? View.VISIBLE : View.GONE);
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  Load avatar
-    // ─────────────────────────────────────────────────────────
+    // fetches and displays the other user's profile picture in the header
     private void loadOtherUserAvatar(String userId) {
         if (userId == null || userId.equals("admin")) return;
-        DatabaseService.getInstance().getUserService()
+       databaseService.getUserService()
                 .get(userId, new IDatabaseService.DatabaseCallback<User>() {
                     @Override
                     public void onCompleted(User user) {
@@ -243,151 +238,191 @@ public class ChatActivity extends BaseActivity {
                 });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  checkChatStatus
-    // ─────────────────────────────────────────────────────────
+    // fetches chat metadata from Firebase and determines which header state to show
     private void checkChatStatus(String otherUserIdFromIntent) {
-        FirebaseDatabase.getInstance(
-                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("chats")
-                .child(chatId)
-                .child("metadata")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful() || !task.getResult().exists()) {
-                        listenToMessages(); // ← גם במקרה כשל
-                        return;
-                    }
-
-                    DataSnapshot meta = task.getResult();
-
-                    String type    = meta.child("type").getValue(String.class);
-                    String giverId = meta.child("giverId").getValue(String.class);
-                    donationGiverId = giverId;
-                    messageAdapter.setDonationGiverId(donationGiverId);
-                    donationId = meta.child("donationId").getValue(String.class);
-                    messageAdapter.setDonationId(donationId);
-
-                    Boolean isDeleted = meta.child("donorDeleted").getValue(Boolean.class);
-                    if (donationId != null && !"admin".equals(type)) {
-                        FirebaseDatabase.getInstance(
-                                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
-                                .getReference("donations")
-                                .child(donationId)
-                                .child("name")
-                                .get()
-                                .addOnCompleteListener(donTask -> {
-                                    if (donTask.isSuccessful() && donTask.getResult().exists()) {
-                                        String donName = donTask.getResult().getValue(String.class);
-                                        runOnUiThread(() -> {
-                                            if (donName != null && !donName.isEmpty()) {
-                                                tvHeaderDonationName.setText("📦 " + donName);
-                                                tvHeaderDonationName.setVisibility(View.VISIBLE);
-                                                tvHeaderDonationName.setOnClickListener(v -> {
-                                                    Intent intent = new Intent(ChatActivity.this,
-                                                            DonationDetailActivity.class);
-                                                    intent.putExtra("DONATION_ID", donationId);
-                                                    startActivity(intent);
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
-                    }
-
-                    if (Boolean.TRUE.equals(isDeleted)) {
-                        runOnUiThread(this::showDeletedUserHeader);
-                        listenToMessages(); // ← donationGiverId כבר מוגדר
-                        return;
-                    }
-
-                    String resolvedOtherUserId = otherUserIdFromIntent;
-                    if (resolvedOtherUserId == null) {
-                        String metaReceiverId = meta.child("receiverId").getValue(String.class);
-                        if ("admin".equals(type)) {
-                            resolvedOtherUserId = currentUserIsAdmin ? metaReceiverId : null;
-                        } else {
-                            resolvedOtherUserId = currentUserId.equals(giverId)
-                                    ? metaReceiverId : giverId;
+        databaseService.getChatService()
+                .getChatMetadata(chatId, new IDatabaseService.DatabaseCallback<DataSnapshot>() {
+                    @Override
+                    public void onCompleted(DataSnapshot meta) {
+                        if (meta == null || !meta.exists()) {
+                            listenToMessages();
+                            return;
                         }
-                    }
 
-                    final String finalOtherUserId = resolvedOtherUserId;
+                        String type    = meta.child("type").getValue(String.class);
+                        String giverId = meta.child("giverId").getValue(String.class);
+                        donationGiverId = giverId;
+                        messageAdapter.setDonationGiverId(donationGiverId);
+                        donationId = meta.child("donationId").getValue(String.class);
+                        messageAdapter.setDonationId(donationId);
 
-                    if (finalOtherUserId != null && !"admin".equals(finalOtherUserId)) {
-                        DatabaseService.getInstance().getUserService()
-                                .get(finalOtherUserId, new IDatabaseService.DatabaseCallback<User>() {
-                                    @Override
-                                    public void onCompleted(User otherUser) {
-                                        if (otherUser == null) {
-                                            runOnUiThread(ChatActivity.this::showDeletedUserHeader);
-                                            listenToMessages(); // ← donationGiverId כבר מוגדר
-                                            return;
+                        Boolean isDeleted = meta.child("donorDeleted").getValue(Boolean.class);
+
+                        if (donationId != null && !"admin".equals(type)) {
+                            databaseService.getDonationService().get(donationId,
+                                    new IDatabaseService.DatabaseCallback<Donation>() {
+                                        @Override
+                                        public void onCompleted(Donation donation) {
+                                            if (donation == null) return;
+                                            runOnUiThread(() -> {
+                                                String donName = donation.getName();
+                                                if (donName != null && !donName.isEmpty()) {
+                                                    tvHeaderDonationName.setText("📦 " + donName);
+                                                    tvHeaderDonationName.setVisibility(View.VISIBLE);
+                                                    tvHeaderDonationName.setOnClickListener(v -> {
+                                                        Intent intent = new Intent(ChatActivity.this,
+                                                                DonationDetailActivity.class);
+                                                        intent.putExtra("DONATION_ID", donationId);
+                                                        startActivity(intent);
+                                                    });
+                                                }
+                                            });
                                         }
-                                        if (!otherUser.isActive()) {
-                                            runOnUiThread(ChatActivity.this::showInactiveHeader);
-                                            listenToMessages(); // ← donationGiverId כבר מוגדר
-                                            return;
+                                        @Override public void onFailed(Exception e) {}
+                                    });
+                        }
+
+                        if (Boolean.TRUE.equals(isDeleted)) {
+                            runOnUiThread(ChatActivity.this::showDeletedUserHeader);
+                            listenToMessages();
+                            return;
+                        }
+
+                        String resolvedOtherUserId = otherUserIdFromIntent;
+                        if (resolvedOtherUserId == null) {
+                            String metaReceiverId = meta.child("receiverId").getValue(String.class);
+                            if ("admin".equals(type)) {
+                                resolvedOtherUserId = currentUserIsAdmin ? metaReceiverId : null;
+                            } else {
+                                resolvedOtherUserId = currentUserId.equals(giverId)
+                                        ? metaReceiverId : giverId;
+                            }
+                        }
+
+                        final String finalOtherUserId = resolvedOtherUserId;
+
+                        if (finalOtherUserId != null && !"admin".equals(finalOtherUserId)) {
+                            databaseService.getUserService()
+                                    .get(finalOtherUserId, new IDatabaseService.DatabaseCallback<User>() {
+                                        @Override
+                                        public void onCompleted(User otherUser) {
+                                            if (otherUser == null) {
+                                                runOnUiThread(ChatActivity.this::showDeletedUserHeader);
+                                                listenToMessages();
+                                                return;
+                                            }
+                                            if (!otherUser.isActive()) {
+                                                runOnUiThread(ChatActivity.this::showInactiveHeader);
+                                                listenToMessages();
+                                                return;
+                                            }
+                                            if ("donation".equals(type) && donationId != null) {
+                                                databaseService.getDonationService().get(donationId,
+                                                        new IDatabaseService.DatabaseCallback<Donation>() {
+                                                            @Override
+                                                            public void onCompleted(Donation donation) {
+                                                                if (donation != null &&
+                                                                        donation.getStatus() == DonationStatus.CANCELLED) {
+                                                                    runOnUiThread(() -> {
+                                                                        boolean isGiver = currentUserId.equals(giverId);
+                                                                        setHeaderState(HeaderState.TAKEN,
+                                                                                isGiver ? "ביטלת תרומה זו"
+                                                                                        : "התרומה בוטלה על ידי התורם");
+                                                                    });
+                                                                    listenToMessages();
+                                                                    return;
+                                                                }
+                                                                checkDonationMatchStatus(giverId, finalOtherUserId);
+                                                            }
+                                                            @Override
+                                                            public void onFailed(Exception e) {
+                                                                checkDonationMatchStatus(giverId, finalOtherUserId);
+                                                            }
+                                                        });
+                                            } else {
+                                                listenToMessages();
+                                            }
                                         }
-                                        if ("donation".equals(type) && donationId != null) {
-                                            checkDonationMatchStatus(giverId, finalOtherUserId);
-                                        } else {
+                                        @Override public void onFailed(Exception e) {
                                             listenToMessages();
                                         }
-                                    }
-                                    @Override public void onFailed(Exception e) {
-                                        listenToMessages();
-                                    }
-                                });
-                    } else if ("donation".equals(type) && donationId != null) {
-                        checkDonationMatchStatus(giverId, finalOtherUserId);
-                    } else {
+                                    });
+                        } else if ("donation".equals(type) && donationId != null) {
+                            databaseService.getDonationService().get(donationId,
+                                    new IDatabaseService.DatabaseCallback<Donation>() {
+                                        @Override
+                                        public void onCompleted(Donation donation) {
+                                            if (donation != null &&
+                                                    donation.getStatus() == DonationStatus.CANCELLED) {
+                                                runOnUiThread(() -> {
+                                                    boolean isGiver = currentUserId.equals(giverId);
+                                                    setHeaderState(HeaderState.TAKEN,
+                                                            isGiver ? "ביטלת תרומה זו"
+                                                                    : "התרומה בוטלה על ידי התורם");
+                                                });
+                                                listenToMessages();
+                                                return;
+                                            }
+                                            checkDonationMatchStatus(giverId, finalOtherUserId);
+                                        }
+                                        @Override
+                                        public void onFailed(Exception e) {
+                                            checkDonationMatchStatus(giverId, finalOtherUserId);
+                                        }
+                                    });
+                        } else {
+                            listenToMessages();
+                        }
+                    }
+
+                    @Override
+                    public void onFailed(Exception e) {
                         listenToMessages();
                     }
                 });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  checkDonationMatchStatus
-    // ─────────────────────────────────────────────────────────
+    // checks the donation's receiver status to determine if a match banner should be shown
     private void checkDonationMatchStatus(String giverId, String otherUserId) {
-        FirebaseDatabase.getInstance(
-                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("donations")
-                .child(donationId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful() || !task.getResult().exists()) {
-                        listenToMessages();
-                        return;
-                    }
-
-                    String receiverID = task.getResult()
-                            .child("receiverID").getValue(String.class);
-
-                    runOnUiThread(() -> {
-                        if (receiverID == null || receiverID.isEmpty()) {
-                            if (currentUserId.equals(giverId) && otherUserId != null) {
-                                showMatchHeader(otherUserId);
-                            }
-                        } else if (currentUserId.equals(giverId)) {
-                            if (!receiverID.equals(otherUserId)) {
+        databaseService.getDonationService().get(donationId,
+                new IDatabaseService.DatabaseCallback<Donation>() {
+                    @Override
+                    public void onCompleted(Donation donation) {
+                        if (donation == null) {
+                            listenToMessages();
+                            return;
+                        }
+                        String receiverID = donation.getReceiverID();
+                        runOnUiThread(() -> {
+                            if (receiverID == null || receiverID.isEmpty()) {
+                                // no receiver yet — giver can confirm this user as a match
+                                if (currentUserId.equals(giverId) && otherUserId != null) {
+                                    showMatchHeader(otherUserId);
+                                }
+                            } else if (currentUserId.equals(giverId)) {
+                                // giver is viewing a chat with someone who was NOT chosen
+                                if (!receiverID.equals(otherUserId)) {
+                                    showDonationTakenHeader();
+                                }
+                            } else if (!currentUserId.equals(receiverID)) {
+                                // this user was not chosen as the receiver
                                 showDonationTakenHeader();
                             }
-                        } else if (!currentUserId.equals(receiverID)) {
-                            showDonationTakenHeader();
-                        }
-                        listenToMessages(); // ← תמיד בסוף
-                    });
+                            listenToMessages();
+                        });
+                    }
+                    @Override
+                    public void onFailed(Exception e) {
+                        listenToMessages();
+                    }
                 });
     }
-    // ─────────────────────────────────────────────────────────
-    //  Header state helpers
-    // ─────────────────────────────────────────────────────────
+
     private void showInactiveHeader() {
         setHeaderState(HeaderState.INACTIVE, "משתמש זה אינו פעיל");
     }
 
+    // shows the deleted header and sets up the delete chat button
     private void showDeletedUserHeader() {
         setHeaderState(HeaderState.DELETED, "משתמש זה הוסר מהמערכת");
         btnDeleteChat.setOnClickListener(v ->
@@ -395,7 +430,7 @@ public class ChatActivity extends BaseActivity {
                         .setTitle("מחיקת שיחה")
                         .setMessage("האם למחוק את השיחה לצמיתות?")
                         .setPositiveButton("מחק", (d, w) ->
-                                DatabaseService.getInstance().getChatService()
+                                databaseService.getChatService()
                                         .deleteChat(chatId, currentUserId,
                                                 new IDatabaseService.DatabaseCallback<Void>() {
                                                     @Override
@@ -419,6 +454,7 @@ public class ChatActivity extends BaseActivity {
         setHeaderState(HeaderState.TAKEN, "התרומה כבר נתפסה על ידי מישהו אחר");
     }
 
+    // shows the match banner and sets up the confirm button for the giver
     private void showMatchHeader(String matchCandidateUserId) {
         String name = getIntent().getStringExtra("OTHER_USER_NAME");
         setHeaderState(HeaderState.MATCH, "תרומה ממתינה לאישור");
@@ -437,11 +473,9 @@ public class ChatActivity extends BaseActivity {
         );
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  performMatch
-    // ─────────────────────────────────────────────────────────
+    // sets the matched receiver in the DB, sends a system message, and resets the header
     private void performMatch(String matchedUserId) {
-        DatabaseService.getInstance().getChatService()
+        databaseService.getChatService()
                 .setMatch(donationId, matchedUserId,
                         new IDatabaseService.DatabaseCallback<Void>() {
                             @Override
@@ -462,56 +496,27 @@ public class ChatActivity extends BaseActivity {
                                         "שגיאה באישור", Toast.LENGTH_SHORT).show());
                             }
                         });
-        DatabaseService.getInstance().getUserService()
+        // increments the giver's donation counter after a successful match
+        databaseService.getUserService()
                 .incrementDonationCounter(currentUserId, null);
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  sendSystemMessage
-    // ─────────────────────────────────────────────────────────
+    // delegates system message sending to the chat service
     private void sendSystemMessage(String text, boolean isRatingRequest) {
-        DatabaseReference messagesRef = FirebaseDatabase.getInstance(
-                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("chats").child(chatId).child("messages");
-
-        String messageId = messagesRef.push().getKey();
-        Message msg = new Message(messageId, "system", text, System.currentTimeMillis());
-        msg.setRatingRequest(isRatingRequest);
-        messagesRef.child(messageId).setValue(msg)
-                .addOnSuccessListener(unused ->
-                        FirebaseDatabase.getInstance(
-                                        "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app")
-                                .getReference("chats")
-                                .child(chatId)
-                                .child("metadata")
-                                .child("receiverId")
-                                .get()
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful() && task.getResult().exists()) {
-                                        String receiverId = task.getResult().getValue(String.class);
-                                        if (receiverId != null) {
-                                            DatabaseService.getInstance()
-                                                    .getChatService()
-                                                    .incrementUnread(chatId, receiverId);
-                                        }
-                                    }
-                                }));
+        databaseService.getChatService()
+                .sendSystemMessage(chatId, text, isRatingRequest,
+                        new IDatabaseService.DatabaseCallback<Void>() {
+                            @Override public void onCompleted(Void unused) {}
+                            @Override public void onFailed(Exception e) {}
+                        });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  setupRatingListener
-    // ─────────────────────────────────────────────────────────
+    // listens for rating submissions from the message adapter and saves them to the DB
     private void setupRatingListener() {
         messageAdapter.setOnRateListener((stars, comment) -> {
             Rate rate = new Rate(
-                    donationGiverId,
-                    currentUserId,
-                    donationId,
-                    stars,
-                    comment
-            );
-            DatabaseService.getInstance()
-                    .getRateService()
+                    donationGiverId, currentUserId, donationId, stars, comment );
+            databaseService.getRateService()
                     .saveRate(rate, new IDatabaseService.DatabaseCallback<Void>() {
                         @Override
                         public void onCompleted(Void unused) {
@@ -524,21 +529,19 @@ public class ChatActivity extends BaseActivity {
         });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  listenToMessages
-    // ─────────────────────────────────────────────────────────
+    // attaches a real-time listener to the chat's messages and resets the unread count
     private void listenToMessages() {
         String senderId = currentUserIsAdmin ? "admin" : currentUserId;
-        DatabaseService.getInstance().getChatService().resetUnread(chatId, senderId);
+        databaseService.getChatService().resetUnread(chatId, senderId);
 
-        messagesListener = DatabaseService.getInstance()
-                .getChatService()
+        messagesListener = databaseService.getChatService()
                 .listenToMessages(chatId, new IDatabaseService.DatabaseCallback<List<Message>>() {
                     @Override
                     public void onCompleted(List<Message> messages) {
                         runOnUiThread(() -> {
                             messageAdapter.setMessages(messages);
                             if (!messages.isEmpty()) {
+                                // scrolls to the latest message automatically
                                 rvMessages.scrollToPosition(messageAdapter.getItemCount() - 1);
                             }
                         });
@@ -552,15 +555,13 @@ public class ChatActivity extends BaseActivity {
                 });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  sendMessage
-    // ─────────────────────────────────────────────────────────
+    // sends a new message from the current user to the chat
     private void sendMessage() {
         String text = etMessage.getText().toString().trim();
         if (text.isEmpty()) return;
         etMessage.setText("");
 
-        DatabaseService.getInstance().getChatService()
+        databaseService.getChatService()
                 .sendMessage(chatId, currentUserId, text, currentUserIsAdmin,
                         new IDatabaseService.DatabaseCallback<Void>() {
                             @Override public void onCompleted(Void unused) {}
@@ -573,14 +574,12 @@ public class ChatActivity extends BaseActivity {
                         });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  onDestroy
-    // ─────────────────────────────────────────────────────────
+    // detaches the messages listener when the activity is destroyed to prevent memory leaks
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (messagesListener != null && chatId != null) {
-            DatabaseService.getInstance().getChatService()
+            databaseService.getChatService()
                     .removeListener(chatId, messagesListener);
         }
     }

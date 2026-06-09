@@ -25,17 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Displays donations belonging to a specific user
+// Supports three view modes: SELF (own donations), ADMIN (full view), OTHER (approved only)
 public class UserDonationsActivity extends BaseActivity {
 
     private DonationAdapter donationAdapter;
     private TextView tvTitle, tvCount;
 
+    // holds the full unfiltered list — filtering works on this list in memory
     private List<Donation> allDonations = new ArrayList<>();
 
     private String searchQuery = "";
     private DonationCategory categoryFilter = null;
     private DonationStatus statusFilter = null;
 
+    // controls which statuses are shown and whether the status filter is visible
     private String viewMode; // "SELF" / "ADMIN" / "OTHER"
     private String userId;
 
@@ -62,7 +66,7 @@ public class UserDonationsActivity extends BaseActivity {
         tvTitle = findViewById(R.id.tvTitle);
         tvCount = findViewById(R.id.tvDonationCount);
 
-        // כותרת לפי מצב
+        // title changes based on whose donations are being viewed
         if ("SELF".equals(viewMode)) {
             tvTitle.setText("התרומות שלי");
         } else {
@@ -86,17 +90,20 @@ public class UserDonationsActivity extends BaseActivity {
         loadDonations();
     }
 
+    // returns which statuses are valid for the current view mode
     private List<DonationStatus> getAllowedStatuses() {
         List<DonationStatus> list = new ArrayList<>();
         switch (viewMode) {
             case "SELF":
             case "ADMIN":
+                // all statuses except DONOR_DELETED are shown to the owner and admin
                 for (DonationStatus s : DonationStatus.values()) {
                     if (s != DonationStatus.DONOR_DELETED) list.add(s);
                 }
                 break;
             case "OTHER":
             default:
+                // other users can only see approved available donations
                 list.add(DonationStatus.APPROVED_AVAILABLE);
                 break;
         }
@@ -104,7 +111,7 @@ public class UserDonationsActivity extends BaseActivity {
     }
 
     private void setupFilters() {
-        // חיפוש
+        // search filter — triggers applyFilters on every keystroke
         com.google.android.material.textfield.TextInputEditText etSearch =
                 findViewById(R.id.etSearch);
         etSearch.addTextChangedListener(new android.text.TextWatcher() {
@@ -117,7 +124,7 @@ public class UserDonationsActivity extends BaseActivity {
             }
         });
 
-        // קטגוריה
+        // category dropdown — position 0 means no filter
         spinnerCategory = findViewById(R.id.spinnerCategory);
         cats = new ArrayList<>();
         cats.add("כל הקטגוריות");
@@ -131,7 +138,7 @@ public class UserDonationsActivity extends BaseActivity {
             applyFilters();
         });
 
-        // סטטוס
+        // status dropdown — populated only with statuses allowed for this view mode
         spinnerStatus = findViewById(R.id.spinnerStatus);
         allowedStatuses = getAllowedStatuses();
         statusNames = new ArrayList<>();
@@ -146,15 +153,14 @@ public class UserDonationsActivity extends BaseActivity {
             applyFilters();
         });
 
-        //  OTHER — מסתירים ספינר סטטוס (יש רק סטטוס אחד ממילא)
+        // hides the status filter for OTHER mode — only one status is possible anyway
         if ("OTHER".equals(viewMode)) {
             spinnerStatus.setVisibility(View.GONE);
-            // מסתירים גם את ה-TextInputLayout שעוטף אותו
             View statusLayout = (View) spinnerStatus.getParent().getParent();
             statusLayout.setVisibility(View.GONE);
         }
 
-        // ניקוי
+        // clear button resets all filters and re-applies
         findViewById(R.id.btnClearFilters).setOnClickListener(v -> {
             etSearch.setText("");
             spinnerCategory.setText("כל הקטגוריות", false);
@@ -168,6 +174,7 @@ public class UserDonationsActivity extends BaseActivity {
         });
     }
 
+    // fetches donations for the given user and pre-filters by allowed statuses for this view mode
     private void loadDonations() {
         if (userId == null) return;
 
@@ -176,6 +183,7 @@ public class UserDonationsActivity extends BaseActivity {
                     @Override
                     public void onCompleted(List<Donation> donations) {
                         List<DonationStatus> allowed = getAllowedStatuses();
+                        // keeps only donations whose status is permitted in this view mode
                         allDonations = donations.stream()
                                 .filter(d -> d.getStatus() != null
                                         && allowed.contains(d.getStatus()))
@@ -194,6 +202,7 @@ public class UserDonationsActivity extends BaseActivity {
                 });
     }
 
+    // filters allDonations by search query, category, and status and updates the adapter
     private void applyFilters() {
         List<Donation> result = allDonations.stream()
                 .filter(d -> {
@@ -211,6 +220,7 @@ public class UserDonationsActivity extends BaseActivity {
         donationAdapter.setDonationList(result);
         tvCount.setText(result.size() + " תרומות");
 
+        // toggles between the list and the empty state based on filter results
         View emptyView = findViewById(R.id.layoutEmpty);
         View rv = findViewById(R.id.rvDonations);
         if (result.isEmpty()) {

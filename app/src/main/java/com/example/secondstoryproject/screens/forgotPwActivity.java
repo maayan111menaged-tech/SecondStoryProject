@@ -21,6 +21,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+// Forgot password screen — resets a user's password by verifying username and email
+// No drawer or bottom nav needed
 public class forgotPwActivity extends BaseActivity {
 
     private static final String TAG = "forgotPwActivity";
@@ -29,7 +31,7 @@ public class forgotPwActivity extends BaseActivity {
 
     @Override
     protected boolean hasSideMenu() {
-        return false; // לא צריך Drawer
+        return false;
     }
     @Override
     protected boolean hasBottomMenu(){ return false; }
@@ -45,21 +47,18 @@ public class forgotPwActivity extends BaseActivity {
         etConfirmPw = findViewById(R.id.confirmPasswordInput);
         btnConfirm = findViewById(R.id.btn_changePw);
 
+        // called when btnConfirm is clicked
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // trim() removes spaces from the start & end of the input
                 String username = etUName.getText().toString().trim();
                 String email = etEmail.getText().toString().trim();
                 String pw = etPw.getText().toString().trim();
                 String cpw = etConfirmPw.getText().toString().trim();
 
                 if (checkInput(username, email, pw, cpw)) {
-                    Log.d(TAG, "Input valid, ready to change password");
-
-                    Log.d(TAG, "Starting password reset for user: " + username);
-                    Log.d(TAG , "searching user by the user name");
-
-                    /// שלב 1: חיפוש יוזר לפי שם המשתמש
+                    // step 1: find the user in the DB by username
                     databaseService.getUserService().findUserByUserName(username, new DatabaseService.DatabaseCallback<User>() {
                         @Override
                         public void onCompleted(User user) {
@@ -69,16 +68,16 @@ public class forgotPwActivity extends BaseActivity {
                                 etUName.requestFocus();
                                 return;
                             }
-                            /// שלב 2: בדיקת התאמה של האימייל
+                            // step 2: verify that the email matches the account
                             if (!email.equals(user.getEmail())) {
                                 Log.e(TAG, "Email does not match for user: " + username);
                                 etEmail.setError("האימייל לא תואם לחשבון זה");
                                 etEmail.requestFocus();
                                 return;
                             }
-                            /// שלב 3: עידכון סיסמא
-                            user.setPassword(cpw);
 
+                            // step 3: update the password in the DB
+                            user.setPassword(cpw);
                             databaseService.getUserService().update(user.getId(), u -> {
                                 u.setPassword(user.getPassword());
                                 return u;
@@ -86,9 +85,9 @@ public class forgotPwActivity extends BaseActivity {
                                 @Override
                                 public void onCompleted(User updatedUser) {
                                     Toast.makeText(forgotPwActivity.this, "הסיסמה עודכנה בהצלחה", Toast.LENGTH_SHORT).show();
+                                    // closes the screen and returns to login
                                     finish();
                                 }
-
                                 @Override
                                 public void onFailed(Exception e) {
                                     Log.e(TAG, "Failed to update password", e);
@@ -107,15 +106,13 @@ public class forgotPwActivity extends BaseActivity {
             }
         });
 
+        // closes this screen and returns to login
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
-    /// Check if the input is valid
-    /// @return true if valid, false otherwise
+    // validates all fields — returns false and shows an error on the first invalid field
     private boolean checkInput(String username, String email, String pw, String cpw) {
         Log.d(TAG, "entered checkInput function");
-
-        // validate user name
         if (!Validator.isUNameValid(username)) {
             Log.e(TAG, "checkInput: Invalid user name");
             etUName.setError("שם משתמש לא תקין");
@@ -124,8 +121,6 @@ public class forgotPwActivity extends BaseActivity {
         } else {
             Log.d(TAG, "isUNameValid true");
         }
-
-        // validate email
         if (!Validator.isEmailValid(email)) {
             Log.e(TAG, "checkInput: Invalid email");
             etEmail.setError("כתובת אימייל לא תקינה");
@@ -134,8 +129,6 @@ public class forgotPwActivity extends BaseActivity {
         } else {
             Log.d(TAG, "isEmailValid true");
         }
-
-        // validate password
         if (!Validator.isPasswordValid(pw)) {
             Log.e(TAG, "checkInput: Password must be at least 6 chars");
             etPw.setError("סיסמה חייבת להכיל לפחות 6 תווים");
@@ -144,8 +137,7 @@ public class forgotPwActivity extends BaseActivity {
         } else {
             Log.d(TAG, "isPasswordValid true");
         }
-
-        // confirm password match
+        // confirms both password fields match
         if (!pw.equals(cpw)) {
             Log.e(TAG, "checkInput: Passwords do not match");
             etConfirmPw.setError("הסיסמאות אינן תואמות");

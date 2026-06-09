@@ -13,16 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ChatServiceImpl implements IChatService {
+public class ChatServiceImpl extends BaseFirebaseService<Chat> implements IChatService {
 
     private final DatabaseReference chatsRef;
     private final DatabaseReference usersRef;
 
     public ChatServiceImpl() {
-        FirebaseDatabase db = FirebaseDatabase.getInstance(
-                "https://second-story-33031-default-rtdb.europe-west1.firebasedatabase.app");
-        this.chatsRef = db.getReference("chats");
-        this.usersRef = db.getReference("users");
+        super("chats", Chat.class);
+        this.chatsRef = getRootRef().child("chats");
+        this.usersRef = getRootRef().child("users");
     }
 
     @Override
@@ -455,5 +454,37 @@ public class ChatServiceImpl implements IChatService {
     @Override
     public DatabaseReference getChatsRef() {
         return chatsRef;
+    }
+
+    @Override
+    public void sendSystemMessage(String chatId, String text, boolean isRatingRequest,
+                                  IDatabaseService.DatabaseCallback<Void> callback) {
+        DatabaseReference messagesRef = chatsRef.child(chatId).child("messages");
+        String messageId = messagesRef.push().getKey();
+        Message msg = new Message(messageId, "system", text, System.currentTimeMillis());
+        msg.setRatingRequest(isRatingRequest);
+        messagesRef.child(messageId).setValue(msg)
+                .addOnSuccessListener(unused ->
+                        chatsRef.child(chatId).child("metadata").child("receiverId").get()
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful() && task.getResult().exists()) {
+                                        String receiverId = task.getResult().getValue(String.class);
+                                        if (receiverId != null) incrementUnread(chatId, receiverId);
+                                    }
+                                    callback.onCompleted(null);
+                                }))
+                .addOnFailureListener(callback::onFailed);
+    }
+
+    @Override
+    public void getChatMetadata(String chatId, IDatabaseService.DatabaseCallback<DataSnapshot> callback) {
+        chatsRef.child(chatId).child("metadata").get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful() || !task.getResult().exists()) {
+                        callback.onFailed(task.getException());
+                        return;
+                    }
+                    callback.onCompleted(task.getResult());
+                });
     }
 }

@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Public donation search screen — shows only approved donations from active donors
+// Supports filtering by name, category, and city. Can be launched with a pre-set city from the map
 public class SearchDonationsActivity extends BaseActivity {
 
     private static final String TAG = "SearchDonationsActivity";
@@ -51,6 +53,7 @@ public class SearchDonationsActivity extends BaseActivity {
     private String cityFilter = null;
     private boolean filtersVisible = false;
 
+    // kept as a field so it can be pre-populated when launched from the map
     private AutoCompleteTextView spinnerCity;
 
     @Override
@@ -80,6 +83,7 @@ public class SearchDonationsActivity extends BaseActivity {
         });
         recyclerView.setAdapter(donationAdapter);
 
+        // updates the count label and toggles empty/list state after every filter
         donationAdapter.setOnFilterListener(count -> {
             tvDonationCount.setText("סה״כ: " + count);
             if (count == 0) showEmpty();
@@ -92,7 +96,7 @@ public class SearchDonationsActivity extends BaseActivity {
         setupCityFilter();
         setupClearFilters();
 
-        // פתיחה עם עיר מהמפה
+        // if launched from the map with a city pre-selected, apply it immediately
         String cityFromMap = getIntent().getStringExtra("CITY_FILTER");
         if (cityFromMap != null) {
             cityFilter = cityFromMap;
@@ -108,10 +112,12 @@ public class SearchDonationsActivity extends BaseActivity {
         loadDonations();
     }
 
+    // loads all users to build an active-status map, then fetches all donations
+    // and keeps only approved ones from active donors
     private void loadDonations() {
         showLoading();
 
-        DatabaseService.getInstance().getUserService().getAll(
+        databaseService.getUserService().getAll(
                 new DatabaseService.DatabaseCallback<List<User>>() {
                     @Override
                     public void onCompleted(List<User> users) {
@@ -120,10 +126,11 @@ public class SearchDonationsActivity extends BaseActivity {
                             activeMap.put(u.getId(), u.isActive());
                         }
 
-                        DatabaseService.getInstance().getDonationService()
+                        databaseService.getDonationService()
                                 .getAll(new DatabaseService.DatabaseCallback<List<Donation>>() {
                                     @Override
                                     public void onCompleted(List<Donation> donations) {
+                                        // filters to only APPROVED_AVAILABLE donations from active donors
                                         List<Donation> available = new ArrayList<>();
                                         for (Donation d : donations) {
                                             boolean isApproved = d.getStatus() == DonationStatus.APPROVED_AVAILABLE;
@@ -155,6 +162,7 @@ public class SearchDonationsActivity extends BaseActivity {
                 });
     }
 
+    // toggles the filter panel visibility on button click
     private void setupToggleFilters() {
         btnToggle.setOnClickListener(v -> {
             filtersVisible = !filtersVisible;
@@ -162,6 +170,7 @@ public class SearchDonationsActivity extends BaseActivity {
         });
     }
 
+    // filters donations by name as the user types
     private void setupSearchFilter() {
         EditText etSearch = findViewById(R.id.et_search_donation);
         etSearch.addTextChangedListener(new android.text.TextWatcher() {
@@ -175,6 +184,7 @@ public class SearchDonationsActivity extends BaseActivity {
         });
     }
 
+    // dropdown for filtering by donation category
     private void setupCategoryFilter() {
         AutoCompleteTextView spinnerCategory = findViewById(R.id.spinner_category);
         List<String> categoryNames = new ArrayList<>();
@@ -186,12 +196,14 @@ public class SearchDonationsActivity extends BaseActivity {
                 android.R.layout.simple_dropdown_item_1line, categoryNames);
         spinnerCategory.setAdapter(adapter);
         spinnerCategory.setText("כל הקטגוריות", false);
+        // position 0 means "all categories"
         spinnerCategory.setOnItemClickListener((parent, view, position, id) -> {
             categoryFilter = position == 0 ? null : DonationCategory.values()[position - 1];
             donationAdapter.filter(searchQuery, categoryFilter, cityFilter);
         });
     }
 
+    // dropdown for filtering by city
     private void setupCityFilter() {
         String[] cities = IsraelCity.getHebrewNames();
         List<String> cityList = new ArrayList<>();
@@ -207,6 +219,7 @@ public class SearchDonationsActivity extends BaseActivity {
         });
     }
 
+    // resets all active filters and refreshes the list
     private void setupClearFilters() {
         findViewById(R.id.btn_clear_filters).setOnClickListener(v -> {
             ((EditText) findViewById(R.id.et_search_donation)).setText("");

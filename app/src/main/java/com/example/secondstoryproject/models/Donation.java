@@ -107,7 +107,6 @@ public class Donation implements Idable {
         statusHistory.add(new StatusLog(status, new Date(), reason));
     }
 
-    // הוסף את ה-getter הזה לקלאס Donation
     public String getRejectionReason() {
         if (statusHistory == null || statusHistory.isEmpty()) return null;
         // מחזיר את הסיבה מהרשומה האחרונה בהיסטוריה

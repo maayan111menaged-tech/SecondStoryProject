@@ -34,6 +34,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import java.util.ArrayList;
 
+// Main screen for admin users — shows system stats, donation pie chart and quick navigation buttons.
 public class AdminMainActivity extends BaseActivity {
 
     private TextView tvUsersCount;
@@ -51,7 +52,7 @@ public class AdminMainActivity extends BaseActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        // marks the home icon as selected in the bottom navigation bar
         bottomNav.setSelectedItemId(R.id.menu_home);
 
         tvUsersCount = findViewById(R.id.tv_users_count);
@@ -59,8 +60,10 @@ public class AdminMainActivity extends BaseActivity {
         pieChart = findViewById(R.id.pie_chart);
         legendContainer = findViewById(R.id.legendContainer);
 
+        // fetches and displays system statistics
         loadStats();
 
+        // quick navigation buttons to main admin screens
         findViewById(R.id.btn_accept_donations).setOnClickListener(v ->
                 startActivity(new Intent(this, AcceptDonationActivity.class)));
         findViewById(R.id.btn_users_list).setOnClickListener(v ->
@@ -71,15 +74,18 @@ public class AdminMainActivity extends BaseActivity {
                 startActivity(new Intent(this, ChatsListActivity.class)));
     }
 
+    // fetches all users and donations from the DB, then updates the stats and pie chart
     private void loadStats() {
+        // shows "..." while data is loading
         tvPendingDonations.setText("...");
         tvUsersCount.setText("...");
 
-        DatabaseService.getInstance().getUserService().getAll(
+        databaseService.getUserService().getAll(
                 new DatabaseService.DatabaseCallback<List<User>>() {
                     @Override
                     public void onCompleted(List<User> users) {
                         int activeCount = 0;
+                        // maps each user ID to their active/blocked status for quick lookup
                         Map<String, Boolean> activeMap = new HashMap<>();
                         for (User u : users) {
                             activeMap.put(u.getId(), u.isActive());
@@ -87,12 +93,12 @@ public class AdminMainActivity extends BaseActivity {
                         }
                         final int finalActiveCount = activeCount;
 
-                        // טוענים את כל התרומות
-                        DatabaseService.getInstance().getDonationService().getAll(
+                        databaseService.getDonationService().getAll(
                                 new DatabaseService.DatabaseCallback<List<Donation>>() {
                                     @Override
                                     public void onCompleted(List<Donation> donations) {
                                         int pendingCount = 0;
+                                        // filters out donations from blocked users
                                         List<Donation> activeDonations = new ArrayList<>();
 
                                         for (Donation d : donations) {
@@ -131,7 +137,10 @@ public class AdminMainActivity extends BaseActivity {
                     }
                 });
     }
+
+    // builds and displays the pie chart based on donation status distribution
     private void setupPieChart(List<Donation> allDonations) {
+        // counts how many donations exist per status
         Map<DonationStatus, Integer> statusCount = new HashMap<>();
         for (Donation d : allDonations) {
             DonationStatus s = d.getStatus();
@@ -146,6 +155,7 @@ public class AdminMainActivity extends BaseActivity {
         ArrayList<Integer> colors = new ArrayList<>();
         ArrayList<DonationStatus> orderedStatuses = new ArrayList<>();
 
+        // adds each status slice in a fixed order with its matching color
         addPieEntry(entries, colors, orderedStatuses, statusCount,
                 DonationStatus.PENDING_APPROVAL,   getColor(R.color.status_pending));
         addPieEntry(entries, colors, orderedStatuses, statusCount,
@@ -164,6 +174,7 @@ public class AdminMainActivity extends BaseActivity {
         dataSet.setValueTextSize(12f);
         dataSet.setValueTextColor(Color.WHITE);
         dataSet.setSliceSpace(2f);
+        // displays whole numbers instead of decimals on the slices
         dataSet.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
@@ -178,12 +189,15 @@ public class AdminMainActivity extends BaseActivity {
         pieChart.setHoleRadius(40f);
         pieChart.setTransparentCircleRadius(45f);
         pieChart.setRotationEnabled(true);
-        pieChart.getLegend().setEnabled(false); // מכבים את ה-legend המובנה
+        // uses a custom legend built manually in buildLegend()
+        pieChart.getLegend().setEnabled(false);
         pieChart.animateY(800);
+        // redraws the chart after data is set
         pieChart.invalidate();
 
         buildLegend(orderedStatuses, colors);
 
+        // tapping a pie slice navigates to the donations list filtered by that status
         pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -198,6 +212,7 @@ public class AdminMainActivity extends BaseActivity {
                 }
                 if (selectedStatus == null) return;
                 Intent intent = new Intent(AdminMainActivity.this, DonationsListActivity.class);
+                // passes the selected status to the donations list screen as a filter
                 intent.putExtra("FILTER_STATUS", selectedStatus.name());
                 startActivity(intent);
             }
@@ -205,6 +220,8 @@ public class AdminMainActivity extends BaseActivity {
             public void onNothingSelected() {}
         });
     }
+
+    // adds a single slice to the pie chart only if that status has at least one donation
     private void addPieEntry(ArrayList<PieEntry> entries,
                              ArrayList<Integer> colors,
                              ArrayList<DonationStatus> statuses,
@@ -217,6 +234,8 @@ public class AdminMainActivity extends BaseActivity {
             statuses.add(status);
         }
     }
+
+    // builds a custom legend below the pie chart — one colored dot and label per status
     private void buildLegend(List<DonationStatus> statuses, List<Integer> colors) {
         legendContainer.removeAllViews();
 
@@ -224,6 +243,7 @@ public class AdminMainActivity extends BaseActivity {
             DonationStatus status = statuses.get(i);
             int color = colors.get(i);
 
+            // each row contains a colored dot and a status label
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
@@ -235,7 +255,7 @@ public class AdminMainActivity extends BaseActivity {
             rowParams.setMargins(0, 0, 0, 8);
             row.setLayoutParams(rowParams);
 
-            // עיגול צבע
+            // colored circle drawn programmatically using GradientDrawable
             View colorDot = new View(this);
             int dotSize = (int) (12 * getResources().getDisplayMetrics().density);
             LinearLayout.LayoutParams dotParams = new LinearLayout.LayoutParams(dotSize, dotSize);
@@ -247,7 +267,7 @@ public class AdminMainActivity extends BaseActivity {
             circle.setColor(color);
             colorDot.setBackground(circle);
 
-            // טקסט
+            // label showing the status name in Hebrew
             TextView label = new TextView(this);
             label.setText(status.getHebrewName());
             label.setTextSize(13f);

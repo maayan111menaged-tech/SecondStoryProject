@@ -29,6 +29,10 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
+// Abstract base activity for the entire app — all screens extend this class.
+// Cannot be instantiated directly;
+// Implements NavigationView.OnNavigationItemSelectedListener to handle
+// side drawer menu item clicks via onNavigationItemSelected().
 public abstract class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -36,36 +40,49 @@ public abstract class BaseActivity extends AppCompatActivity
     protected DrawerLayout drawerLayout;
     BottomNavigationView bottomNav;
 
+    // list of listeners that track unread message count per chat
     private final List<com.google.firebase.database.ValueEventListener> unreadListeners = new ArrayList<>();
+    // list of Firebase references (paths) for unread count per chat — kept to allow listener removal
     private final List<com.google.firebase.database.DatabaseReference> unreadRefs = new ArrayList<>();
 
+    // Returns true if the current logged-in user is admin
     protected boolean isAdmin() {
         User currentUser = SharedPreferencesUtil.getUser(this);
         if (currentUser == null) { return false; }
         return currentUser.isAdmin();
     }
+    // Override to false for hiding the side drawer in this activity
     protected boolean hasSideMenu() {
-        return true; // ברירת מחדל – יש Drawer
+        return true;
     }
-    protected boolean hasBottomMenu(){ return true; }
-    protected int getSelectedBottomNavItem() { return -1; }
+    // Override to false for hiding the bottom navigation bar in this activity
+    protected boolean hasBottomMenu(){
+        return true;
+    }
+    // Override to return the R.id of the bottom nav item to mark as selected. Default: none (-1).
+    protected int getSelectedBottomNavItem() {
+        return -1;
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         databaseService = DatabaseService.getInstance();
 
-        // טוען את ה-Base XML
+        // inflates the base XML layout that wraps all activities
         super.setContentView(R.layout.activity_base);
 
-        // Toolbar
+        // registers the toolbar as the official action bar for this activity
         Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
-        // Drawer
+
+        // finds the drawer and sets this activity to listen to its menu clicks
         drawerLayout = findViewById(R.id.nav_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // עדכון Header של Drawer
+        // adding to the drawer header the current user's name, username and profile picture
         View headerView = navigationView.getHeaderView(0);
         TextView navHeaderName = headerView.findViewById(R.id.navHeaderName);
         TextView navHeaderUsername = headerView.findViewById(R.id.navHeaderUsername);
@@ -84,13 +101,14 @@ public abstract class BaseActivity extends AppCompatActivity
 
         bottomNav = findViewById(R.id.bottom_nav);
 
-        // בודק סוג משתמש
+        // loads the correct menu XML depending on whether the user is admin
         if (isAdmin()) {
-            navigationView.inflateMenu(R.menu.nav_menu_admin); // XML נפרד ל-ADMIN
+            navigationView.inflateMenu(R.menu.nav_menu_admin);
         } else {
             navigationView.inflateMenu(R.menu.nav_menu);
         }
 
+        // sets up the hamburger icon and toggle behavior for the side drawer
         if (hasSideMenu()) {
 
             if (getSupportActionBar() != null) {
@@ -102,6 +120,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 getSupportActionBar().setHomeAsUpIndicator(menuIcon);
             }
 
+            // toggles the drawer open/closed on toolbar icon click
             toolbar.setNavigationOnClickListener(v -> {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
@@ -111,6 +130,7 @@ public abstract class BaseActivity extends AppCompatActivity
             });
 
         } else{
+            // locks and hides the drawer for activities that don't need it
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             navigationView.setVisibility(View.GONE);
 
@@ -120,10 +140,12 @@ public abstract class BaseActivity extends AppCompatActivity
                 getSupportActionBar().setHomeAsUpIndicator(null);
             }
         }
+
         if(!hasBottomMenu()){
             bottomNav.setVisibility(View.GONE);
         }
         else {
+            // navigates to the correct screen based on which bottom nav item was clicked
             bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -142,6 +164,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 }
             });
 
+            // marks the correct item as selected, or clears selection if none specified
             int selectedItem = getSelectedBottomNavItem();
             if (selectedItem != -1) {
                 bottomNav.setSelectedItemId(selectedItem);
@@ -157,23 +180,27 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
+    // overrides setContentView so child activities inject their layout into the base frame
     @Override
     public void setContentView(int layoutResID) {
         setContentLayout(layoutResID);
     }
 
-    //  מזריק את ה-layout של המסך לתוך Base
+    // inflates the child activity's layout into the FrameLayout inside activity_base.xml
     protected void setContentLayout(int layoutResId) {
         FrameLayout contentFrame = findViewById(R.id.content_frame);
         getLayoutInflater().inflate(layoutResId, contentFrame, true);
     }
 
+    // navigates to the target activity and finishes the current one to avoid stacking screens
+    // is used in the sideMenu navigation function
     protected void navigateTo(Class<?> targetActivity) {
         if (!this.getClass().equals(targetActivity)) {
             Intent intent = new Intent(this, targetActivity);
             startActivity(intent);
             finish();
         } else if (targetActivity.equals(UserProfileActivity.class)) {
+            // allows re-opening the profile screen even if already on it
             Intent intent = new Intent(this, targetActivity);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
@@ -182,11 +209,10 @@ public abstract class BaseActivity extends AppCompatActivity
         drawerLayout.closeDrawer(GravityCompat.START);
     }
 
+    // handles clicks on side drawer menu items and navigates accordingly
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
         int id = item.getItemId();
-
         if (id == R.id.nav_home) {
             navigateTo(MainActivity.class);
         } else if(id == R.id.nav_home_admin){
@@ -213,15 +239,16 @@ public abstract class BaseActivity extends AppCompatActivity
         }
         return true;
     }
+
+    // shows a confirmation dialog before signing the user out
     private void showLogoutDialog() {
 
         new androidx.appcompat.app.AlertDialog.Builder(this , R.style.DialogTheme)
                 .setTitle("התנתקות")
                 .setMessage("את/ה בטוח/ה שאת/ה רוצה להתנתק?")
                 .setPositiveButton("כן", (dialog, which) -> {
-
                     SharedPreferencesUtil.signOutUser(this);
-
+                    // clears the back stack so the user cannot navigate back after logout
                     Intent intent = new Intent(this, LandingActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -230,6 +257,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 .show();
     }
 
+    // closes the drawer on back press if open, otherwise performs default back behavior
     @Override
     public void onBackPressed() {
         if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -239,8 +267,9 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
+    // attaches a real-time Firebase listener per chat to track total unread message count
     private void listenToTotalUnread() {
-        // ניקוי ליסנרים קודמים
+        // detaches any existing listeners before re-attaching to avoid duplicates
         for (int i = 0; i < unreadListeners.size(); i++) {
             unreadRefs.get(i).removeEventListener(unreadListeners.get(i));
         }
@@ -251,10 +280,10 @@ public abstract class BaseActivity extends AppCompatActivity
         if (currentUser == null) return;
 
         com.google.firebase.database.DatabaseReference chatsRef =
-                DatabaseService.getInstance().getChatService().getChatsRef();
+                databaseService.getChatService().getChatsRef();
 
         if (!isAdmin()) {
-            DatabaseService.getInstance().getChatService()
+            databaseService.getChatService()
                     .getUserChats(currentUser.getId(),
                             new IDatabaseService.DatabaseCallback<List<Chat>>() {
                                 @Override
@@ -277,6 +306,7 @@ public abstract class BaseActivity extends AppCompatActivity
                                                         Integer unread = snapshot.getValue(Integer.class);
                                                         total[0] += (unread != null ? unread : 0);
                                                         count[0]++;
+                                                        // once all chats were counted, update the badge and reset counters
                                                         if (count[0] == chats.size()) {
                                                             updateChatBadge(total[0]);
                                                             total[0] = 0;
@@ -296,7 +326,8 @@ public abstract class BaseActivity extends AppCompatActivity
                                 public void onFailed(Exception e) {}
                             });
         } else {
-            DatabaseService.getInstance().getChatService()
+            // admin listens to unread_admin field across all chats
+            databaseService.getChatService()
                     .getAllAdminChats(new IDatabaseService.DatabaseCallback<List<Chat>>() {
                         @Override
                         public void onCompleted(List<Chat> chats) {
@@ -317,6 +348,7 @@ public abstract class BaseActivity extends AppCompatActivity
                                                 Integer unread = snapshot.getValue(Integer.class);
                                                 total[0] += (unread != null ? unread : 0);
                                                 count[0]++;
+                                                // once all chats were counted, update the badge and reset counters
                                                 if (count[0] == chats.size()) {
                                                     updateChatBadge(total[0]);
                                                     total[0] = 0;
@@ -338,6 +370,7 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
+    // detaches all Firebase listeners when the activity is paused to prevent memory leaks
     @Override
     protected void onPause() {
         super.onPause();
@@ -347,6 +380,8 @@ public abstract class BaseActivity extends AppCompatActivity
         unreadListeners.clear();
         unreadRefs.clear();
     }
+
+    // updates the chat badge on the bottom nav with the total unread count
     private void updateChatBadge(int count) {
         runOnUiThread(() -> {
             com.google.android.material.badge.BadgeDrawable badge =
@@ -360,12 +395,13 @@ public abstract class BaseActivity extends AppCompatActivity
         });
     }
 
+    // sends an automated message from admin to the given user's chat
     protected void sendAutoAdminMessage(String userId, String text) {
-        DatabaseService.getInstance().getChatService()
+        databaseService.getChatService()
                 .getOrCreateAdminChat(userId, new IDatabaseService.DatabaseCallback<String>() {
                     @Override
                     public void onCompleted(String chatId) {
-                        DatabaseService.getInstance().getChatService()
+                        databaseService.getChatService()
                                 .sendMessage(chatId, "admin", text, true, new IDatabaseService.DatabaseCallback<Void>() {
                                     @Override
                                     public void onCompleted(Void unused) {}
@@ -378,6 +414,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 });
     }
 
+    // re-attaches unread listeners when returning to the activity
     @Override
     protected void onResume() {
         super.onResume();

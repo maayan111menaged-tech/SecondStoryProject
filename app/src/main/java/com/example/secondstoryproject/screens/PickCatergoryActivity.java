@@ -14,6 +14,7 @@ import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.adapters.CategoryAdapter;
 import com.example.secondstoryproject.models.DonationCategory;
 
+// Screen for picking a donation category before adding a new donation.
 public class PickCatergoryActivity extends BaseActivity {
 
     @Override
@@ -27,19 +28,14 @@ public class PickCatergoryActivity extends BaseActivity {
             return insets;
         });
 
-        // ----------------------------
-        // RecyclerView setup
-        // ----------------------------
         RecyclerView rvCategories = findViewById(R.id.rvCategories);
 
-        // Grid עם 3 ריבועים בשורה
+        // displays categories in a 3-column grid
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         rvCategories.setLayoutManager(gridLayoutManager);
 
-        // Adapter עם callback ללחיצה
+        // navigates to the next donation step with the selected category passed as an extra
         CategoryAdapter adapter = new CategoryAdapter(category -> {
-            // מה קורה כשנלחץ ריבוע
-            // נעבור לשלב הבא של התרומה
             Intent intent = new Intent(PickCatergoryActivity.this, AddDonationStep2Activity.class);
             intent.putExtra("selected_category", category.name());
             startActivity(intent);

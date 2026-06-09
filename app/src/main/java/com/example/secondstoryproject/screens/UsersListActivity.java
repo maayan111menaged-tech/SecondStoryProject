@@ -38,6 +38,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+// Admin user management screen — lists all users with search by username and admin/non-admin filter.
+// Supports adding new users, promoting to admin, deactivating, reactivating, and permanent deletion.
 public class UsersListActivity extends BaseActivity {
 
     private static final String TAG = "UsersListActivity";
@@ -45,6 +47,7 @@ public class UsersListActivity extends BaseActivity {
     private TextView tvUserCount;
 
     private String searchQuery = "";
+    // null = show all, true = admins only, false = non-admins only
     private Boolean adminFilter = null;
 
     private LinearLayout layoutEmpty;
@@ -61,6 +64,7 @@ public class UsersListActivity extends BaseActivity {
         usersList.setLayoutManager(new LinearLayoutManager(this));
 
         userAdapter = new UserAdapter(new UserAdapter.OnUserClickListener() {
+            // opens the user's profile screen
             @Override
             public void onUserClick(User user) {
                 Intent intent = new Intent(UsersListActivity.this, UserProfileActivity.class);
@@ -71,6 +75,7 @@ public class UsersListActivity extends BaseActivity {
             @Override
             public void onLongUserClick(User user) {}
 
+            // info icon also opens the profile screen
             @Override
             public void onInfoClick(User user) {
                 Intent intent = new Intent(UsersListActivity.this, UserProfileActivity.class);
@@ -78,23 +83,24 @@ public class UsersListActivity extends BaseActivity {
                 startActivity(intent);
             }
 
+            // promotes a user to admin after confirming they have no active donations
             @Override
             public void onMakeAdminClick(User user) {
                 new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this, R.style.DialogTheme)
                         .setTitle("הפיכה לאדמין")
                         .setMessage("האם תרצה להפוך את " + user.getUserName() + " לאדמין?")
                         .setPositiveButton("כן", (dialog, which) -> {
-                            DatabaseService.getInstance().getDonationService()
+                            databaseService.getDonationService()
                                     .getByGiverId(user.getId(),
                                             new IDatabaseService.DatabaseCallback<List<Donation>>() {
                                                 @Override
                                                 public void onCompleted(List<Donation> donations) {
+                                                    // blocks promotion if the user has pending or available donations
                                                     boolean hasActiveDonations = false;
                                                     for (Donation d : donations) {
                                                         DonationStatus s = d.getStatus();
                                                         if (s == DonationStatus.PENDING_APPROVAL ||
-                                                                s == DonationStatus.APPROVED_AVAILABLE ||
-                                                                s == DonationStatus.MATCHED) {
+                                                                s == DonationStatus.APPROVED_AVAILABLE) {
                                                             hasActiveDonations = true;
                                                             break;
                                                         }
@@ -108,15 +114,15 @@ public class UsersListActivity extends BaseActivity {
                                                         userAdapter.resetMakeAdminButton(user);
                                                         return;
                                                     }
-                                                    // אין תרומות פעילות — מעדכן רק את השדה
-                                                    DatabaseService.getInstance().getUserService()
+                                                    // updates the admin field in the DB and deletes the user's admin chat
+                                                    databaseService.getUserService()
                                                             .updateUserFields(user.getId(), Map.of("admin", true),
                                                                     new IDatabaseService.DatabaseCallback<Void>() {
                                                                         @Override
                                                                         public void onCompleted(Void unused) {
                                                                             user.setAdmin(true);
                                                                             userAdapter.updateUserById(user);
-                                                                            DatabaseService.getInstance().getChatService()
+                                                                            databaseService.getChatService()
                                                                                     .deleteAdminChat(user.getId(),
                                                                                             new IDatabaseService.DatabaseCallback<Void>() {
                                                                                                 @Override public void onCompleted(Void u) {}
@@ -148,10 +154,10 @@ public class UsersListActivity extends BaseActivity {
                         })
                         .show();
             }
+            // deactivated users get a reactivate dialog; active users get a deactivate/delete choice
             @Override
             public void onToggleActiveClick(User user) {
                 if (!user.isActive()) {
-                    // משתמש מושבת – הפעל מחדש בלבד
                     new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this, R.style.DialogTheme)
                             .setTitle("הפעל משתמש")
                             .setMessage("האם להפעיל מחדש את " + user.getUserName() + "?")
@@ -161,7 +167,6 @@ public class UsersListActivity extends BaseActivity {
                     return;
                 }
 
-                // משתמש פעיל – דיאלוג בחירה
                 new androidx.appcompat.app.AlertDialog.Builder(UsersListActivity.this, R.style.DialogTheme)
                         .setTitle("פעולה על משתמש")
                         .setMessage("מה ברצונך לעשות עם " + user.getUserName() + "?")
@@ -171,6 +176,7 @@ public class UsersListActivity extends BaseActivity {
                         .show();
             }
 
+            // opens an admin chat with the selected user, skips if the user is the admin themselves
             @Override
             public void onChatClick(User user) {
                 String currentUserId = SharedPreferencesUtil.getUserId(UsersListActivity.this);
@@ -187,8 +193,10 @@ public class UsersListActivity extends BaseActivity {
 
         usersList.setAdapter(userAdapter);
 
+        // FAB opens the add-user dialog
         findViewById(R.id.fab_add_user).setOnClickListener(v -> showAddUserDialog());
 
+        // search filter — updates the adapter on every keystroke
         EditText etSearch = findViewById(R.id.et_search);
         etSearch.addTextChangedListener(new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -200,6 +208,7 @@ public class UsersListActivity extends BaseActivity {
             }
         });
 
+        // chip group toggles between showing all users, admins only, or non-admins only
         ChipGroup chipGroup = findViewById(R.id.chip_group_filter);
         chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.contains(R.id.chip_admin)) adminFilter = true;
@@ -212,6 +221,7 @@ public class UsersListActivity extends BaseActivity {
                 tvUserCount.setText("סה״כ: " + count));
     }
 
+    // inflates and shows the add-user dialog with full validation and username uniqueness check
     private void showAddUserDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_user, null);
 
@@ -231,7 +241,7 @@ public class UsersListActivity extends BaseActivity {
         TextInputLayout layoutDate      = dialogView.findViewById(R.id.layout_date);
         TextInputLayout layoutPassword  = dialogView.findViewById(R.id.layout_password);
 
-        // פתיחת date picker בלחיצה על השדה
+        // date field opens a date picker instead of a keyboard
         etDate.setOnClickListener(v -> {
             CalendarConstraints constraints = new CalendarConstraints.Builder()
                     .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
@@ -249,17 +259,18 @@ public class UsersListActivity extends BaseActivity {
             datePicker.show(getSupportFragmentManager(), "ADD_USER_DATE_PICKER");
         });
 
+        // positive button is set to null in the builder so we can control dismiss manually
         androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
                 .setTitle("הוספת משתמש חדש")
                 .setView(dialogView)
-                .setPositiveButton("הוסף", null) // null – נטפל ידנית
+                .setPositiveButton("הוסף", null)
                 .setNegativeButton("ביטול", null)
                 .create();
 
         dialog.setOnShowListener(dlg -> {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
 
-                // ניקוי שגיאות קודמות
+                // clears all previous field errors before re-validating
                 layoutUsername.setError(null);
                 layoutFirstname.setError(null);
                 layoutLastname.setError(null);
@@ -276,7 +287,7 @@ public class UsersListActivity extends BaseActivity {
                 String date      = etDate.getText().toString().trim();
                 String password  = etPassword.getText().toString().trim();
 
-                // Validation
+                // validates each field in order and stops at the first error
                 if (!Validator.isUNameValid(username)) {
                     layoutUsername.setError("שם משתמש לא תקין (אותיות, מספרים, נקודה, קו תחתון)");
                     return;
@@ -306,8 +317,8 @@ public class UsersListActivity extends BaseActivity {
                     return;
                 }
 
-                // בדיקת קיום שם משתמש
-                DatabaseService.getInstance().getUserService()
+                // checks uniqueness in the DB before creating the user
+                databaseService.getUserService()
                         .checkIfUserNameExists(username, new IDatabaseService.DatabaseCallback<Boolean>() {
                             @Override
                             public void onCompleted(Boolean exists) {
@@ -315,21 +326,22 @@ public class UsersListActivity extends BaseActivity {
                                     layoutUsername.setError("שם המשתמש כבר קיים במערכת");
                                     return;
                                 }
-                                // יצירת המשתמש
-                                String uid = DatabaseService.getInstance().getUserService().generateId();
+                                // generates a new ID and creates the user in the DB
+                                String uid = databaseService.getUserService().generateId();
                                 User newUser = new User(uid, username, password,
                                         firstname, lastname, email, phone, date);
 
-                                DatabaseService.getInstance().getUserService()
+                                databaseService.getUserService()
                                         .create(newUser, new IDatabaseService.DatabaseCallback<Void>() {
                                             @Override
                                             public void onCompleted(Void unused) {
-                                                // יצירת צ'אט אדמין אוטומטי
-                                                DatabaseService.getInstance().getChatService()
+                                                // automatically creates an admin chat for the new user
+                                                databaseService.getChatService()
                                                         .getOrCreateAdminChat(uid, new IDatabaseService.DatabaseCallback<String>() {
                                                             @Override public void onCompleted(String chatId) {}
                                                             @Override public void onFailed(Exception e) {}
                                                         });
+                                                // sends a welcome message from the admin
                                                 sendAutoAdminMessage(uid,
                                                         "ברוכ/ה הבא/ה לסיפור שני! 🌸\nשמחים שהצטרפת לקהילה שלנו.\nאם יש שאלות או צורך בעזרה — אנחנו כאן!");
                                                 userAdapter.addUser(newUser);
@@ -357,9 +369,7 @@ public class UsersListActivity extends BaseActivity {
         dialog.show();
     }
 
-    // ─────────────────────────────────────────────
-    // השבתה לוגית
-    // ─────────────────────────────────────────────
+    // soft delete — marks the user as inactive without removing data
     private void showDeactivateConfirmDialog(User user) {
         new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
                 .setTitle("השבתת משתמש")
@@ -371,7 +381,7 @@ public class UsersListActivity extends BaseActivity {
                                 "• ניתן לשחזר בכל עת ✅"
                 )
                 .setPositiveButton("השבת", (d, w) -> {
-                    DatabaseService.getInstance().getUserService()
+                    databaseService.getUserService()
                             .updateUserFields(user.getId(), Map.of("active", false),
                                     new IDatabaseService.DatabaseCallback<Void>() {
                                         @Override
@@ -392,9 +402,7 @@ public class UsersListActivity extends BaseActivity {
                 .show();
     }
 
-    // ─────────────────────────────────────────────
-    // מחיקה פיזית – צ'אטים + תרומות + משתמש
-    // ─────────────────────────────────────────────
+    // permanent deletion — marks donations as DONOR_DELETED, flags chats, then removes the user
     private void showDeleteConfirmDialog(User user) {
         new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
                 .setTitle("מחיקה לצמיתות")
@@ -411,32 +419,32 @@ public class UsersListActivity extends BaseActivity {
     }
 
     /**
-     * ✅ מחיקה פיזית מלאה:
-     * 1. עדכון סטטוס תרומות → DONOR_DELETED
-     * 2. מחיקת כל הצ'אטים
-     * 3. מחיקת המשתמש מה-DB
+     * Full permanent delete in 3 steps:
+     * 1. marks all donations → DONOR_DELETED
+     * 2. flags all chats as donorDeleted so the other side sees a banner
+     * 3. deletes the user record from the DB
      */
     private void performFullDelete(User user) {
-        // שלב 1: עדכון תרומות לסטטוס DONOR_DELETED
-        DatabaseService.getInstance().getDonationService()
+        databaseService.getDonationService()
                 .getByGiverId(user.getId(), new IDatabaseService.DatabaseCallback<List<Donation>>() {
                     @Override
                     public void onCompleted(List<Donation> donations) {
+                        // step 1 — update each active donation to DONOR_DELETED
                         for (Donation donation : donations) {
                             if (donation.getStatus() != DonationStatus.DONOR_DELETED) {
                                 donation.updateStatus(DonationStatus.DONOR_DELETED, "תורם נמחק מהמערכת");
-                                DatabaseService.getInstance().getDonationService()
+                                databaseService.getDonationService()
                                         .update(donation.getId(), old -> donation, null);
                             }
                         }
 
-                        // שלב 2: סימון הצ'אטים כ-donorDeleted (לא נמחקים – הצד השני יראה באנר)
-                        DatabaseService.getInstance().getChatService()
+                        // step 2 — flag chats (not deleted, so the other user sees the "deleted" banner)
+                        databaseService.getChatService()
                                 .markUserAsDeleted(user.getId(), new IDatabaseService.DatabaseCallback<Void>() {
                                     @Override
                                     public void onCompleted(Void unused) {
-                                        // שלב 3: מחיקת המשתמש עצמו
-                                        DatabaseService.getInstance().getUserService()
+                                        // step 3 — delete the user record
+                                        databaseService.getUserService()
                                                 .delete(user.getId(), new IDatabaseService.DatabaseCallback<Void>() {
                                                     @Override
                                                     public void onCompleted(Void unused2) {
@@ -454,8 +462,8 @@ public class UsersListActivity extends BaseActivity {
                                     @Override
                                     public void onFailed(Exception e) {
                                         Log.e(TAG, "שגיאה במחיקת צ'אטים", e);
-                                        // ממשיכים למחיקת המשתמש גם אם הצ'אטים נכשלו
-                                        DatabaseService.getInstance().getUserService()
+                                        // continues with user deletion even if chat flagging failed
+                                        databaseService.getUserService()
                                                 .delete(user.getId(), new IDatabaseService.DatabaseCallback<Void>() {
                                                     @Override
                                                     public void onCompleted(Void unused) {
@@ -481,11 +489,9 @@ public class UsersListActivity extends BaseActivity {
                 });
     }
 
-    // ─────────────────────────────────────────────
-    // הפעלה מחדש
-    // ─────────────────────────────────────────────
+    // restores a deactivated user's access
     private void reactivateUser(User user) {
-        DatabaseService.getInstance().getUserService()
+        databaseService.getUserService()
                 .updateUserFields(user.getId(), Map.of("active", true),
                         new IDatabaseService.DatabaseCallback<Void>() {
                             @Override
@@ -503,10 +509,11 @@ public class UsersListActivity extends BaseActivity {
                         });
     }
 
+    // reloads the full user list every time the screen becomes visible
     @Override
     protected void onResume() {
         super.onResume();
-        DatabaseService.getInstance().getUserService().getAll(
+        databaseService.getUserService().getAll(
                 new DatabaseService.DatabaseCallback<List<User>>() {
                     @Override
                     public void onCompleted(List<User> users) {

@@ -4,7 +4,7 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
-public class Chat {
+public class Chat implements Idable{
     private String id;
     private String type;        // "donation" או "admin"
     private String donationId;  // רלוונטי רק לסוג donation

@@ -22,6 +22,7 @@ import com.example.secondstoryproject.models.IsraelCity;
 import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.views.CityInfoWindow;
 
+// Full screen interactive map — shows donation counts per city with tappable markers.
 public class FullMapActivity extends BaseActivity {
 
     private MapView fullMap;
@@ -44,10 +45,12 @@ public class FullMapActivity extends BaseActivity {
 
         fullMap = findViewById(R.id.fullMap);
         fullMap.setTileSource(TileSourceFactory.MAPNIK);
+        // enables pinch-to-zoom and drag — unlike the mini map
         fullMap.setMultiTouchControls(true);
         fullMap.getController().setZoom(8.0);
         fullMap.getController().setCenter(new GeoPoint(31.5, 34.8));
 
+        // closes any open marker info window when the user taps anywhere on the map
         fullMap.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 InfoWindow.closeAllInfoWindowsOn(fullMap);
@@ -57,9 +60,11 @@ public class FullMapActivity extends BaseActivity {
 
         AddAllMarkers();
 
+        // closes this screen and returns to MainActivity
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
+    // fetches donation counts per city and places a tappable marker for each city
     public void AddAllMarkers() {
         fullMap.getOverlays().clear();
 
@@ -71,11 +76,13 @@ public class FullMapActivity extends BaseActivity {
                                 IsraelCity[] cities = IsraelCity.values();
                                 for (IsraelCity city : cities) {
                                     String cityName = city.getHebrewName();
+                                    // defaults to 0 if the city has no donations
                                     int count = cityCountMap.containsKey(cityName)
                                             ? cityCountMap.get(cityName) : 0;
                                     addCityMarker(cityName, city.getLatitude(),
                                             city.getLongitude(), count);
                                 }
+                                // redraws the map on the UI thread after all markers are added
                                 runOnUiThread(() -> fullMap.invalidate());
                             }
 
@@ -84,11 +91,13 @@ public class FullMapActivity extends BaseActivity {
                         });
     }
 
+    // places a marker on the map — tapping it closes other open windows and shows this city's info
     private void addCityMarker(String city, double lat, double lon, int count) {
         Marker marker = new Marker(fullMap);
         marker.setPosition(new GeoPoint(lat, lon));
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 
+        // custom info window that shows the city name and donation count in a styled popup
         CityInfoWindow infoWindow = new CityInfoWindow(fullMap, city, count);
         marker.setInfoWindow(infoWindow);
 
@@ -101,6 +110,8 @@ public class FullMapActivity extends BaseActivity {
         fullMap.getOverlays().add(marker);
     }
 
+    // required by the map library — must be called to resume map rendering when returning to the screen
     @Override public void onResume() { super.onResume(); fullMap.onResume(); }
+    // required by the map library — must be called to pause map rendering when leaving the screen
     @Override public void onPause() { super.onPause(); fullMap.onPause(); }
 }

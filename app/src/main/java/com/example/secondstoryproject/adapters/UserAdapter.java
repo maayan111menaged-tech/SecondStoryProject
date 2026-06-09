@@ -254,7 +254,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>  {
      * Adds a new user to the list.
      */
     public void addUser(User user) {
-        fullUserList.add(user);   // כדי שהפילטר יעבוד
+        fullUserList.add(user);
         userList.add(user);
         notifyItemInserted(userList.size() - 1);
     }

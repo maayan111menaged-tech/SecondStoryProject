@@ -15,10 +15,13 @@ import com.example.secondstoryproject.R;
 import com.example.secondstoryproject.models.User;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
+// Splash screen — shown on app launch for 3 seconds, then navigates to the correct screen.
+// No drawer or bottom nav needed here.
+
 public class SplashActivity extends BaseActivity {
     @Override
     protected boolean hasSideMenu() {
-        return false; // לא צריך Drawer
+        return false;
     }
     @Override
     protected boolean hasBottomMenu(){ return false; }
@@ -34,18 +37,22 @@ public class SplashActivity extends BaseActivity {
             return insets;
         });
 
+        // waits 3 seconds, then navigates to the correct screen based on login state
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (SharedPreferencesUtil.isUserLoggedIn(SplashActivity.this)) {
                     User currentUser = SharedPreferencesUtil.getUser(SplashActivity.this);
+                    // sends admin to AdminMainActivity, regular user to MainActivity
                     Class<?> targetActivity = currentUser.isAdmin()
                             ? AdminMainActivity.class
                             : MainActivity.class;
                     startActivity(new Intent(SplashActivity.this, targetActivity));
                 } else {
+                    // no logged-in user — go to landing screen
                     startActivity(new Intent(SplashActivity.this, LandingActivity.class));
                 }
+                // closes SplashActivity so the user can't navigate back to it
                 finish();
             }
         }, 3000);

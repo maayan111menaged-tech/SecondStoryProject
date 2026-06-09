@@ -19,8 +19,11 @@ import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
 import java.util.List;
 
+// Chat list screen — displays all conversations for the current user or admin.
+// Shows an empty state when no chats exist, sorted by most recent message.
 public class ChatsListActivity extends BaseActivity {
 
+    // highlights the chat icon in the bottom navigation bar
     @Override
     protected int getSelectedBottomNavItem() {
         return R.id.menu_chat;
@@ -44,12 +47,14 @@ public class ChatsListActivity extends BaseActivity {
         rvChats.setAdapter(chatListAdapter);
     }
 
+    // reloads chats every time the screen becomes visible to reflect new messages
     @Override
     protected void onResume() {
         super.onResume();
         loadChats();
     }
 
+    // fetches chats from the DB — all admin chats for admins, user-specific chats otherwise
     private void loadChats() {
         User currentUser = SharedPreferencesUtil.getUser(this);
         if (currentUser == null) return;
@@ -58,10 +63,12 @@ public class ChatsListActivity extends BaseActivity {
                 new IDatabaseService.DatabaseCallback<List<Chat>>() {
                     @Override
                     public void onCompleted(List<Chat> chats) {
+                        // sorts chats so the most recently active conversation appears first
                         chats.sort((a, b) ->
                                 Long.compare(b.getLastTimestamp(), a.getLastTimestamp()));
                         runOnUiThread(() -> {
                             chatListAdapter.setChats(chats);
+                            // toggles between the list and the empty state view
                             if (chats.isEmpty()) {
                                 rvChats.setVisibility(View.GONE);
                                 layoutEmpty.setVisibility(View.VISIBLE);
@@ -80,13 +87,14 @@ public class ChatsListActivity extends BaseActivity {
                 };
 
         if (currentUser.isAdmin()) {
-            DatabaseService.getInstance().getChatService().getAllAdminChats(callback);
+            databaseService.getChatService().getAllAdminChats(callback);
         } else {
-            DatabaseService.getInstance().getChatService()
+            databaseService.getChatService()
                     .getUserChats(currentUser.getId(), callback);
         }
     }
 
+    // opens the full chat screen and passes the chat ID, other user's name and ID
     private void openChat(Chat chat) {
         android.util.Log.d("ChatDebug", "chat.getOtherUserId()=" + chat.getOtherUserId());
 

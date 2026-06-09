@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// Admin donations management screen — shows all donations in the system with full filtering
+// Supports search, multi-status filter, category, and city. Can be launched with a pre-set status filter
 public class DonationsListActivity extends BaseActivity {
 
     private static final String TAG = "DonationsListActivity";
@@ -47,6 +49,7 @@ public class DonationsListActivity extends BaseActivity {
     private ProgressBar progressBar;
 
     private String searchQuery = "";
+    // supports selecting multiple statuses simultaneously
     private Set<DonationStatus> statusFilter = new HashSet<>();
     private DonationCategory categoryFilter = null;
     private String cityFilter = null;
@@ -79,7 +82,7 @@ public class DonationsListActivity extends BaseActivity {
         });
         recyclerView.setAdapter(donationAdapter);
 
-        //  עדכון ספירה + showList/showEmpty אחרי כל פילטור
+        // updates the count label and toggles empty/list state after every filter
         donationAdapter.setOnFilterListener(count -> {
             tvDonationCount.setText("סה״כ: " + count);
             if (count == 0) showEmpty();
@@ -93,7 +96,7 @@ public class DonationsListActivity extends BaseActivity {
         setupCityFilter();
         setupClearFilters();
 
-        // פתיחה עם סטטוס מוגדר מראש
+        // if launched from another screen with a status pre-selected, apply it immediately
         String statusFromMain = getIntent().getStringExtra("FILTER_STATUS");
         if (statusFromMain != null) {
             DonationStatus status = DonationStatus.fromString(statusFromMain);
@@ -104,6 +107,7 @@ public class DonationsListActivity extends BaseActivity {
         }
     }
 
+    // toggles the filter panel visibility on button click
     private void setupToggleFilters() {
         btnToggle.setOnClickListener(v -> {
             filtersVisible = !filtersVisible;
@@ -111,6 +115,7 @@ public class DonationsListActivity extends BaseActivity {
         });
     }
 
+    // filters donations by name as the admin types
     private void setupSearchFilter() {
         EditText etSearch = findViewById(R.id.et_search_donation);
         etSearch.addTextChangedListener(new android.text.TextWatcher() {
@@ -124,6 +129,7 @@ public class DonationsListActivity extends BaseActivity {
         });
     }
 
+    // opens a multi-choice dialog letting the admin select one or more statuses to filter by
     private void setupStatusFilter() {
         DonationStatus[] allStatuses = DonationStatus.values();
         String[] statusNames = new String[allStatuses.length];
@@ -145,6 +151,7 @@ public class DonationsListActivity extends BaseActivity {
                         for (int i = 0; i < allStatuses.length; i++) {
                             if (checkedItems[i]) statusFilter.add(allStatuses[i]);
                         }
+                        // updates button label to reflect how many statuses are selected
                         btnStatus.setText(statusFilter.isEmpty()
                                 ? "סטטוס: הכל"
                                 : "סטטוס (" + statusFilter.size() + ")");
@@ -155,6 +162,7 @@ public class DonationsListActivity extends BaseActivity {
         });
     }
 
+    // dropdown for filtering by donation category
     private void setupCategoryFilter() {
         AutoCompleteTextView spinnerCategory = findViewById(R.id.spinner_category);
 
@@ -169,6 +177,7 @@ public class DonationsListActivity extends BaseActivity {
         spinnerCategory.setAdapter(adapter);
         spinnerCategory.setText(categoryNames.get(0), false);
 
+        // position 0 means "all categories" — any other position maps to a DonationCategory value
         spinnerCategory.setOnItemClickListener((parent, view, position, id) -> {
             categoryFilter = position == 0 ? null : DonationCategory.values()[position - 1];
             donationAdapter.filterAdmin(searchQuery, statusFilter, categoryFilter, cityFilter);
@@ -176,6 +185,7 @@ public class DonationsListActivity extends BaseActivity {
 
     }
 
+    // dropdown for filtering by city
     private void setupCityFilter() {
         AutoCompleteTextView spinnerCity = findViewById(R.id.spinner_city);
 
@@ -195,6 +205,7 @@ public class DonationsListActivity extends BaseActivity {
         });
     }
 
+    // resets all filters and re-applies an empty filter to show all donations
     private void setupClearFilters() {
         findViewById(R.id.btn_clear_filters).setOnClickListener(v -> {
             ((EditText) findViewById(R.id.et_search_donation)).setText("");
@@ -211,17 +222,18 @@ public class DonationsListActivity extends BaseActivity {
         });
     }
 
+    // fetches all donations from the DB and applies the current filters
     @Override
     protected void onResume() {
         super.onResume();
         showLoading();
-        DatabaseService.getInstance().getDonationService()
+        databaseService.getDonationService()
                 .getAll(new DatabaseService.DatabaseCallback<List<Donation>>() {
                     @Override
                     public void onCompleted(List<Donation> donations) {
                         runOnUiThread(() -> {
                             donationAdapter.setDonationList(donations);
-                            // ה-OnFilterListener יטפל ב-showList/showEmpty
+                            // OnFilterListener handles showList/showEmpty after filtering
                             donationAdapter.filterAdmin(searchQuery, statusFilter, categoryFilter, cityFilter);
                         });
                     }

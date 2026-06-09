@@ -174,7 +174,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     new IDatabaseService.DatabaseCallback<Boolean>() {
                                         @Override
                                         public void onCompleted(Boolean hasRated) {
-                                            // ✅ בדוק שה-ViewHolder עדיין שייך לאותה פוזיציה
                                             if (vh.getAdapterPosition() != currentPosition) return;
 
                                             vh.btnRate.post(() -> {

@@ -13,11 +13,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.secondstoryproject.R;
 
-
+// Landing screen — entry point for not logged users. No drawer or bottom nav needed.
 public class LandingActivity extends BaseActivity {
     @Override
-    protected boolean hasSideMenu() {
-        return false;   }
+    protected boolean hasSideMenu() { return false;   }
     @Override
     protected boolean hasBottomMenu(){ return false; }
 
@@ -35,6 +34,7 @@ public class LandingActivity extends BaseActivity {
         Button buttonLogin = findViewById(R.id.btn_Landing_toLogin);
         Button buttonSignin = findViewById(R.id.btn_Landing_toSignUp);
 
+        // navigates to the login screen
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,6 +42,8 @@ public class LandingActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
+
+        // navigates to the registration screen
         buttonSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

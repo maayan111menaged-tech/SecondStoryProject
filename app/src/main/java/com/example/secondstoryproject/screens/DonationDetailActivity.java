@@ -37,7 +37,7 @@ public class DonationDetailActivity extends BaseActivity {
 
     private ImageView ivDonation, ivStatus;
     private TextView tvName, tvDescription, tvStatus;
-    private Button btnApprove, btnReject, btnInterested;
+    private Button btnApprove, btnReject, btnInterested, btnCancelDonation;
     private LinearLayout layout_admin_actions, layout_interested;
     private Donation currentDonation;
     private User currentUser;
@@ -47,7 +47,7 @@ public class DonationDetailActivity extends BaseActivity {
     private LinearLayout layoutReceiverRow;
     private TextView tvRejectionReason, tvGiverName, tvReceiverName;
     private ImageView ivGiverAvatar, ivReceiverAvatar;
-    private CardView cardAdminActions, cardInterested;
+    private CardView cardAdminActions, cardInterested, cardCancel;
 
     private MaterialCardView cardDonationRating;
     private RatingBar ratingBarDonation;
@@ -90,6 +90,9 @@ public class DonationDetailActivity extends BaseActivity {
         ivReceiverAvatar      = findViewById(R.id.ivReceiverAvatar);
         cardAdminActions      = findViewById(R.id.cardAdminActions);
         cardInterested        = findViewById(R.id.cardInterested);
+
+        cardCancel         = findViewById(R.id.cardCancel);
+        btnCancelDonation  = findViewById(R.id.btnCancelDonation);
 
         cardDonationRating      = findViewById(R.id.cardDonationRating);
         ratingBarDonation       = findViewById(R.id.ratingBarDonation);
@@ -170,6 +173,14 @@ public class DonationDetailActivity extends BaseActivity {
         } else {
             cardInterested.setVisibility(View.GONE);
             layout_interested.setVisibility(View.GONE);
+        }
+
+        // ── כפתור ביטול — רק לתורם עצמו, רק כשהתרומה זמינה ──
+        if (isGiver && !isAdmin && status == DonationStatus.APPROVED_AVAILABLE) {
+            cardCancel.setVisibility(View.VISIBLE);
+            setupCancelButton();
+        } else {
+            cardCancel.setVisibility(View.GONE);
         }
 
         // ── שורת תורם — לכולם חוץ מהתורם עצמו ──
@@ -453,6 +464,20 @@ public class DonationDetailActivity extends BaseActivity {
                                                 "שגיאה בפתיחת הצאט", Toast.LENGTH_SHORT).show());
                             }
                         });
+    }
+
+    // מציג דיאלוג אישור לביטול התרומה, ואז מעדכן סטטוס ל-CANCELLED
+    private void setupCancelButton() {
+        btnCancelDonation.setOnClickListener(v ->
+                new androidx.appcompat.app.AlertDialog.Builder(this, R.style.DialogTheme)
+                        .setTitle("ביטול תרומה")
+                        .setMessage("את/ה בטוח/ה שאת/ה רוצה לבטל את התרומה \""
+                                + currentDonation.getName() + "\"?")
+                        .setPositiveButton("כן, בטל", (dialog, which) ->
+                                updateDonationStatus(DonationStatus.CANCELLED, null))
+                        .setNegativeButton("חזרה", null)
+                        .show()
+        );
     }
 
     private void loadDonationRating(Donation donation, boolean isClosed,

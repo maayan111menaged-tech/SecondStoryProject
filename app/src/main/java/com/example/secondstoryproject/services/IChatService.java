@@ -2,6 +2,7 @@ package com.example.secondstoryproject.services;
 
 import com.example.secondstoryproject.models.Chat;
 import com.example.secondstoryproject.models.Message;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
@@ -87,4 +88,9 @@ public interface IChatService {
                   IDatabaseService.DatabaseCallback<Void> callback);
 
     com.google.firebase.database.DatabaseReference getChatsRef();
+
+    void sendSystemMessage(String chatId, String text, boolean isRatingRequest,
+                           IDatabaseService.DatabaseCallback<Void> callback);
+
+    void getChatMetadata(String chatId, IDatabaseService.DatabaseCallback<DataSnapshot> callback);
 }

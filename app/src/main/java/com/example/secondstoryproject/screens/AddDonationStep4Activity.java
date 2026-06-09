@@ -17,7 +17,9 @@ import com.example.secondstoryproject.services.DatabaseService;
 import com.example.secondstoryproject.utils.ImageUtil;
 import com.example.secondstoryproject.utils.SharedPreferencesUtil;
 
+// Step 4 (final) of adding a donation — shows a preview and publishes to the DB on confirmation.
 public class AddDonationStep4Activity extends BaseActivity {
+
     private ImageView imgPreview;
     private TextView tvName, tvDescription, tvCity, tvCategory;
     private Button btnConfirm;
@@ -37,15 +39,14 @@ public class AddDonationStep4Activity extends BaseActivity {
         tvCategory = findViewById(R.id.tvPreviewCategory);
         btnConfirm = findViewById(R.id.btnConfirmDonation);
 
-        // --- מקבלים מה-Step3 ---
+        // receives all donation data collected across steps 1, 2 and 3
         donationName = getIntent().getStringExtra("donationName");
         description = getIntent().getStringExtra("description");
         categoryName = getIntent().getStringExtra("selected_category");
         imageBase64 = getIntent().getStringExtra("imageBase64");
         city = getIntent().getStringExtra("city");
 
-
-        // --- מציגים ---
+        // populates the preview fields so the user can review before confirming
         tvName.setText(donationName);
         tvDescription.setText(description);
         tvCity.setText(city);
@@ -60,9 +61,9 @@ public class AddDonationStep4Activity extends BaseActivity {
         btnConfirm.setOnClickListener(v -> publishDonation());
     }
 
-    /// add the food to the database
-    /// @see Donation
+    // creates the donation object and saves it to the DB with PENDING_APPROVAL status
     private void publishDonation() {
+        // disables the button to prevent double submission
         btnConfirm.setEnabled(false);
         btnConfirm.setText("מפרסם...");
 
@@ -81,18 +82,20 @@ public class AddDonationStep4Activity extends BaseActivity {
                 null
         );
 
-
         databaseService.getDonationService().create(donation, new DatabaseService.DatabaseCallback<Void>() {
             @Override
             public void onCompleted(Void object) {
                 Toast.makeText(AddDonationStep4Activity.this,
                         "התרומה פורסמה בהצלחה!", Toast.LENGTH_SHORT).show();
+                // sends an automatic admin message to notify the user their donation is pending
                 sendAutoAdminMessage(currentUserId,
                         "תרומה חדשה נשלחה לאישור ✨\n\n" +
                                 "שם: " + donationName + "\n" +
                                 "קטגוריה: " + categoryName + "\n" +
                                 "עיר: " + city + "\n\n" +
                                 "נעדכן אותך ברגע שהתרומה תאושר ותפורסם לציבור 🌸");
+
+                // clears the back stack so the user can't navigate back to the donation flow
                 Intent intent = new Intent(AddDonationStep4Activity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -101,6 +104,7 @@ public class AddDonationStep4Activity extends BaseActivity {
 
             @Override
             public void onFailed(Exception e) {
+                // re-enables the button so the user can try again
                 runOnUiThread(() -> {
                     btnConfirm.setEnabled(true);
                     btnConfirm.setText("פרסם את התרומה");
@@ -110,5 +114,4 @@ public class AddDonationStep4Activity extends BaseActivity {
             }
         });
     }
-
 }
