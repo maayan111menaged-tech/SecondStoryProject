@@ -1,6 +1,6 @@
 package com.example.secondstoryproject.models;
 
-public class Rate {
+public class Rate{
 
     /** המשתמש שמקבל את הדירוג — התורם */
     private String ratedUserId;
@@ -50,4 +50,6 @@ public class Rate {
 
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+
+
 }
